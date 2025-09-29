@@ -1,3 +1,4 @@
+
 //import Image from "next/image";
 
 "use client";
@@ -148,7 +149,7 @@ class Home extends Component{
         }}
         >
           <p style={{ margin: 0, fontSize: "20px", fontWeight: "bold", fontFamily: "'Playfair Display', serif" }}>
-          Hi! just messing around with different stuff on next.js. we can change this interface layout later 
+            Hi! just messing around with different stuff on next.js. we can change this interface layout later 
           </p>
 
         </div>
