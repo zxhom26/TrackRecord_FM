@@ -14,6 +14,9 @@ export const authOptions = {
     async jwt({ token, account }) {
       if (account) { // existing account
         token.accessToken = account.access_token; // store Spotify access token
+        console.log("JWT Callback - new token:", token);
+      } else {
+        console.log("JWT Callback - existing token:", token)
       }
       return token; // return token
     },
