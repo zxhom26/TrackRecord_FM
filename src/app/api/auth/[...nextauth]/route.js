@@ -23,6 +23,8 @@ export const authOptions = {
       return session;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET, // NextAuth secret for when we need to login
+  debug: true, // adding to log erros to Vercel console
 };
 
 const handler = NextAuth(authOptions); // NextAuth handler
