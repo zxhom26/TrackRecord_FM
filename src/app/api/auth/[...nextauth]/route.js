@@ -7,8 +7,7 @@ export const authOptions = {
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID, // client ID
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET, // client Secret
-      authorization:
-        "https://accounts.spotify.com/authorize?scope=user-top-read user-read-recently-played user-read-private",
+      authorization:"https://accounts.spotify.com/authorize?scope=user-read-email user-top-read user-read-recently-played user-read-private",
     }),
   ],
   callbacks: { // callbacks in place to modify the authentication session
