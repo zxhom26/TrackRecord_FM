@@ -1,8 +1,8 @@
 'use client'; // marking as a client component
 
 import AuthButton from '../components/AuthButton'; //importing our AuthButton component -- separating logic and UI
-import Link from 'next/link';
-import './login.css'; // import css for styling 
+//import Link from 'next/link';
+import '../login.css'; // import css for styling 
 
 export default function LoginPage() { // React functional component for login page
   return (
