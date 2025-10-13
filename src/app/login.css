@@ -42,3 +42,9 @@
     width: 24px;
     height: 24px;
 }
+
+/*fade animation*/
+.fade-out{
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
