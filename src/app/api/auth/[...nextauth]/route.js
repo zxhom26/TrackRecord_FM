@@ -12,21 +12,20 @@ export const authOptions = {
   ],
   callbacks: { // callbacks in place to modify the authentication session
     async jwt({ token, account, user, profile}) {
-      console.log("=== JWT Callback Called ===");
-      console.log("Account object:", account);
-      console.log("Token before modification:", token);
-      console.log("User object:", user);
-      console.log("Profile object:", profile);
+      //console.log("=== JWT Callback Called ===");
+      //console.log("Account object:", account);
+      //console.log("Token before modification:", token);
+     // console.log("User object:", user);
+      //console.log("Profile object:", profile);
 
       if (account) { // existing account
         token.accessToken = account.access_token; // store Spotify access token
         token.refreshToken = account.refresh_token;
         token.expiresAt = account.expires_at;
-        console.log("JWT Callback - new token:", token);
-      } else {
-        console.log("JWT Callback - existing token:", token)
-      }
-      console.log("Token after modification:", token);
+        //console.log("JWT Callback - new token:", token);
+      } //else {
+        //console.log("JWT Callback - existing token:", token)
+      //onsole.log("Token after modification:", token);
       return token; // return token
     },
     async session({ session, token }) { // send data to frontend
@@ -36,6 +35,18 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET, // NextAuth secret for when we need to login
   debug: true, // adding to log erros to Vercel console
+
+  cookies: {
+    sessionToken:{
+      name: "next-auth.session-token",
+      options:{
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+      },
+    },
+  },
 };
 
 const handler = NextAuth(authOptions); // NextAuth handler
