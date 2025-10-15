@@ -1,8 +1,5 @@
 
 
-//import Image from "next/image";
-// test change
-
 "use client";
 import React, { useState } from "react";
 
@@ -17,7 +14,7 @@ export default function Home() {
 
   const handlePost = () => {
     if (post.trim() !== "") {
-      setFeed([...feed, post]);
+      setFeed((prevFeed) => [...prevFeed, post]);
       setPost("");
     }
   };
@@ -40,7 +37,7 @@ export default function Home() {
         🎧 TrackRecord FM Dashboard
       </h1>
 
-      {/* Layout */}
+      {/* ===== Dashboard Grid ===== */}
       <div
         style={{
           display: "grid",
@@ -50,16 +47,13 @@ export default function Home() {
           maxWidth: "1200px",
         }}
       >
-        {/* Music Diary */}
-        <div
+        {/* 🎶 Music Diary */}
+        <section
           style={{
             background: "linear-gradient(135deg,#f0e8ff,#d7caff)",
             borderRadius: "20px",
             boxShadow: "0 6px 15px rgba(0,0,0,0.1)",
             padding: "1.5rem",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
           }}
         >
           <h3>🎶 Music Diary</h3>
@@ -91,10 +85,10 @@ export default function Home() {
           >
             💾 Save Mood
           </button>
-        </div>
+        </section>
 
-        {/* Analytics Dashboard (static visual mock) */}
-        <div
+        {/* 📊 Analytics Overview */}
+        <section
           style={{
             background: "linear-gradient(135deg,#e8faff,#d3ebff)",
             borderRadius: "20px",
@@ -106,7 +100,6 @@ export default function Home() {
           <div
             style={{
               height: "200px",
-              width: "100%",
               borderRadius: "15px",
               background:
                 "repeating-linear-gradient(90deg,#cae5ff 0px,#cae5ff 50px,#d8f3ff 50px,#d8f3ff 100px)",
@@ -126,24 +119,27 @@ export default function Home() {
                     "linear-gradient(180deg,#6a56c2,#9e8ce2,#c3b9f0)",
                   borderRadius: "8px",
                 }}
-              ></div>
+              />
             ))}
           </div>
-          <p style={{ textAlign: "center", marginTop: "0.5rem", fontWeight: 500 }}>
+          <p
+            style={{
+              textAlign: "center",
+              marginTop: "0.5rem",
+              fontWeight: 500,
+            }}
+          >
             Weekly engagement bars (mock visualization)
           </p>
-        </div>
+        </section>
 
-        {/* Social Feed */}
-        <div
+        {/* 💬 Social Feed */}
+        <section
           style={{
             background: "linear-gradient(135deg,#ffe9f0,#ffd0de)",
             borderRadius: "20px",
             boxShadow: "0 6px 15px rgba(0,0,0,0.1)",
             padding: "1.5rem",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
           }}
         >
           <h3>💬 Social Feed</h3>
@@ -176,7 +172,9 @@ export default function Home() {
             🚀 Post
           </button>
 
-          <div style={{ marginTop: "1rem", maxHeight: "150px", overflowY: "auto" }}>
+          <div
+            style={{ marginTop: "1rem", maxHeight: "150px", overflowY: "auto" }}
+          >
             {feed.map((item, i) => (
               <p
                 key={i}
@@ -192,8 +190,8 @@ export default function Home() {
               </p>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </main>
   );
-export default Home;
+}
