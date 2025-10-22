@@ -1,12 +1,44 @@
 
 
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react"; // token stuff 
+
 
 export default function Home() {
+  const { data: session } = useSession(); // Spotify session
+
+  // Local states
   const [mood, setMood] = useState("");
   const [post, setPost] = useState("");
   const [feed, setFeed] = useState<string[]>([]);
+
+  const [data, setData] = useState(""); // new useState to set up backend call -- FastAPI backend message
+  const [spotifyInfo, setSpotifyInfo] = useState<any>(null); // Spotify API Response
+
+  // useEffect will fetch FastAPI backend 
+  useEffect(() => {
+    fetch("https://track-record-fm-test.vercel.app/api/data") // "api/data" is a filler for now
+    .then((res) => res.json())
+    .then((json) => setData(json.message))
+    //.then((err) => console.error("Error fetching backend data:", err))
+  }, []);
+
+  // Send Spotify token to backend to call Spotify API
+  useEffect(() => {
+    if (session?.accessToken){
+      fetch("https://track-record-fm-test.vercel.app/api/spotify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: session.accessToken }),
+})
+      .then((res) => res.json())
+      .then((json) => setSpotifyInfo(json))
+      .catch((err) => console.error("Error calling backend Spotify route:", err));
+
+    }
+  }, [session]);
+
 
   const handleMoodSave = () => {
     alert(`Mood saved: ${mood || "neutral"}`);
@@ -36,6 +68,32 @@ export default function Home() {
       <h1 style={{ marginBottom: "2rem", fontSize: "2rem", fontWeight: 700 }}>
         🎧 TrackRecord FM Dashboard
       </h1>
+
+      {/* Backend message from FastAPI to check if data fetching is  */}
+      <p style={{ color: "#7b72a3", marginBottom: "2rem", fontWeight: 500}}>
+        {data ? data: "Loading backend data..."}
+      </p>
+
+      {/* Spotify API response */}
+{spotifyInfo && (
+  <section
+    style={{
+      background: "linear-gradient(135deg,#f0f0f0,#dcdcdc)",
+      borderRadius: "15px",
+      padding: "1rem",
+      marginBottom: "2rem",
+      width: "90%",
+      maxWidth: "1200px",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+      fontFamily: "monospace",
+      overflowX: "auto",
+    }}
+  >
+    <h3>🎵 Spotify API Response</h3>
+    <pre>{JSON.stringify(spotifyInfo, null, 2)}</pre>
+  </section>
+)}
+
 
       {/* ===== Dashboard Grid ===== */}
       <div
