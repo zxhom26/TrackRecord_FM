@@ -11,6 +11,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.post("/api/token")
+async def get_token(request: Request):
+    data = await request.json()
+    token = data.get('accessToken')
+    return token 
+
 @app.get("/api/data")
 def get_data():
+
+    api = SpotifyAPI() # client id param
+    proxy = SpotifyAPIProxy(api, token)
+
     return {"message": "Hello from Python backend!"}
+
+'''
+top artists
+top songs
+minutes (daily, weekly, monthly)
+genre
+
+'''
