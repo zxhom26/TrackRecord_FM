@@ -14,6 +14,7 @@ class SpotifyAPIProxy(APIInterface):
         self.cache = {}
         self.base_url = "https://api.spotify.com/v1"
         self.access_token = access_token
+        pass
     
     def fetch_api(self, endpoint, access_token=self.access_token, method="GET", data=None, params=None) -> Dict[str, Any]:
         """
@@ -64,6 +65,7 @@ class SpotifyAPIProxy(APIInterface):
 class SpotifyAPI(APIInterface):
     def __init__(self):
         # self.client_id = client_id
+        pass
 
     def fetch_api(self, url, headers, method="GET", data=None, params=None) -> Optional[requests.Response]:
         """
