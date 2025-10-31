@@ -39,6 +39,7 @@ def get_data():
 
     return {"message": "Hello from Python backend!"}
 
+handler = Mangum(app)
 '''
 top artists
 top songs
