@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from spotify_api import SpotifyAPI, SpotifyAPIProxy
+from backend.spotify_api import SpotifyAPI, SpotifyAPIProxy
 
 # Temporary token storage (for development)
 user_tokens = {}
