@@ -19,6 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ✅ Home
+@app.get("/")
+def root():
+    return {"message": "✅ TrackRecord.fm API is live!"}
+
 # ✅ Simple test route
 @app.get("/api/data")
 def get_data():
