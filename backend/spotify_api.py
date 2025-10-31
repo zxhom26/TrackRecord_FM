@@ -16,7 +16,7 @@ class SpotifyAPIProxy(APIInterface):
         self.access_token = access_token
         pass
     
-    def fetch_api(self, endpoint, access_token=self.access_token, method="GET", data=None, params=None) -> Dict[str, Any]:
+    def fetch_api(self, endpoint, access_token=None, method="GET", data=None, params=None) -> Dict[str, Any]:
         """
         Calls the Spotify Web API with OAuth access token.
         :param endpoint: Spotify API endpoint (e.g. "/v1/me" or "/v1/playlists/{id}")
@@ -27,6 +27,8 @@ class SpotifyAPIProxy(APIInterface):
         :return: Parsed JSON response
         """
         url = f"{self.base_url}/{endpoint}"
+        if access_token is None:
+            access_token = self.access_token
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
