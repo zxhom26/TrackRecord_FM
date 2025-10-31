@@ -2,47 +2,52 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from spotify_api import SpotifyAPI, SpotifyAPIProxy
 
-user_tokens = {} # temp token storage for dev
+# Temporary token storage (for development)
+user_tokens = {}
 
 app = FastAPI()
+
+# ✅ Add correct CORS setup
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["track-record-fm-test.vercel.app",
-                    "http://localhost:3000"],  # your Next.js frontend
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=[
+        "https://track-record-fm-test.vercel.app",  # production frontend
+        "http://localhost:3000",                    # local development
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
+# ✅ Simple test route
+@app.get("/api/data")
+def get_data():
+    return {"message": "Hello from FastAPI backend!"}
+
+# ✅ Receive and store access token
 @app.post("/api/token")
 async def get_token(request: Request):
-    """
-    Receives access token from front end and stores it for api calls
-    """
-    data = await request.json()
-    token = data.get('accessToken')
-    if not token:
-        return {"error": "token not found"}
-    user_tokens['active'] = token
-    return {"error": "token not found"}
+    data = await request.json()
+    token = data.get("accessToken")
+    if not token:
+        return {"error": "token not found"}
+    user_tokens["active"] = token
+    return {"message": "token stored successfully"}
 
-@app.get("/api/data") # need to specify diff endpoints
-def get_data():
-    # token = user_tokens['active']
-    # if not token:
-    #     return {"error": "token not found. cannot make api calls"}
+# ✅ Spotify route example
+@app.post("/api/spotify")
+async def call_spotify(request: Request):
+    data = await request.json()
+    token = data.get("token")
 
-    # api = SpotifyAPI()
-    # proxy = SpotifyAPIProxy(api, token)
+    if not token:
+        return {"error": "token not found"}
 
-    # data = proxy.fetch_api(endpoint="me/top/tracks") # default method GET
+    # Example call using your wrapper
+    api = SpotifyAPI()
+    proxy = SpotifyAPIProxy(api, token)
 
-    return {"message": "Hello from Python backend!"}
+    # Example: fetch top tracks
+    response = proxy.fetch_api(endpoint="me/top/tracks")
 
-handler = Mangum(app)
-'''
-top artists
-top songs
-minutes (daily, weekly, monthly)
-genre
-'''
+    return {"spotify_data": response}
