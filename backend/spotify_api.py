@@ -9,12 +9,13 @@ class APIInterface(ABC):
         pass
 
 class SpotifyAPIProxy(APIInterface):
-    def __init__(self, api: APIInterface):
+    def __init__(self, api: APIInterface, access_token):
         self.api = api
         self.cache = {}
         self.base_url = "https://api.spotify.com/v1"
+        self.access_token = access_token
     
-    def fetch_api(self, endpoint, access_token, method="GET", data=None, params=None) -> Dict[str, Any]:
+    def fetch_api(self, endpoint, access_token=self.access_token, method="GET", data=None, params=None) -> Dict[str, Any]:
         """
         Calls the Spotify Web API with OAuth access token.
         :param endpoint: Spotify API endpoint (e.g. "/v1/me" or "/v1/playlists/{id}")
@@ -61,8 +62,8 @@ class SpotifyAPIProxy(APIInterface):
     
 
 class SpotifyAPI(APIInterface):
-    def __init__(self, client_id):
-        self.client_id = client_id
+    def __init__(self):
+        # self.client_id = client_id
 
     def fetch_api(self, url, headers, method="GET", data=None, params=None) -> Optional[requests.Response]:
         """
