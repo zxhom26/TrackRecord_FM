@@ -9,7 +9,7 @@ class TestSpotifyAPI(unittest.TestCase):
     def setUp(self):
         self.api = SpotifyAPI()
 
-    @patch('spotify_api.requests.get')
+    @patch('spotify_api.requests.requests')
     def test_fetch_api(self, mock_get):
         # mock get is what patches the real get
         mock_response = MagicMock() # magic mock creates a fake object
@@ -31,7 +31,7 @@ class TestSpotifyAPIProxy(unittest.TestCase):
         self.api = SpotifyAPI()
         self.proxy = SpotifyAPIProxy(api, 'fake_token'):
     
-    @patch('spotify_api.requests.get')
+    @patch('spotify_api.requests.requests')
     def test_fetch_api(self, mock_get):
         # mock get is what patches the real get
         mock_response = MagicMock() # magic mock creates a fake object
