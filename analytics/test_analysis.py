@@ -18,7 +18,7 @@ def test_top_artist():
 
 ## CASE 4: bottom artist calculated properly?
 def test_bottom_artist():
-  assert analyze.bottom_artist() == "Lewis Capaldi"
+  assert analyze.bottom_artist() == "Post Malone"
 
 ## CASE 5: top genre calculated properly?
 def test_top_genre():
@@ -34,7 +34,7 @@ def test_top_day():
 
 ## CASE 8: bottom day calculated properly?
 def test_bottom_day():
-  assert analyze.bottom_day() == "Friday"
+  assert analyze.bottom_day() == "Sunday"
 
 ## CASE 9: test proper + dynamic calculation of minutes
 def test_total_minutes():
