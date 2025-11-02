@@ -1,0 +1,74 @@
+[
+  {
+    "track_name": "Blinding Lights",
+    "artist": "The Weeknd",
+    "duration_s": 200,
+    "genre": "R&B",
+    "day_of_week": "Monday",
+    "minutes_listened": 3.33
+  },
+  {
+    "track_name": "Shape of You",
+    "artist": "Ed Sheeran",
+    "duration_s": 233,
+    "genre": "Pop",
+    "day_of_week": "Tuesday",
+    "minutes_listened": 3.88
+  },
+  {
+    "track_name": "Starboy",
+    "artist": "The Weeknd",
+    "duration_s": 230,
+    "genre": "R&B",
+    "day_of_week": "Wednesday",
+    "minutes_listened": 3.83
+  },
+  {
+    "track_name": "Someone You Loved",
+    "artist": "Lewis Capaldi",
+    "duration_s": 182,
+    "genre": "Classical",
+    "day_of_week": "Thursday",
+    "minutes_listened": 3.03
+  },
+  {
+    "track_name": "As It Was",
+    "artist": "Harry Styles",
+    "duration_s": 167,
+    "genre": "Pop",
+    "day_of_week": "Friday",
+    "minutes_listened": 2.75
+  },
+  {
+    "track_name": "Sweater Weather",
+    "artist": "The Neighbourhood",
+    "duration_s": 240,
+    "genre": "Alternative",
+    "day_of_week": "Saturday",
+    "minutes_listened": 4.0
+  },
+  {
+    "track_name": "Sunflower",
+    "artist": "Post Malone",
+    "duration_s": 158,
+    "genre": "Pop",
+    "day_of_week": "Sunday",
+    "minutes_listened": 2.7
+  },
+  {
+    "track_name": "One Dance",
+    "artist": "Drake",
+    "duration_s": 173,
+    "genre": "R&B",
+    "day_of_week": "Monday",
+    "minutes_listened": 2.88
+  },
+  {
+    "track_name": "Perfect",
+    "artist": "Ed Sheeran",
+    "duration_s": 263,
+    "genre": "Pop",
+    "day_of_week": "Tuesday",
+    "minutes_listened": 2.34
+  }
+]
