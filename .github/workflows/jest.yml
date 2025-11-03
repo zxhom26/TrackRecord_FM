@@ -22,9 +22,11 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      #  Only install inside src/app (where package.json actually lives)
+      - name: Install dependencies in src/app
+        working-directory: src/app
         run: npm install
 
-      - name: Run Jest tests from src/app
+      - name: Run Jest tests
         working-directory: src/app
         run: npx jest --config ./jest.config.cjs --verbose
