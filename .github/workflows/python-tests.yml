@@ -2,9 +2,9 @@ name: Python Tests - Analytics Only
 
 on:
   push:
-    branches: [ TRF-35-Create-framework-for-basic-music-analytics ]
+    branches: [ TRF-38-Create-framework-for-basic-music-analytics ]
   pull_request:
-    branches: [ TRF-35-Create-framework-for-basic-music-analytics ]
+    branches: [ TRF-38-Create-framework-for-basic-music-analytics ]
 
 jobs:
   run-tests:
