@@ -1,7 +1,7 @@
 // __tests__/utils.test.js
 // Jest test suite for mood tracking and feed management utility functions
 
-import {
+const {
   handleMoodSave,
   handlePost,
   clearFeed,
@@ -12,7 +12,7 @@ import {
   postExists,
   formatMood,
   generateMoodSummary,
-} from "../utils"; // 
+} = require("../../utils");// 
 
 describe("Utility Functions", () => {
   //  TEST 1: handleMoodSave()
