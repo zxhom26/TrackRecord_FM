@@ -25,12 +25,12 @@ class TestSpotifyAPI(unittest.TestCase):
 
         # Test API call failure catch --> returns None if status code != (200,300)
         mock_response.status_code = 404
-        status_check = self.api.fetch_api('fake_endpoint')
+        status_check = self.api.fetch_api('fake_endpoint', 'fake_header')
         self.assertIsNone(status_check)
 
         # Test cached conditional response --> returns Response object
         mock_response.status_code = 304
-        conditional_call = self.api.fetch_api('fake_endpoint')
+        conditional_call = self.api.fetch_api('fake_endpoint', 'fake_header')
         self.assertEqual(conditional_call.status_code, 304)
 
 
