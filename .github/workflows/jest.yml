@@ -23,7 +23,8 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Run tests
+      - name: Run Jest tests from src/app
+        working-directory: src/app
         run: npx jest --config ./jest.config.cjs --verbose
