@@ -52,7 +52,7 @@ class TestSpotifyAPIProxy(unittest.TestCase):
         self.assertEqual(result1, {"data": "fresh"})
         cache = self.proxy.get_cache()
         self.assertIn("https://api.spotify.com/v1/fake", cache)
-        self.assertEqual(cache["https://api.spotify.com/v1/me"]["ETag"], "12345")
+        self.assertEqual(cache["https://api.spotify.com/v1/fake"]["ETag"], "12345")
 
         # Check cached result
         cached_response = MagicMock()
@@ -75,6 +75,7 @@ class TestSpotifyAPIProxy(unittest.TestCase):
         result3 = self.proxy.fetch_api("fake")
         self.assertEqual(result3, {})  # proxy returns {} on failure
 
+    @patch("spotify_api.requests.request")
     def test_get_cache(self):
         # Populate the cache and check its stored properly
         first_response = MagicMock()
