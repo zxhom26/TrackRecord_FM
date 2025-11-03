@@ -45,7 +45,12 @@ class TestMusicAnalytics(unittest.TestCase):
     def test_total_minutes(self):
         total = self.analyze.df["minutes_listened"].astype(float).sum()
         self.assertAlmostEqual(self.analyze.total_minutes(), total, places=2)
-
+    
+    # CASE 10: test average minutes 
+    def test_average_minutes_the_weeknd(self):
+        expected_avg = round((3.33 + 3.83) / 2, 2)
+        defined_avg = self.analyze.average_minutes_by_artist().loc["The Weeknd"]
+        self.assertAlmostEqual(defined_avg, expected_avg, places=2)
 
 if __name__ == "__main__":
     unittest.main()
