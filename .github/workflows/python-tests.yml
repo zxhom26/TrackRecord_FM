@@ -1,0 +1,38 @@
+name: Python Tests
+
+on:
+  push:
+    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render ]
+  pull_request:
+    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render ]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          # Install backend dependencies if backend/requirements.txt exists
+          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+          # Install root-level dependencies if requirements.txt exists
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run all tests
+        run: |
+          source venv/bin/activate
+          # Discover and run all tests anywhere in the repo matching test_*.py
+          python -m unittest discover -s backend -p "test_*.py"
+
+

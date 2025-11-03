@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from backend.spotify_api import SpotifyAPI, SpotifyAPIProxy
+from spotify_api import SpotifyAPI, SpotifyAPIProxy
 
 # Temporary token storage (for development)
 user_tokens = {}
@@ -11,7 +11,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://track-record-fm-test.vercel.app",  # production frontend
+        "https://trackrecord-fm-ui.onrender.com",  # production frontend
         "http://localhost:3000",                    # local development
     ],
     allow_credentials=True,
