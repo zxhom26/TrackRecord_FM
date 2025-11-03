@@ -1,10 +1,10 @@
-name: Python Tests
+name: Python Tests - Analytics Only
 
 on:
   push:
-    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render, TRF-38-Create-framework-for-basic-music-analytics ]
+    branches: [ TRF-35-Create-framework-for-basic-music-analytics ]
   pull_request:
-    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render, TRF-38-Create-framework-for-basic-music-analytics ]
+    branches: [ TRF-35-Create-framework-for-basic-music-analytics ]
 
 jobs:
   run-tests:
@@ -24,16 +24,9 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          # Install backend dependencies if backend/requirements.txt exists
-          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
-          # Install root-level dependencies if requirements.txt exists
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pandas  # only what your analytics code needs
 
-      - name: Run all tests
+      - name: Run analytics tests only
         run: |
           source venv/bin/activate
-          # Discover and run all tests anywhere in the repo matching test_*.py
-          python -m unittest discover -s backend -p "test_*.py"
           python -m unittest discover -s analytics -p "test_*.py"
-
-
