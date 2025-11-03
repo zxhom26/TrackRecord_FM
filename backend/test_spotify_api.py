@@ -29,7 +29,7 @@ class TestSpotifyAPI(unittest.TestCase):
 class TestSpotifyAPIProxy(unittest.TestCase):
     def setUp(self):
         self.api = SpotifyAPI()
-        self.proxy = SpotifyAPIProxy(api, 'fake_token'):
+        self.proxy = SpotifyAPIProxy(api, 'fake_token')
     
     @patch('spotify_api.requests.requests')
     def test_fetch_api(self, mock_get):
