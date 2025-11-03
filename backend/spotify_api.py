@@ -62,6 +62,9 @@ class SpotifyAPIProxy(APIInterface):
             print(f"API cache search failed: {e}")
             return {} # return empty dict on failure
 
+    def get_cache(self):
+        return self.cache.copy()
+
     
 
 class SpotifyAPI(APIInterface):
