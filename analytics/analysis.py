@@ -7,6 +7,7 @@ class MusicAnalytics:
         self.df = pd.read_json(filepath)
         self.clean_data()
 
+
     # ---------------- CLEANING DATA ----------------
     def clean_data(self):
         # Convert string columns to str and strip whitespace
@@ -22,7 +23,8 @@ class MusicAnalytics:
         # Fill missing numeric values with 0
         self.df[["duration_s", "minutes_listened"]] = self.df[["duration_s", "minutes_listened"]].fillna(0)
 
-    # ---------------- ANALYTICS FUNCTIONS ----------------
+
+    # ---------------- MINUTES ----------------
     def total_minutes(self):
         return round(self.df["minutes_listened"].sum(), 2)
 
@@ -35,23 +37,41 @@ class MusicAnalytics:
     def minutes_by_day(self):
         return self.df.groupby("day_of_week")["minutes_listened"].sum().sort_values(ascending=False)
 
+
+     # ---------------- ARTIST ----------------
+
     def top_artist(self):
         return self.minutes_by_artist().idxmax()
 
     def bottom_artist(self):
         return self.minutes_by_artist().idxmin()
 
+
+    # ---------------- GENRE ----------------
+
     def top_genre(self):
         return self.minutes_by_genre().idxmax()
 
     def bottom_genre(self):
         return self.minutes_by_genre().idxmin()
+    
+     # ---------------- DAY ----------------
 
     def top_day(self):
         return self.minutes_by_day().idxmax()
 
     def bottom_day(self):
         return self.minutes_by_day().idxmin()
+
+    # ---------------- AVERAGE MINUTES BY CATEGORY ----------------
+    def average_minutes(self):
+        return round(self.df["minutes_listened"].mean(), 2)
+
+    def average_minutes_by_artist(self):
+        return self.df.groupby("artist")["minutes_listened"].mean().round(2)
+
+    def average_minutes_by_genre(self):
+        return self.df.groupby("genre")["minutes_listened"].mean().round(2)
 
     # ---------------- SUMMARY REPORT ----------------
     def summary_report(self):
@@ -68,7 +88,7 @@ class MusicAnalytics:
     # ---------------- VIEW LAYER ----------------
     def print_summary(self):
         report = self.summary_report()
-        print("🎧 Spotify Listening Summary:")
+        print("Spotify Listening Summary:")
         for k, v in report.items():
             print(f"{k}: {v}")
 
