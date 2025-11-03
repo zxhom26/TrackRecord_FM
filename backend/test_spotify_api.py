@@ -25,12 +25,12 @@ class TestSpotifyAPI(unittest.TestCase):
 
         # Test API call failure catch --> returns None if status code != (200,300)
         mock_response.status_code = 404
-        status_check = self.proxy.fetch_api('fake_endpoint')
+        status_check = self.api.fetch_api('fake_endpoint')
         self.assertIsNone(status_check)
 
         # Test cached conditional response --> returns Response object
         mock_response.status_code = 304
-        conditional_call = self.proxy.fetch_api('fake_endpoint')
+        conditional_call = self.api.fetch_api('fake_endpoint')
         self.assertEqual(conditional_call.status_code, 304)
 
 
@@ -76,7 +76,7 @@ class TestSpotifyAPIProxy(unittest.TestCase):
         self.assertEqual(result3, {})  # proxy returns {} on failure
 
     @patch("spotify_api.requests.request")
-    def test_get_cache(self):
+    def test_get_cache(self, mock_request):
         # Populate the cache and check its stored properly
         first_response = MagicMock()
         first_response.status_code = 200
