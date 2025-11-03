@@ -2,9 +2,9 @@ name: Python Tests
 
 on:
   push:
-    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render ]
+    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render, TRF-38-Create-framework-for-basic-music-analytics ]
   pull_request:
-    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render ]
+    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render, TRF-38-Create-framework-for-basic-music-analytics ]
 
 jobs:
   run-tests:
@@ -34,5 +34,6 @@ jobs:
           source venv/bin/activate
           # Discover and run all tests anywhere in the repo matching test_*.py
           python -m unittest discover -s backend -p "test_*.py"
+          python -m unittest discover -s analytics -p "test_*.py"
 
 
