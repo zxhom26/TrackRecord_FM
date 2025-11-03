@@ -45,3 +45,31 @@ export function analyzeMood(mood) {
 
   return "neutral";
 }
+
+// --- 7. Get feed length ---
+export function getFeedLength(feed) {
+  return Array.isArray(feed) ? feed.length : 0;
+}
+
+// --- 8. Check if a post already exists in feed ---
+export function postExists(feed, post) {
+  if (!Array.isArray(feed)) return false;
+  return feed.includes(post);
+}
+
+// --- 9. Format mood string (capitalize first letter) ---
+export function formatMood(mood) {
+  if (!mood || typeof mood !== "string") return "Neutral";
+  return mood.charAt(0).toUpperCase() + mood.slice(1).toLowerCase();
+}
+
+// --- 10. Generate mood summary ---
+export function generateMoodSummary(moods) {
+  if (!Array.isArray(moods) || moods.length === 0) return "No moods recorded";
+  const positives = moods.filter((m) => analyzeMood(m) === "positive").length;
+  const negatives = moods.filter((m) => analyzeMood(m) === "negative").length;
+
+  if (positives > negatives) return "Overall positive trend";
+  if (negatives > positives) return "Overall negative trend";
+  return "Mixed mood pattern";
+}
