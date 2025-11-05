@@ -1,4 +1,3 @@
-import '@babel/register';
 module.exports = {
     testEnvironment: 'jsdom',
     transform: {
