@@ -1,13 +1,13 @@
 module.exports = {
-  rootDir: '.',
-  testEnvironment: 'jsdom',
+  rootDir: ".",
+  testEnvironment: "jsdom",
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
+    "^.+\\.(ts|tsx|js|jsx)$": "ts-jest", // replace babel-jest
   },
-  transformIgnorePatterns: ['/node_modules/'],
+  transformIgnorePatterns: ["/node_modules/"],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1',
+    "^@/(.*)$": "<rootDir>/$1",
   },
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
-  testMatch: ['<rootDir>/app/_tests_/**/*.test.js'],
+  testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
+  testMatch: ["<rootDir>/app/_tests_/**/*.test.js"], // adjust for .ts if needed
 };
