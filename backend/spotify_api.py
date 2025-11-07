@@ -9,11 +9,11 @@ class APIInterface(ABC):
         pass
 
 class SpotifyAPIProxy(APIInterface):
-    def __init__(self, api: APIInterface, access_token):
+    def __init__(self, api: APIInterface):
         self.api = api
         self.cache = {}
         self.base_url = "https://api.spotify.com/v1"
-        self.access_token = access_token
+        self.access_token = self.api.get_token()
         pass
     
     def fetch_api(self, endpoint, access_token=None, method="GET", data=None, params=None) -> Dict[str, Any]:
@@ -62,14 +62,14 @@ class SpotifyAPIProxy(APIInterface):
             print(f"API cache search failed: {e}")
             return {} # return empty dict on failure
 
-    def get_cache(self):
+    def get_cache(self): 
         return self.cache.copy()
 
     
 
 class SpotifyAPI(APIInterface):
-    def __init__(self):
-        # self.client_id = client_id
+    def __init__(self, access_token: str):
+        self.access_token = access_token
         pass
 
     def fetch_api(self, url, headers, method="GET", data=None, params=None) -> Optional[requests.Response]:
@@ -99,6 +99,10 @@ class SpotifyAPI(APIInterface):
         except Exception as e:
             print(f"{e}")
             return None
+    
+    def get_token(self):
+        return access_token.copy()
+
 
 
 # Sample Usage ---------------------------------------------------------
