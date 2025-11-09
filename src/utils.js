@@ -73,3 +73,24 @@ export function generateMoodSummary(moods) {
   if (negatives > positives) return "Overall negative trend";
   return "Mixed mood pattern";
 }
+
+// --- 11. Call backend helper ---
+export async function callBackend() {
+  try {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+    const res = await fetch(`${backendUrl}/api/data`, {
+      method: "GET",
+    });
+
+    if (!res.ok) {
+      throw new Error(`Backend responded with status ${res.status}`);
+    }
+
+    return await res.json(); // Expect { message: "hello from the backend" }
+  } catch (err) {
+    console.error("Error calling backend:", err);
+    return { error: err.message };
+  }
+}
+
