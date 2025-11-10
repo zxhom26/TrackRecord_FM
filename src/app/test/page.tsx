@@ -7,7 +7,9 @@ export default function TestBackendPage() {
   const [data, setData] = useState(null);
 
   async function handleTest() {
+    console.log("Button clicked!");
     const result = await callBackend();
+    console.log("Backend result:", result);
     setData(result);
   }
 
