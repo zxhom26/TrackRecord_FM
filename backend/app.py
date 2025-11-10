@@ -19,6 +19,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+'''
+@app.get("/")
+@app.get("/api/data")
+@app.post("/api/token")
+@app.post("/api/spotify")
+'''
+
+
 # ✅ Home
 @app.get("/")
 def root():
@@ -29,9 +37,8 @@ def root():
 def get_data():
     return {"message": "Hello from FastAPI backend!"}
 
-# ✅ Receive and store access token
 @app.post("/api/token")
-async def get_token(request: Request):
+async def receive_token(request: Request):
     data = await request.json()
     token = data.get("accessToken")
     if not token:
