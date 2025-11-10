@@ -78,6 +78,7 @@ export function generateMoodSummary(moods) {
 export async function callBackend() {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    console.log("Backend URL:", backendUrl);
 
     const res = await fetch(`${backendUrl}/api/data`, {
       method: "GET",
@@ -87,10 +88,11 @@ export async function callBackend() {
       throw new Error(`Backend responded with status ${res.status}`);
     }
 
-    return await res.json(); // Expect { message: "hello from the backend" }
+    return await res.json();
   } catch (err) {
     console.error("Error calling backend:", err);
     return { error: err.message };
   }
 }
+
 
