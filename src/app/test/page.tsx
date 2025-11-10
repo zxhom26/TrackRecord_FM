@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { callBackend } from "@/utils";  // uses absolute import
+import { callBackend } from "../../utils";
 
 export default function TestBackendPage() {
   const [data, setData] = useState(null);
