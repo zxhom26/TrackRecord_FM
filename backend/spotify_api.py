@@ -6,7 +6,7 @@ import copy
 
 class APIInterface(ABC):
     @abstractmethod
-    def fetch_api(self, *args, **kwargs):
+    def fetch_api(self, endpoint, headers, method, data, params):
         pass
 
 class SpotifyAPIProxy(APIInterface):
