@@ -19,7 +19,7 @@ export default function TestBackendPage() {
         onClick={handleTest}
         style={{ padding: "8px", marginTop: "20px" }}
       >
-        Test Backend Connection
+        Test Backend Connection take 2
       </button>
 
       {data && (
