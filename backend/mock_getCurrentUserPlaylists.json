@@ -1,0 +1,1880 @@
+{
+  "href": "https://api.spotify.com/v1/users/iliveforbethanymota19/playlists?offset=0&limit=50&locale=en-US,en;q%3D0.9",
+  "limit": 50,
+  "next": "https://api.spotify.com/v1/users/iliveforbethanymota19/playlists?offset=50&limit=50&locale=en-US,en;q%3D0.9",
+  "offset": 0,
+  "previous": null,
+  "total": 113,
+  "items": [
+    {
+      "collaborative": false,
+      "description": "Playlist created by the tutorial on developer.spotify.com",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/1HrnK9czKjkiwqEoYhbbCW"
+      },
+      "href": "https://api.spotify.com/v1/playlists/1HrnK9czKjkiwqEoYhbbCW",
+      "id": "1HrnK9czKjkiwqEoYhbbCW",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e0228ae9a159d24cb0ab2552712ab67616d00001e02b968625b03ec59b30b48e9c3ab67616d00001e02bba7cfaf7c59ff0898acba1fab67616d00001e02ceb160561269ab00b1df9678",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e0228ae9a159d24cb0ab2552712ab67616d00001e02b968625b03ec59b30b48e9c3ab67616d00001e02bba7cfaf7c59ff0898acba1fab67616d00001e02ceb160561269ab00b1df9678",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e0228ae9a159d24cb0ab2552712ab67616d00001e02b968625b03ec59b30b48e9c3ab67616d00001e02bba7cfaf7c59ff0898acba1fab67616d00001e02ceb160561269ab00b1df9678",
+          "width": 60
+        }
+      ],
+      "name": "My top tracks playlist",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAAmtHqFMzUi6fF0Mijai0i/jFcsiy",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/1HrnK9czKjkiwqEoYhbbCW/tracks",
+        "total": 5
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:1HrnK9czKjkiwqEoYhbbCW"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/7jaoo9b09HWO9aDOY8GY66"
+      },
+      "href": "https://api.spotify.com/v1/playlists/7jaoo9b09HWO9aDOY8GY66",
+      "id": "7jaoo9b09HWO9aDOY8GY66",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab676d63000076a02d842b144a8c71c6f5d2038e",
+          "width": null
+        }
+      ],
+      "name": "Dark Synth Hardgroove Vibes",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAACOZb2x0BfNIl5did+esBMJUwt35e",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/7jaoo9b09HWO9aDOY8GY66/tracks",
+        "total": 60
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:7jaoo9b09HWO9aDOY8GY66"
+    },
+    {
+      "collaborative": false,
+      "description": "A selection of carefully selected synthwave tracks to recharge your inspiration upon returning to the present 🌌 <a href=\"https://spoti.fi/49vgW8M\">Click here if you need synthwave to sleep 💤 </a>",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/1YIe34rcmLjCYpY9wJoM2p"
+      },
+      "href": "https://api.spotify.com/v1/playlists/1YIe34rcmLjCYpY9wJoM2p",
+      "id": "1YIe34rcmLjCYpY9wJoM2p",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8443953467afaaac28e80dfa1a",
+          "width": null
+        }
+      ],
+      "name": "Synthwave - beats to chill/game to",
+      "owner": {
+        "display_name": "Lofi Girl",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/chilledcow"
+        },
+        "href": "https://api.spotify.com/v1/users/chilledcow",
+        "id": "chilledcow",
+        "type": "user",
+        "uri": "spotify:user:chilledcow"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAUzbjWxc0JOkWtbk5zlR6/vumDBqZv",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/1YIe34rcmLjCYpY9wJoM2p/tracks",
+        "total": 373
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:1YIe34rcmLjCYpY9wJoM2p"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/4ETxM0kkS3RMPveAijToRh"
+      },
+      "href": "https://api.spotify.com/v1/playlists/4ETxM0kkS3RMPveAijToRh",
+      "id": "4ETxM0kkS3RMPveAijToRh",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84e5a8f5d346676a7f78160082",
+          "width": null
+        }
+      ],
+      "name": "workout 💦",
+      "owner": {
+        "display_name": "luca444",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/itslucawhitaker"
+        },
+        "href": "https://api.spotify.com/v1/users/itslucawhitaker",
+        "id": "itslucawhitaker",
+        "type": "user",
+        "uri": "spotify:user:itslucawhitaker"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAADVcgVLIJv8bUvfDOwxJRC4qrmDhiE",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4ETxM0kkS3RMPveAijToRh/tracks",
+        "total": 337
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:4ETxM0kkS3RMPveAijToRh"
+    },
+    {
+      "collaborative": false,
+      "description": "A musical time capsule from the past has been unsealed…!",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/0Klmd2eaP0ueJ4x2K8VZTa"
+      },
+      "href": "https://api.spotify.com/v1/playlists/0Klmd2eaP0ueJ4x2K8VZTa",
+      "id": "0Klmd2eaP0ueJ4x2K8VZTa",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84458a5b967235507fc69131ad",
+          "width": null
+        }
+      ],
+      "name": "My 2024 Playlist in a Bottle",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAAzO1AsttyyZD0NDLlG8ZB3jpca33",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/0Klmd2eaP0ueJ4x2K8VZTa/tracks",
+        "total": 3
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:0Klmd2eaP0ueJ4x2K8VZTa"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2nlUZxlTCYL0rviDgeZoqN"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2nlUZxlTCYL0rviDgeZoqN",
+      "id": "2nlUZxlTCYL0rviDgeZoqN",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84f81bed432303105e4bfee6fc",
+          "width": null
+        }
+      ],
+      "name": "2070",
+      "owner": {
+        "display_name": "Agrokitty",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/motavator18"
+        },
+        "href": "https://api.spotify.com/v1/users/motavator18",
+        "id": "motavator18",
+        "type": "user",
+        "uri": "spotify:user:motavator18"
+      },
+      "primary_color": null,
+      "public": false,
+      "snapshot_id": "AAAAHqZU0T6xW3RmjuvAwS9w/PFgMFzU",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2nlUZxlTCYL0rviDgeZoqN/tracks",
+        "total": 23
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2nlUZxlTCYL0rviDgeZoqN"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/0DngRxIFhe7OPoa7i5GJy9"
+      },
+      "href": "https://api.spotify.com/v1/playlists/0DngRxIFhe7OPoa7i5GJy9",
+      "id": "0DngRxIFhe7OPoa7i5GJy9",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da840cdd34a2571f54eca1ec06be",
+          "width": null
+        }
+      ],
+      "name": "Overcast Shadows",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAALIFwW2iTPDa12rZF21E1D0nUV+PL",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/0DngRxIFhe7OPoa7i5GJy9/tracks",
+        "total": 42
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:0DngRxIFhe7OPoa7i5GJy9"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/6ZQWOY577Fz8aoLCwlrejC"
+      },
+      "href": "https://api.spotify.com/v1/playlists/6ZQWOY577Fz8aoLCwlrejC",
+      "id": "6ZQWOY577Fz8aoLCwlrejC",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da844e0fe863cdf4b80ad956c5ee",
+          "width": null
+        }
+      ],
+      "name": "Kaua’i",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAGLnDqfY4b5xMR8CfLWHQO2pEVOqj",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/6ZQWOY577Fz8aoLCwlrejC/tracks",
+        "total": 22
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:6ZQWOY577Fz8aoLCwlrejC"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/3V3Y7Jc8pvTEF6sODwDNIO"
+      },
+      "href": "https://api.spotify.com/v1/playlists/3V3Y7Jc8pvTEF6sODwDNIO",
+      "id": "3V3Y7Jc8pvTEF6sODwDNIO",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da842bae1418f95d5ce78538c1ba",
+          "width": null
+        }
+      ],
+      "name": "Shut it",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAMkX4/+cep+922Oc7jtV3C9HsLnmJ",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/3V3Y7Jc8pvTEF6sODwDNIO/tracks",
+        "total": 45
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:3V3Y7Jc8pvTEF6sODwDNIO"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/6cn2hLZyatsrL5vdyBTdWj"
+      },
+      "href": "https://api.spotify.com/v1/playlists/6cn2hLZyatsrL5vdyBTdWj",
+      "id": "6cn2hLZyatsrL5vdyBTdWj",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da840d06c59758012f1bbe873b77",
+          "width": null
+        }
+      ],
+      "name": "🍃🍁🥬🍂🍀",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAL7YJ3B7dPIuMyiGddy52snculRk7",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/6cn2hLZyatsrL5vdyBTdWj/tracks",
+        "total": 45
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:6cn2hLZyatsrL5vdyBTdWj"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/1mWGJHJ1epzNP48KLTGlhV"
+      },
+      "href": "https://api.spotify.com/v1/playlists/1mWGJHJ1epzNP48KLTGlhV",
+      "id": "1mWGJHJ1epzNP48KLTGlhV",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84849a83f68cf20f3dd567834f",
+          "width": null
+        }
+      ],
+      "name": "Casa",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAInpnkOjmOdT9iQr6Zl0hl091V4mY",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/1mWGJHJ1epzNP48KLTGlhV/tracks",
+        "total": 31
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:1mWGJHJ1epzNP48KLTGlhV"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/1TxYDPMe5puUHzI0lgIuRT"
+      },
+      "href": "https://api.spotify.com/v1/playlists/1TxYDPMe5puUHzI0lgIuRT",
+      "id": "1TxYDPMe5puUHzI0lgIuRT",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84d22bc59c2a55d9f7c04bac64",
+          "width": null
+        }
+      ],
+      "name": "Jean Luca🏎",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAKDRvfrHIAFVV+Ca2YpvzWbkh+hR6",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/1TxYDPMe5puUHzI0lgIuRT/tracks",
+        "total": 35
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:1TxYDPMe5puUHzI0lgIuRT"
+    },
+    {
+      "collaborative": false,
+      "description": "chestnuts roasting on an open fire",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/4F36RLSkdxniWGBlp1WP2U"
+      },
+      "href": "https://api.spotify.com/v1/playlists/4F36RLSkdxniWGBlp1WP2U",
+      "id": "4F36RLSkdxniWGBlp1WP2U",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da847e7e869f96e17ff85f2bb385",
+          "width": null
+        }
+      ],
+      "name": "calming christmas songs 🕯️🎄❄️",
+      "owner": {
+        "display_name": "pelox0318",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/22qmhfpsvo53a3au6dkgf35jy"
+        },
+        "href": "https://api.spotify.com/v1/users/22qmhfpsvo53a3au6dkgf35jy",
+        "id": "22qmhfpsvo53a3au6dkgf35jy",
+        "type": "user",
+        "uri": "spotify:user:22qmhfpsvo53a3au6dkgf35jy"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAEx3jZeppYwf3KGmV7VY3XI8mf9JRd",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4F36RLSkdxniWGBlp1WP2U/tracks",
+        "total": 84
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:4F36RLSkdxniWGBlp1WP2U"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/5VSo6oRvwUAX6aqAuN4VWN"
+      },
+      "href": "https://api.spotify.com/v1/playlists/5VSo6oRvwUAX6aqAuN4VWN",
+      "id": "5VSo6oRvwUAX6aqAuN4VWN",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84af29b6e37d45cd961036511f",
+          "width": null
+        }
+      ],
+      "name": "downtown",
+      "owner": {
+        "display_name": "jordanspotify",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/jordannnnn379"
+        },
+        "href": "https://api.spotify.com/v1/users/jordannnnn379",
+        "id": "jordannnnn379",
+        "type": "user",
+        "uri": "spotify:user:jordannnnn379"
+      },
+      "primary_color": null,
+      "public": false,
+      "snapshot_id": "AAAAyJ02CiwAkrbN4i4x3q1bKrVp137r",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/5VSo6oRvwUAX6aqAuN4VWN/tracks",
+        "total": 180
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:5VSo6oRvwUAX6aqAuN4VWN"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/15bMIkyFRD9RMcG0DHqSTW"
+      },
+      "href": "https://api.spotify.com/v1/playlists/15bMIkyFRD9RMcG0DHqSTW",
+      "id": "15bMIkyFRD9RMcG0DHqSTW",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da842c2902c3b11473fc29b1c221",
+          "width": null
+        }
+      ],
+      "name": "Summer",
+      "owner": {
+        "display_name": "Ava Lee",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ava_flava_"
+        },
+        "href": "https://api.spotify.com/v1/users/ava_flava_",
+        "id": "ava_flava_",
+        "type": "user",
+        "uri": "spotify:user:ava_flava_"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAIbDu7tvdLOxR+/r4gfbBelvrvPEf0",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/15bMIkyFRD9RMcG0DHqSTW/tracks",
+        "total": 257
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:15bMIkyFRD9RMcG0DHqSTW"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/6MHYoLStdPEdZ3LeZBkx4e"
+      },
+      "href": "https://api.spotify.com/v1/playlists/6MHYoLStdPEdZ3LeZBkx4e",
+      "id": "6MHYoLStdPEdZ3LeZBkx4e",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84c278d6502e5ccee63a5b7923",
+          "width": null
+        }
+      ],
+      "name": "Summer 2023",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAPtRYSfgm8yCC4qN6YuASgU6Lkal7",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/6MHYoLStdPEdZ3LeZBkx4e/tracks",
+        "total": 36
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:6MHYoLStdPEdZ3LeZBkx4e"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/4IEdHuUl14PbCjZjzvD2z0"
+      },
+      "href": "https://api.spotify.com/v1/playlists/4IEdHuUl14PbCjZjzvD2z0",
+      "id": "4IEdHuUl14PbCjZjzvD2z0",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84b07b9205cf54353f0cc7b981",
+          "width": null
+        }
+      ],
+      "name": "Metamorphosis, Side C",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAPAv5fsNjaNgp9NpwJVgmewrSK3Cq",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4IEdHuUl14PbCjZjzvD2z0/tracks",
+        "total": 58
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:4IEdHuUl14PbCjZjzvD2z0"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/7yg5dK1vrZm037ffaqmRY1"
+      },
+      "href": "https://api.spotify.com/v1/playlists/7yg5dK1vrZm037ffaqmRY1",
+      "id": "7yg5dK1vrZm037ffaqmRY1",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e0289992f4d7d4ab94937bf9e23ab67616d00001e02940aa635eea98719f6ca4ad9ab67616d00001e02bc18bdade69ec5ef0bb25b17ab67616d00001e02d84a9bbcba91cb6a4a212b1b",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e0289992f4d7d4ab94937bf9e23ab67616d00001e02940aa635eea98719f6ca4ad9ab67616d00001e02bc18bdade69ec5ef0bb25b17ab67616d00001e02d84a9bbcba91cb6a4a212b1b",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e0289992f4d7d4ab94937bf9e23ab67616d00001e02940aa635eea98719f6ca4ad9ab67616d00001e02bc18bdade69ec5ef0bb25b17ab67616d00001e02d84a9bbcba91cb6a4a212b1b",
+          "width": 60
+        }
+      ],
+      "name": "Beach Playlist",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAtBPMZJvY+yppn8P3GTAnad7t02Wk",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/7yg5dK1vrZm037ffaqmRY1/tracks",
+        "total": 173
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:7yg5dK1vrZm037ffaqmRY1"
+    },
+    {
+      "collaborative": false,
+      "description": "erm what the sigma 🤓☝️",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2YnKrK2BfWzaIfr60Tqs3k"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2YnKrK2BfWzaIfr60Tqs3k",
+      "id": "2YnKrK2BfWzaIfr60Tqs3k",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8423cd7a4f475713079eb4a563",
+          "width": null
+        }
+      ],
+      "name": "w rizz",
+      "owner": {
+        "display_name": "kuromooni",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/2757f62z846rr8voqcudmqolk"
+        },
+        "href": "https://api.spotify.com/v1/users/2757f62z846rr8voqcudmqolk",
+        "id": "2757f62z846rr8voqcudmqolk",
+        "type": "user",
+        "uri": "spotify:user:2757f62z846rr8voqcudmqolk"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAADxjHzgOHLQbRGGNjasKsh+oR8c1XI",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2YnKrK2BfWzaIfr60Tqs3k/tracks",
+        "total": 261
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2YnKrK2BfWzaIfr60Tqs3k"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/7xwzna2lIOpzSEFzemJ9xw"
+      },
+      "href": "https://api.spotify.com/v1/playlists/7xwzna2lIOpzSEFzemJ9xw",
+      "id": "7xwzna2lIOpzSEFzemJ9xw",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8496799cf47f3f5dff82eaf288",
+          "width": null
+        }
+      ],
+      "name": "Head Above Water",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": false,
+      "snapshot_id": "AAAALyfAuf4Oa6Edcv8PXy4v2SH3E7A6",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/7xwzna2lIOpzSEFzemJ9xw/tracks",
+        "total": 36
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:7xwzna2lIOpzSEFzemJ9xw"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2tCufa3M7grfgHJ9yadVet"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2tCufa3M7grfgHJ9yadVet",
+      "id": "2tCufa3M7grfgHJ9yadVet",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84d436688777b97350e9b1dcce",
+          "width": null
+        }
+      ],
+      "name": "谭🌊",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAANxYGYSlwxjve4dKGPXIQn7LB0dZO",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2tCufa3M7grfgHJ9yadVet/tracks",
+        "total": 51
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2tCufa3M7grfgHJ9yadVet"
+    },
+    {
+      "collaborative": false,
+      "description": "yay environmental sciences yay",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/3rkSE3RwKxY8CyiXLKAoFS"
+      },
+      "href": "https://api.spotify.com/v1/playlists/3rkSE3RwKxY8CyiXLKAoFS",
+      "id": "3rkSE3RwKxY8CyiXLKAoFS",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da845d0c0948a18b6e3f7960583f",
+          "width": null
+        }
+      ],
+      "name": "envi ",
+      "owner": {
+        "display_name": "addyson",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/22n5k63w2wfa4ovly7ormz4ji"
+        },
+        "href": "https://api.spotify.com/v1/users/22n5k63w2wfa4ovly7ormz4ji",
+        "id": "22n5k63w2wfa4ovly7ormz4ji",
+        "type": "user",
+        "uri": "spotify:user:22n5k63w2wfa4ovly7ormz4ji"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAZnDlSSsHDB55C975pgKgGYx7tsKo",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/3rkSE3RwKxY8CyiXLKAoFS/tracks",
+        "total": 97
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:3rkSE3RwKxY8CyiXLKAoFS"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/0obRSb733dMOsEz7UL4Lyb"
+      },
+      "href": "https://api.spotify.com/v1/playlists/0obRSb733dMOsEz7UL4Lyb",
+      "id": "0obRSb733dMOsEz7UL4Lyb",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da845b97bcbb64aec7b47e752dc2",
+          "width": null
+        }
+      ],
+      "name": "Szalations 12:9",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAH/IpfnJfCymFaO8mKTlnBAjPhBrD",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/0obRSb733dMOsEz7UL4Lyb/tracks",
+        "total": 25
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:0obRSb733dMOsEz7UL4Lyb"
+    },
+    {
+      "collaborative": false,
+      "description": "and more &lt;33",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/3ybmSa9VwuNzcjwGQye1Wn"
+      },
+      "href": "https://api.spotify.com/v1/playlists/3ybmSa9VwuNzcjwGQye1Wn",
+      "id": "3ybmSa9VwuNzcjwGQye1Wn",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84adf30a125e4d55e4ba3cafcb",
+          "width": null
+        }
+      ],
+      "name": "sza, tyler the creator,  the weeknd, frank ocean",
+      "owner": {
+        "display_name": "natalie",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/kkehbes52myl7c3ypvlz7x4jk"
+        },
+        "href": "https://api.spotify.com/v1/users/kkehbes52myl7c3ypvlz7x4jk",
+        "id": "kkehbes52myl7c3ypvlz7x4jk",
+        "type": "user",
+        "uri": "spotify:user:kkehbes52myl7c3ypvlz7x4jk"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAABMesK4R03w2ORt0K3sVF0VNFwWsE7",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/3ybmSa9VwuNzcjwGQye1Wn/tracks",
+        "total": 292
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:3ybmSa9VwuNzcjwGQye1Wn"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2r8uXluvNujwcw9O0h96iB"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2r8uXluvNujwcw9O0h96iB",
+      "id": "2r8uXluvNujwcw9O0h96iB",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da842b0dc3ba4649881bad84fd85",
+          "width": null
+        }
+      ],
+      "name": "Grimm’s Fairytales🧚‍♀️",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": false,
+      "snapshot_id": "AAAAVomGQ8k6azt/H4IPenC3PY+opoF+",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2r8uXluvNujwcw9O0h96iB/tracks",
+        "total": 55
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2r8uXluvNujwcw9O0h96iB"
+    },
+    {
+      "collaborative": false,
+      "description": "A playlist based on your style. You’re Taking It Easy. You’re wearing Red, Blue, and Yellow. Your vibe is Wavy.",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/1ggMPAjlqMBuwVXtkatrj8"
+      },
+      "href": "https://api.spotify.com/v1/playlists/1ggMPAjlqMBuwVXtkatrj8",
+      "id": "1ggMPAjlqMBuwVXtkatrj8",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84c3aa9d159f181f30ad1a946a",
+          "width": null
+        }
+      ],
+      "name": "GetReadyWithzach 09.22.22",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAABH85R7bkWMTWrDW4jg/jh63wSnq6",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/1ggMPAjlqMBuwVXtkatrj8/tracks",
+        "total": 30
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:1ggMPAjlqMBuwVXtkatrj8"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/5nZFua6iZhUDVi3q7PI5cp"
+      },
+      "href": "https://api.spotify.com/v1/playlists/5nZFua6iZhUDVi3q7PI5cp",
+      "id": "5nZFua6iZhUDVi3q7PI5cp",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84413cc90fef13a2dffbbe555c",
+          "width": null
+        }
+      ],
+      "name": "Classical ",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAROEWwxZ+V3YyGkgPbc17njgzQkJw",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/5nZFua6iZhUDVi3q7PI5cp/tracks",
+        "total": 56
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:5nZFua6iZhUDVi3q7PI5cp"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/427IrmqjuRD8kdIka9JvUN"
+      },
+      "href": "https://api.spotify.com/v1/playlists/427IrmqjuRD8kdIka9JvUN",
+      "id": "427IrmqjuRD8kdIka9JvUN",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da849efd62699406f24b47931510",
+          "width": null
+        }
+      ],
+      "name": "Metamorphosis🦋, Side B",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAQ5QcAdftLPdTNyoK5JT/KefVEuVQ",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/427IrmqjuRD8kdIka9JvUN/tracks",
+        "total": 58
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:427IrmqjuRD8kdIka9JvUN"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/4u5IANtJj912V6SCA8ZcAa"
+      },
+      "href": "https://api.spotify.com/v1/playlists/4u5IANtJj912V6SCA8ZcAa",
+      "id": "4u5IANtJj912V6SCA8ZcAa",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da8403f1251dfbe550551b0aea2b",
+          "width": null
+        }
+      ],
+      "name": "Summer 2022",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAduxVVQBdab56kUhUtYE1tpSSf9x+",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4u5IANtJj912V6SCA8ZcAa/tracks",
+        "total": 116
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:4u5IANtJj912V6SCA8ZcAa"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/0Tzw4nJIWxWnLUDiow9cH2"
+      },
+      "href": "https://api.spotify.com/v1/playlists/0Tzw4nJIWxWnLUDiow9cH2",
+      "id": "0Tzw4nJIWxWnLUDiow9cH2",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e02365b3fb800c19f7ff72602daab67616d00001e02798f315e011d4ada702ce9bbab67616d00001e02ab413812ddf711cb61adb782f9cc2e5d29b97a944a08331834c620a44da47e08",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e02365b3fb800c19f7ff72602daab67616d00001e02798f315e011d4ada702ce9bbab67616d00001e02ab413812ddf711cb61adb782f9cc2e5d29b97a944a08331834c620a44da47e08",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e02365b3fb800c19f7ff72602daab67616d00001e02798f315e011d4ada702ce9bbab67616d00001e02ab413812ddf711cb61adb782f9cc2e5d29b97a944a08331834c620a44da47e08",
+          "width": 60
+        }
+      ],
+      "name": "College Party Anthems🥵",
+      "owner": {
+        "display_name": "Diego C",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/190084"
+        },
+        "href": "https://api.spotify.com/v1/users/190084",
+        "id": "190084",
+        "type": "user",
+        "uri": "spotify:user:190084"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAFJ7pWR8RqvqPUELAwmMMpQU8JZ93m",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/0Tzw4nJIWxWnLUDiow9cH2/tracks",
+        "total": 474
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:0Tzw4nJIWxWnLUDiow9cH2"
+    },
+    {
+      "collaborative": false,
+      "description": "NOTHING BUT STRAIGHT PARTY BANGERS!",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/4weFUxehFnqQJIn9oHr98D"
+      },
+      "href": "https://api.spotify.com/v1/playlists/4weFUxehFnqQJIn9oHr98D",
+      "id": "4weFUxehFnqQJIn9oHr98D",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da841e929e7f3753668ac016bc7c",
+          "width": null
+        }
+      ],
+      "name": "BEST THROWBACK PARTY HITS 🎉",
+      "owner": {
+        "display_name": "DMAN",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/12147233841"
+        },
+        "href": "https://api.spotify.com/v1/users/12147233841",
+        "id": "12147233841",
+        "type": "user",
+        "uri": "spotify:user:12147233841"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAbxtdDGelMQAeDOCEOaqCb6+TXDCH",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4weFUxehFnqQJIn9oHr98D/tracks",
+        "total": 890
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:4weFUxehFnqQJIn9oHr98D"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/65uwOSfaiAQIpC2CdPtxCV"
+      },
+      "href": "https://api.spotify.com/v1/playlists/65uwOSfaiAQIpC2CdPtxCV",
+      "id": "65uwOSfaiAQIpC2CdPtxCV",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8463ce99d3da2dffc5d66fe2e9",
+          "width": null
+        }
+      ],
+      "name": "Toaster Bath",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAI39yeIXfq198K7DW4dIpEtFFU39O",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/65uwOSfaiAQIpC2CdPtxCV/tracks",
+        "total": 33
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:65uwOSfaiAQIpC2CdPtxCV"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/59yjm9k3adI8vXl3m4OkjF"
+      },
+      "href": "https://api.spotify.com/v1/playlists/59yjm9k3adI8vXl3m4OkjF",
+      "id": "59yjm9k3adI8vXl3m4OkjF",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e0226f7f19c7f0381e56156c94aab67616d00001e0252004a2d905dbb5fec0c65d8ab67616d00001e02aab2c3c3f1f3207137d915c9ab67616d00001e02ccdddd46119a4ff53eaf1f5d",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e0226f7f19c7f0381e56156c94aab67616d00001e0252004a2d905dbb5fec0c65d8ab67616d00001e02aab2c3c3f1f3207137d915c9ab67616d00001e02ccdddd46119a4ff53eaf1f5d",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e0226f7f19c7f0381e56156c94aab67616d00001e0252004a2d905dbb5fec0c65d8ab67616d00001e02aab2c3c3f1f3207137d915c9ab67616d00001e02ccdddd46119a4ff53eaf1f5d",
+          "width": 60
+        }
+      ],
+      "name": "",
+      "owner": {
+        "display_name": "emmawenger",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/emmagw03x"
+        },
+        "href": "https://api.spotify.com/v1/users/emmagw03x",
+        "id": "emmagw03x",
+        "type": "user",
+        "uri": "spotify:user:emmagw03x"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAB8CsiT0VqZPkIinhcwfH8jGbdkwYn",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/59yjm9k3adI8vXl3m4OkjF/tracks",
+        "total": 284
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:59yjm9k3adI8vXl3m4OkjF"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/6Kreyxdmqlg9Vcab4ECqEI"
+      },
+      "href": "https://api.spotify.com/v1/playlists/6Kreyxdmqlg9Vcab4ECqEI",
+      "id": "6Kreyxdmqlg9Vcab4ECqEI",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da849bbe7d4cb50bfba77ceed106",
+          "width": null
+        }
+      ],
+      "name": "Pali",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAG5ZblC1XaUTif8mx358wvHiLKAHa",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/6Kreyxdmqlg9Vcab4ECqEI/tracks",
+        "total": 25
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:6Kreyxdmqlg9Vcab4ECqEI"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/4j6OHLXK91ciPMrb8KKzX3"
+      },
+      "href": "https://api.spotify.com/v1/playlists/4j6OHLXK91ciPMrb8KKzX3",
+      "id": "4j6OHLXK91ciPMrb8KKzX3",
+      "images": [
+        {
+          "height": null,
+          "url": "https://i.scdn.co/image/ab67616d00001e0247dd2ca47ec9bf14559e17c6",
+          "width": null
+        }
+      ],
+      "name": "Coral",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAAkQpCZWzfWFu2QAGD4scQPDKKg+i",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4j6OHLXK91ciPMrb8KKzX3/tracks",
+        "total": 1
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:4j6OHLXK91ciPMrb8KKzX3"
+    },
+    {
+      "collaborative": false,
+      "description": "shit i think you might like",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/0ojqeOxJzO9qD4lK5c7ilt"
+      },
+      "href": "https://api.spotify.com/v1/playlists/0ojqeOxJzO9qD4lK5c7ilt",
+      "id": "0ojqeOxJzO9qD4lK5c7ilt",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da8456b4cedd2ee2f32008ab4869",
+          "width": null
+        }
+      ],
+      "name": "zach",
+      "owner": {
+        "display_name": "ellie polleux",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/66u54o1tn792pbmbkq0w2m72y"
+        },
+        "href": "https://api.spotify.com/v1/users/66u54o1tn792pbmbkq0w2m72y",
+        "id": "66u54o1tn792pbmbkq0w2m72y",
+        "type": "user",
+        "uri": "spotify:user:66u54o1tn792pbmbkq0w2m72y"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAGDvcyY+TyW4a6rvvJwUTfHPnTd3s",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/0ojqeOxJzO9qD4lK5c7ilt/tracks",
+        "total": 21
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:0ojqeOxJzO9qD4lK5c7ilt"
+    },
+    {
+      "collaborative": false,
+      "description": "Studio Ghibl Chill music you need to focus on your homework - Chillhop, Lo-Fi and Chill Beats - Including Joe Hisaishi&#x27;s hits and top 10 from Ghibli movies.",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2rcMRS9fDOnuu5YUTXAcQZ"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2rcMRS9fDOnuu5YUTXAcQZ",
+      "id": "2rcMRS9fDOnuu5YUTXAcQZ",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8483e504d694e8887690fde3e8",
+          "width": null
+        }
+      ],
+      "name": "Studio Ghibli Lofi Music & Chill Beats",
+      "owner": {
+        "display_name": "Lancelot Dulac",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/dnss4k0fxpskv9c1oh1k33qno"
+        },
+        "href": "https://api.spotify.com/v1/users/dnss4k0fxpskv9c1oh1k33qno",
+        "id": "dnss4k0fxpskv9c1oh1k33qno",
+        "type": "user",
+        "uri": "spotify:user:dnss4k0fxpskv9c1oh1k33qno"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAApukkEznUnXa1LRRMjkE3f3xZpMHQb",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2rcMRS9fDOnuu5YUTXAcQZ/tracks",
+        "total": 77
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2rcMRS9fDOnuu5YUTXAcQZ"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/62SK3wmhUv4BElceYjInEn"
+      },
+      "href": "https://api.spotify.com/v1/playlists/62SK3wmhUv4BElceYjInEn",
+      "id": "62SK3wmhUv4BElceYjInEn",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e022a3cd062a05a0df88713cd0dab67616d00001e0262c1f3370811c52ae2d26d24ab67616d00001e02c6e983c5f493a1a0df3de6d4ab67616d00001e02fd220b07117400ccbc85ed96",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e022a3cd062a05a0df88713cd0dab67616d00001e0262c1f3370811c52ae2d26d24ab67616d00001e02c6e983c5f493a1a0df3de6d4ab67616d00001e02fd220b07117400ccbc85ed96",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e022a3cd062a05a0df88713cd0dab67616d00001e0262c1f3370811c52ae2d26d24ab67616d00001e02c6e983c5f493a1a0df3de6d4ab67616d00001e02fd220b07117400ccbc85ed96",
+          "width": 60
+        }
+      ],
+      "name": "",
+      "owner": {
+        "display_name": "AniPlaylist",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/fz230568w0ccmom2dg3zvxq1h"
+        },
+        "href": "https://api.spotify.com/v1/users/fz230568w0ccmom2dg3zvxq1h",
+        "id": "fz230568w0ccmom2dg3zvxq1h",
+        "type": "user",
+        "uri": "spotify:user:fz230568w0ccmom2dg3zvxq1h"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAACEXtLi4mYPpqYSlUJFo9yx2QPfBrB",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/62SK3wmhUv4BElceYjInEn/tracks",
+        "total": 50
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:62SK3wmhUv4BElceYjInEn"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/5UfgsjWBKqSx1xjITuQuNR"
+      },
+      "href": "https://api.spotify.com/v1/playlists/5UfgsjWBKqSx1xjITuQuNR",
+      "id": "5UfgsjWBKqSx1xjITuQuNR",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da844dc8f606348c2c89c0ce2954",
+          "width": null
+        }
+      ],
+      "name": "Saffron",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAALmo/sHBoQPLxOiVWfiwMyWQmmxgq",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/5UfgsjWBKqSx1xjITuQuNR/tracks",
+        "total": 42
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:5UfgsjWBKqSx1xjITuQuNR"
+    },
+    {
+      "collaborative": true,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/1PqPD2oyGRhgJAxwkaTuNR"
+      },
+      "href": "https://api.spotify.com/v1/playlists/1PqPD2oyGRhgJAxwkaTuNR",
+      "id": "1PqPD2oyGRhgJAxwkaTuNR",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84378c2346d36a111e3c05c643",
+          "width": null
+        }
+      ],
+      "name": "formal",
+      "owner": {
+        "display_name": "jordanspotify",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/jordannnnn379"
+        },
+        "href": "https://api.spotify.com/v1/users/jordannnnn379",
+        "id": "jordannnnn379",
+        "type": "user",
+        "uri": "spotify:user:jordannnnn379"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAxxsgO1fLTUBTM0r+w2hyHfQPm+lw",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/1PqPD2oyGRhgJAxwkaTuNR/tracks",
+        "total": 187
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:1PqPD2oyGRhgJAxwkaTuNR"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2drurQ2v6IsRIjKCQacGv1"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2drurQ2v6IsRIjKCQacGv1",
+      "id": "2drurQ2v6IsRIjKCQacGv1",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84bbe32b1dcb640c5126f0d9dd",
+          "width": null
+        }
+      ],
+      "name": "Soko",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAALQWTkO+oGvP8UCyrJsZi7rgIuDny",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2drurQ2v6IsRIjKCQacGv1/tracks",
+        "total": 38
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2drurQ2v6IsRIjKCQacGv1"
+    },
+    {
+      "collaborative": false,
+      "description": "feat. Tyler, The Creator",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/6rDwx4QZoqRniXLJVdMMN9"
+      },
+      "href": "https://api.spotify.com/v1/playlists/6rDwx4QZoqRniXLJVdMMN9",
+      "id": "6rDwx4QZoqRniXLJVdMMN9",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84ff3f949a1a13fd3704912291",
+          "width": null
+        }
+      ],
+      "name": "WOLF HALEY",
+      "owner": {
+        "display_name": "Adikara",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/louismartin.tobing"
+        },
+        "href": "https://api.spotify.com/v1/users/louismartin.tobing",
+        "id": "louismartin.tobing",
+        "type": "user",
+        "uri": "spotify:user:louismartin.tobing"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAPakcDKHWfg2XDtEtamZVcZ008+BQ",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/6rDwx4QZoqRniXLJVdMMN9/tracks",
+        "total": 62
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:6rDwx4QZoqRniXLJVdMMN9"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/5qpD1As9CUDko82YcnXEOC"
+      },
+      "href": "https://api.spotify.com/v1/playlists/5qpD1As9CUDko82YcnXEOC",
+      "id": "5qpD1As9CUDko82YcnXEOC",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da845981fb6d138086b0a9b97d94",
+          "width": null
+        }
+      ],
+      "name": "Embrace🧚‍♀️",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": false,
+      "snapshot_id": "AAAATXpiHDcnbwCXpHkfQIQZnWLtCeK7",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/5qpD1As9CUDko82YcnXEOC/tracks",
+        "total": 54
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:5qpD1As9CUDko82YcnXEOC"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2vHaDe3T5lX96t4S09LUO6"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2vHaDe3T5lX96t4S09LUO6",
+      "id": "2vHaDe3T5lX96t4S09LUO6",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e020df6a00937f62abc0e73c0abab67616d00001e02df7a61e9fdf9fec7df7bd72aab67616d00001e02e341c520c154f89b77bd2aafab67616d00001e02fc1bc1cf80c431c2bdbde601",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e020df6a00937f62abc0e73c0abab67616d00001e02df7a61e9fdf9fec7df7bd72aab67616d00001e02e341c520c154f89b77bd2aafab67616d00001e02fc1bc1cf80c431c2bdbde601",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e020df6a00937f62abc0e73c0abab67616d00001e02df7a61e9fdf9fec7df7bd72aab67616d00001e02e341c520c154f89b77bd2aafab67616d00001e02fc1bc1cf80c431c2bdbde601",
+          "width": 60
+        }
+      ],
+      "name": "Kids",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAIfyq3FZze1/GWGgVfzKPyLn3JhIT",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2vHaDe3T5lX96t4S09LUO6/tracks",
+        "total": 32
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2vHaDe3T5lX96t4S09LUO6"
+    },
+    {
+      "collaborative": false,
+      "description": "Retrowave &#x2F; Synthwave &#x2F; Vaporwave",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/3ebHKSjHujS4Tyt2KKP97R"
+      },
+      "href": "https://api.spotify.com/v1/playlists/3ebHKSjHujS4Tyt2KKP97R",
+      "id": "3ebHKSjHujS4Tyt2KKP97R",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da8418b830788ea8914e1da3292d",
+          "width": null
+        }
+      ],
+      "name": "Retrowave Synthwave",
+      "owner": {
+        "display_name": "Cheerzo",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ar4e0yqkqlci359jrc4yp0g5a"
+        },
+        "href": "https://api.spotify.com/v1/users/ar4e0yqkqlci359jrc4yp0g5a",
+        "id": "ar4e0yqkqlci359jrc4yp0g5a",
+        "type": "user",
+        "uri": "spotify:user:ar4e0yqkqlci359jrc4yp0g5a"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAFiYg59vvybUCIsRsFO9OXiCpQYXQ3",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/3ebHKSjHujS4Tyt2KKP97R/tracks",
+        "total": 75
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:3ebHKSjHujS4Tyt2KKP97R"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/7jUPOMhyz2q9OCVpzFfUvC"
+      },
+      "href": "https://api.spotify.com/v1/playlists/7jUPOMhyz2q9OCVpzFfUvC",
+      "id": "7jUPOMhyz2q9OCVpzFfUvC",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84c634b5dfedc8519f35243599",
+          "width": null
+        }
+      ],
+      "name": "Metamorphosis🦋",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAARR2RrlX3vMUscM4i2EuNnfnOS5m1",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/7jUPOMhyz2q9OCVpzFfUvC/tracks",
+        "total": 41
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:7jUPOMhyz2q9OCVpzFfUvC"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2PZ8YDmPzqkrHU1A1vA3sd"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2PZ8YDmPzqkrHU1A1vA3sd",
+      "id": "2PZ8YDmPzqkrHU1A1vA3sd",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84311c2c40ad767de440675bd6",
+          "width": null
+        }
+      ],
+      "name": "Summer 2021",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAZwCJfSBQJTfO+iwTucStRpwDV6Ms",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2PZ8YDmPzqkrHU1A1vA3sd/tracks",
+        "total": 68
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2PZ8YDmPzqkrHU1A1vA3sd"
+    },
+    {
+      "collaborative": false,
+      "description": "Selection of the best relaxing lofi hip hop beats for the perfect chill session - best lofi cover playlist - best lofi songs - lofi hip hop playlist - best study music - lofi remix playlist - relaxing beats playlist - chill beats playlist - lofi covers playlist - lofi beats - lofi fruits music",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/3LFIBdP7eZXJKqf3guepZ1"
+      },
+      "href": "https://api.spotify.com/v1/playlists/3LFIBdP7eZXJKqf3guepZ1",
+      "id": "3LFIBdP7eZXJKqf3guepZ1",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84bc777cc650ddc2876875dca5",
+          "width": null
+        }
+      ],
+      "name": "Lofi Fruits Music - lofi hip hop beats to study, relax & sleep to",
+      "owner": {
+        "display_name": "Fruits Music",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/a902190"
+        },
+        "href": "https://api.spotify.com/v1/users/a902190",
+        "id": "a902190",
+        "type": "user",
+        "uri": "spotify:user:a902190"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAetc+v3LzWoE3HUlXC/C8shSNZODoC",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/3LFIBdP7eZXJKqf3guepZ1/tracks",
+        "total": 250
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:3LFIBdP7eZXJKqf3guepZ1"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/0SYFtxCVvx6Sb3UTKPg5gI"
+      },
+      "href": "https://api.spotify.com/v1/playlists/0SYFtxCVvx6Sb3UTKPg5gI",
+      "id": "0SYFtxCVvx6Sb3UTKPg5gI",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e024ce8b4e42588bf18182a1ad2ab67616d00001e0282aa266b6d8bef04b865dbf5ab67616d00001e02b71c2bb954c78c4a605a095aab67616d00001e02c94603dcb78ec39322cebb5b",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e024ce8b4e42588bf18182a1ad2ab67616d00001e0282aa266b6d8bef04b865dbf5ab67616d00001e02b71c2bb954c78c4a605a095aab67616d00001e02c94603dcb78ec39322cebb5b",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e024ce8b4e42588bf18182a1ad2ab67616d00001e0282aa266b6d8bef04b865dbf5ab67616d00001e02b71c2bb954c78c4a605a095aab67616d00001e02c94603dcb78ec39322cebb5b",
+          "width": 60
+        }
+      ],
+      "name": "Oldies",
+      "owner": {
+        "display_name": "zachom",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/iliveforbethanymota19"
+        },
+        "href": "https://api.spotify.com/v1/users/iliveforbethanymota19",
+        "id": "iliveforbethanymota19",
+        "type": "user",
+        "uri": "spotify:user:iliveforbethanymota19"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAQSsFOttP2bchFBrKJFEq9+4+JJPS",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/0SYFtxCVvx6Sb3UTKPg5gI/tracks",
+        "total": 63
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:0SYFtxCVvx6Sb3UTKPg5gI"
+    },
+    {
+      "collaborative": false,
+      "description": "lol",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/5hx48KouTj2yVy7TJYc43U"
+      },
+      "href": "https://api.spotify.com/v1/playlists/5hx48KouTj2yVy7TJYc43U",
+      "id": "5hx48KouTj2yVy7TJYc43U",
+      "images": [
+        {
+          "height": null,
+          "url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da8407132bdde561fad009885d81",
+          "width": null
+        }
+      ],
+      "name": "coming of age movie type shit ⋆",
+      "owner": {
+        "display_name": "annajasminee",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/annajasminee"
+        },
+        "href": "https://api.spotify.com/v1/users/annajasminee",
+        "id": "annajasminee",
+        "type": "user",
+        "uri": "spotify:user:annajasminee"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAzWqZc+vXfTj8kJerHSwGmMELBMN/",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/5hx48KouTj2yVy7TJYc43U/tracks",
+        "total": 194
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:5hx48KouTj2yVy7TJYc43U"
+    }
+  ]
+}
