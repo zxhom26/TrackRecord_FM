@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 export default function AuthButton() {
   const { data: session } = useSession(); // get the current session
+  console.log("Session data:", session)
   const router = useRouter();
   const [showAnalyzing, setShowAnalyzing] = useState(false); // ADDED THIS
 
