@@ -1,28 +1,31 @@
-'use client'; // required for client-side components in Next.js App Router
+'use client';
 
-import { useSession, signIn } from "next-auth/react"; // stuff from NextAuth
+import { useSession, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-
 export default function AuthButton() {
-  const { data: session } = useSession(); // get the current session
-  console.log("Session data:", session)
+  const { data: session } = useSession();
   const router = useRouter();
-  const [showAnalyzing, setShowAnalyzing] = useState(false); // ADDED THIS
+  const [showAnalyzing, setShowAnalyzing] = useState(false);
 
-  // Case: if user logs in -- redirect to home after 3000 milliseconds
-  useEffect(()=> {
-    if (session){
-      setShowAnalyzing(true); // ADDED THIS
-      const timer = setTimeout(() => { // ADDED THIS
-      router.push("/");
-    }, 3000); // ADDED THIS
-    return () => clearTimeout(timer) // ADDED THIS
-  }
-  }, [session, router]);
+  console.log("Session in AuthButton:", session);
 
-  if (session && showAnalyzing) { // ADDED THIS BLOCK
+  useEffect(() => {
+    // Only trigger redirect if FULLY authenticated (token available)
+    if (session?.accessToken) {
+      setShowAnalyzing(true);
+
+      const timer = setTimeout(() => {
+        router.push("/");
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [session?.accessToken, router]);
+
+  // Show “Analyzing…” only when token is ready + we’re redirecting
+  if (session?.accessToken && showAnalyzing) {
     return (
       <div
         style={{
@@ -31,13 +34,13 @@ export default function AuthButton() {
           opacity: 1,
           transition: "opacity 1s ease",
         }}
-        >
-          Analyzing...
+      >
+        Analyzing...
       </div>
     );
   }
 
-  // If user is not logged in
+  // Default: user not logged in
   return (
     <button className="spotify-button" onClick={() => signIn("spotify")}>
       Sign in with Spotify
