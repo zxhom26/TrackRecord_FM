@@ -44,23 +44,27 @@ export async function sendTokenToBackend(token) {
 }
 
 // --- 13. Fetching Top Tracks ---
-export async function fetchTopTracks() {
+export async function fetchTopTracks(token) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/spotify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: "use-backend-stored-token"
-      }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/spotify`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: token  
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Spotify request failed: ${response.status}`);
     }
-
     return await response.json();
+
   } catch (err) {
     console.error("fetchTopTracks error:", err);
     return { error: err.message };
   }
 }
+
