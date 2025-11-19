@@ -1,11 +1,38 @@
 "use client";
-import React, { useState } from "react";
+
+  // --------------------- IMPORTS + STATES ---------------------
+import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { sendTokenToBackend, fetchTopTracks } from "../utils";
 
 export default function Home() {
+  const { data: session } = useSession();
+
   const [mood, setMood] = useState("");
   const [post, setPost] = useState("");
   const [feed, setFeed] = useState<string[]>([]);
+  const [topTracks, setTopTracks] = useState(null); 
 
+  // --------------------- SENDING TOKEN TO BACKEND ---------------------
+  useEffect(() => {
+    if (session?.accessToken) {
+      console.log("Sending token to backend...");
+      sendTokenToBackend(session.accessToken).then((res) => {
+        console.log("Backend token store response:", res);
+      });
+    }
+  }, [session?.accessToken]);
+
+  // --------------------- FETCHING TOP TRACKS ---------------------
+  async function handleFetchTopTracks() {
+    console.log("Requesting top tracks from backend...");
+    const result = await fetchTopTracks();
+
+    console.log("Spotify response:", result);
+    setTopTracks(result);
+  }
+
+  // --------------------- UI HANDLERS ---------------------
   const handleMoodSave = () => {
     alert(`Mood saved: ${mood || "neutral"}`);
   };
@@ -35,7 +62,39 @@ export default function Home() {
         🎧 TrackRecord FM Dashboard
       </h1>
 
-      {/* ===== Dashboard Grid ===== */}
+      {/* ==================== SPOTIFY SECTION ==================== */}
+      <div style={{ marginBottom: "2rem" }}>
+        <button
+          onClick={handleFetchTopTracks}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "8px",
+            backgroundColor: "#6a56c2",
+            color: "white",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
+          🔥 Load My Top Tracks
+        </button>
+
+        {topTracks && (
+          <pre
+            style={{
+              marginTop: "20px",
+              background: "rgba(255,255,255,0.7)",
+              padding: "15px",
+              borderRadius: "10px",
+              maxWidth: "600px",
+              overflowX: "auto",
+            }}
+          >
+            {JSON.stringify(topTracks, null, 2)}
+          </pre>
+        )}
+      </div>
+
+      {/* ==================== OLD UI ==================== */}
       <div
         style={{
           display: "grid",
@@ -45,6 +104,7 @@ export default function Home() {
           maxWidth: "1200px",
         }}
       >
+
         {/* 🎶 Music Diary */}
         <section
           style={{
@@ -106,20 +166,7 @@ export default function Home() {
               justifyContent: "space-around",
               padding: "0 1rem",
             }}
-          >
-            {[40, 70, 55, 90, 100, 65, 80].map((height, i) => (
-              <div
-                key={i}
-                style={{
-                  width: "20px",
-                  height: `${height * 1.5}px`,
-                  background:
-                    "linear-gradient(180deg,#6a56c2,#9e8ce2,#c3b9f0)",
-                  borderRadius: "8px",
-                }}
-              />
-            ))}
-          </div>
+          ></div>
           <p
             style={{
               textAlign: "center",
@@ -171,7 +218,11 @@ export default function Home() {
           </button>
 
           <div
-            style={{ marginTop: "1rem", maxHeight: "150px", overflowY: "auto" }}
+            style={{
+              marginTop: "1rem",
+              maxHeight: "150px",
+              overflowY: "auto",
+            }}
           >
             {feed.map((item, i) => (
               <p
