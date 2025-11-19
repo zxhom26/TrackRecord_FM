@@ -3,7 +3,7 @@
   // --------------------- IMPORTS + STATES ---------------------
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { sendTokenToBackend, fetchTopTracks } from "./utils";
+import { sendTokenToBackend, fetchTopTracks } from "../utils";
 
 export default function Home() {
   const { data: session } = useSession();
