@@ -25,12 +25,18 @@ export default function Home() {
 
   // --------------------- FETCHING TOP TRACKS ---------------------
   async function handleFetchTopTracks() {
-    console.log("Requesting top tracks from backend...");
-    const result = await fetchTopTracks();
-
-    console.log("Spotify response:", result);
-    setTopTracks(result);
+  if (!session?.accessToken) {
+    console.log("No Spotify token available");
+    return;
   }
+
+  console.log("Requesting top tracks from backend...");
+  const result = await fetchTopTracks(session.accessToken);
+  console.log("Spotify response:", result);
+
+  setTopTracks(result);
+}
+
 
   // --------------------- UI HANDLERS ---------------------
   const handleMoodSave = () => {
