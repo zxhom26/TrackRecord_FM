@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { sendTokenToBackend, fetchTopTracks } from "../utils";
+import { sendTokenToBackend, fetchTopTracks } from "../../utils";
 
 interface SpotifyArtist {
   name: string;
