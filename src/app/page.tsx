@@ -61,7 +61,7 @@ export default function Home() {
         style={{
           width: "95px",
           padding: "25px 10px",
-          background: "rgba(0,0,0,0)",
+          background: "rgba(0,0,0,0.15)",
           backdropFilter: "blur(8px)",
           display: "flex",
           flexDirection: "column",
@@ -69,48 +69,48 @@ export default function Home() {
           gap: "50px",
         }}
       >
-        {/* -----  WAVEFORM ----- */}
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "10px",
-            marginBottom: "10px",
-          }}
-        >
-          <svg
-            width="120"
-            height="220"
-            viewBox="0 0 400 200"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            {/* Play circle */}
-            <circle cx="60" cy="100" r="40" fill="url(#grad)" />
-            <polygon points="50,80 50,120 80,100" fill="white" />
+        {/* -----  WAVEFORM (moved upward) ----- */}
+<div
+  style={{
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "0px",        // moved up
+    marginBottom: "5px",
+  }}
+>
+  <svg
+    width="120"
+    height="220"
+    viewBox="0 0 400 200"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Play circle */}
+    <circle cx="60" cy="100" r="40" fill="url(#grad)" />
+    <polygon points="50,80 50,120 80,100" fill="white" />
 
-            {/* Left bars */}
-            <rect x="130" y="60" width="20" height="80" rx="10" fill="url(#grad)" />
-            <rect x="170" y="70" width="20" height="60" rx="10" fill="url(#grad)" />
+    {/* Left bars */}
+    <rect x="130" y="60" width="20" height="80" rx="10" fill="url(#grad)" />
+    <rect x="170" y="70" width="20" height="60" rx="10" fill="url(#grad)" />
 
-            {/* Center bars */}
-            <rect x="210" y="40" width="20" height="120" rx="10" fill="url(#grad)" />
-            <rect x="250" y="55" width="20" height="90" rx="10" fill="url(#grad)" />
-            <rect x="290" y="45" width="20" height="110" rx="10" fill="url(#grad)" />
+    {/* Center tall bars */}
+    <rect x="210" y="40" width="20" height="120" rx="10" fill="url(#grad)" />
+    <rect x="250" y="55" width="20" height="90" rx="10" fill="url(#grad)" />
+    <rect x="290" y="45" width="20" height="110" rx="10" fill="url(#grad)" />
 
-            {/* Right bars */}
-            <rect x="330" y="65" width="20" height="70" rx="10" fill="url(#grad)" />
-            <rect x="370" y="80" width="20" height="40" rx="10" fill="url(#grad)" />
+    {/* Right decreasing bars */}
+    <rect x="330" y="65" width="20" height="70" rx="10" fill="url(#grad)" />
+    <rect x="370" y="80" width="20" height="40" rx="10" fill="url(#grad)" />
 
-            {/* Gradient */}
-            <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#a160ff" />
-                <stop offset="100%" stopColor="#ff985c" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
+    <defs>
+      <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#a160ff" />
+        <stop offset="100%" stopColor="#ff985c" />
+      </linearGradient>
+    </defs>
+  </svg>
+</div>
+
 
         {/* ---------------- ICON NAV ---------------- */}
         <nav
