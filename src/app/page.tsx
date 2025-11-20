@@ -68,8 +68,8 @@ export default function Home() {
       <aside
         style={{
           width: "95px",
-          padding: "25px 10px",
-          background: "rgba(0,0,0,0.15)",
+          padding: "5px 10px",
+          background: "#221d36",
           backdropFilter: "blur(8px)",
           display: "flex",
           flexDirection: "column",
@@ -127,10 +127,10 @@ export default function Home() {
             gap: "35px",
           }}
         >
-          <House size={38} color="#6A56C2" strokeWidth={2.4} />
-          <MessagesSquare size={38} color="#6A56C2" strokeWidth={2.4} />
-          <Trophy size={38} color="#6A56C2" strokeWidth={2.4} />
-          <Settings size={38} color="#6A56C2" strokeWidth={2.4} />
+          <House size={38} color="#e5daf5" strokeWidth={2.4} />
+          <MessagesSquare size={38} color="#e5daf5" strokeWidth={2.4} />
+          <Trophy size={38} color="#e5daf5" strokeWidth={2.4} />
+          <Settings size={38} color="#e5daf5" strokeWidth={2.4} />
         </nav>
       </aside>
 
