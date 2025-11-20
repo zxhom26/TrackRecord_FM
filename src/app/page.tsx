@@ -130,7 +130,7 @@ export default function HomePage() {
               justifyContent: "center",
             }}
           >
-            <Home size={24} color="#6A56C2" />
+            <Home size={24} color="#dccbf2" />
           </div>
 
           {/* SOCIAL */}
@@ -145,7 +145,7 @@ export default function HomePage() {
               justifyContent: "center",
             }}
           >
-            <MessagesSquare size={24} color="#6A56C2" />
+            <MessagesSquare size={24} color="#dccbf2" />
           </div>
 
           {/* TROPHY */}
@@ -160,7 +160,7 @@ export default function HomePage() {
               justifyContent: "center",
             }}
           >
-            <Trophy size={24} color="#6A56C2" />
+            <Trophy size={24} color="#dccbf2" />
           </div>
 
           {/* SETTINGS */}
@@ -175,7 +175,7 @@ export default function HomePage() {
               justifyContent: "center",
             }}
           >
-            <Settings size={24} color="#6A56C2" />
+            <Settings size={24} color="#dccbf2" />
           </div>
         </nav>
       </aside>
