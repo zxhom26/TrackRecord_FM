@@ -1,6 +1,5 @@
 "use client";
 
-  // --------------------- IMPORTS + STATES ---------------------
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { sendTokenToBackend, fetchTopTracks } from "../utils";
@@ -11,9 +10,9 @@ export default function Home() {
   const [mood, setMood] = useState("");
   const [post, setPost] = useState("");
   const [feed, setFeed] = useState<string[]>([]);
-  const [topTracks, setTopTracks] = useState(null); 
+  const [topTracks, setTopTracks] = useState<any>(null);
 
-  // --------------------- SENDING TOKEN TO BACKEND ---------------------
+  // --------------------- SEND SPOTIFY TOKEN TO BACKEND ---------------------
   useEffect(() => {
     if (session?.accessToken) {
       console.log("Sending token to backend...");
@@ -23,20 +22,19 @@ export default function Home() {
     }
   }, [session?.accessToken]);
 
-  // --------------------- FETCHING TOP TRACKS ---------------------
+  // --------------------- FETCH TOP TRACKS ---------------------
   async function handleFetchTopTracks() {
-  if (!session?.accessToken) {
-    console.log("No Spotify token available");
-    return;
+    if (!session?.accessToken) {
+      console.log("No Spotify token available");
+      return;
+    }
+
+    console.log("Requesting top tracks from backend...");
+    const result = await fetchTopTracks(session.accessToken);
+    console.log("Spotify response:", result);
+
+    setTopTracks(result);
   }
-
-  console.log("Requesting top tracks from backend...");
-  const result = await fetchTopTracks(session.accessToken);
-  console.log("Spotify response:", result);
-
-  setTopTracks(result);
-}
-
 
   // --------------------- UI HANDLERS ---------------------
   const handleMoodSave = () => {
@@ -58,7 +56,6 @@ export default function Home() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
         background: "linear-gradient(135deg,#e8defa,#d0bcf5)",
         fontFamily: "'Inter', sans-serif",
         color: "#2b225a",
@@ -69,7 +66,7 @@ export default function Home() {
       </h1>
 
       {/* ==================== SPOTIFY SECTION ==================== */}
-      <div style={{ marginBottom: "2rem" }}>
+      <div style={{ marginBottom: "2rem", width: "100%", textAlign: "center" }}>
         <button
           onClick={handleFetchTopTracks}
           style={{
@@ -84,23 +81,83 @@ export default function Home() {
           🔥 Load My Top Tracks
         </button>
 
-        {topTracks && (
-          <pre
+        {/* ===== TOP TRACK CARDS ===== */}
+        {topTracks?.spotify_data?.items && (
+          <div
             style={{
               marginTop: "20px",
-              background: "rgba(255,255,255,0.7)",
-              padding: "15px",
-              borderRadius: "10px",
-              maxWidth: "600px",
-              overflowX: "auto",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "20px",
+              width: "100%",
+              maxWidth: "900px",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
-            {JSON.stringify(topTracks, null, 2)}
-          </pre>
+            {topTracks.spotify_data.items.map((track: any, index: number) => (
+              <div
+                key={index}
+                style={{
+                  background: "white",
+                  borderRadius: "12px",
+                  padding: "15px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
+              >
+                <img
+                  src={track.album.images?.[0]?.url}
+                  alt={track.name}
+                  style={{
+                    width: "100%",
+                    height: "250px",
+                    objectFit: "cover",
+                    borderRadius: "10px",
+                    marginBottom: "10px",
+                  }}
+                />
+
+                <h4
+                  style={{
+                    margin: "10px 0 5px",
+                    fontSize: "1.1rem",
+                    fontWeight: 700,
+                  }}
+                >
+                  {track.name}
+                </h4>
+
+                <p style={{ margin: 0, color: "#666", fontWeight: 500 }}>
+                  {track.artists.map((a: any) => a.name).join(", ")}
+                </p>
+
+                <a
+                  href={track.external_urls.spotify}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    marginTop: "10px",
+                    padding: "8px 14px",
+                    background: "#1DB954",
+                    color: "white",
+                    borderRadius: "20px",
+                    textDecoration: "none",
+                    fontWeight: 600,
+                  }}
+                >
+                  ▶️ Open in Spotify
+                </a>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* ==================== OLD UI ==================== */}
+      {/* ==================== EXISTING UI BELOW ==================== */}
       <div
         style={{
           display: "grid",
@@ -110,7 +167,6 @@ export default function Home() {
           maxWidth: "1200px",
         }}
       >
-
         {/* 🎶 Music Diary */}
         <section
           style={{
@@ -140,18 +196,18 @@ export default function Home() {
               marginTop: "1rem",
               padding: "8px 16px",
               borderRadius: "8px",
-              border: "none",
               backgroundColor: "#6a56c2",
               color: "white",
               fontWeight: "bold",
               cursor: "pointer",
+              border: "none",
             }}
           >
             💾 Save Mood
           </button>
         </section>
 
-        {/* 📊 Analytics Overview */}
+        {/* 📊 Analytics */}
         <section
           style={{
             background: "linear-gradient(135deg,#e8faff,#d3ebff)",
@@ -213,11 +269,11 @@ export default function Home() {
               marginTop: "1rem",
               padding: "8px 16px",
               borderRadius: "8px",
-              border: "none",
               backgroundColor: "#f37eab",
               color: "white",
               fontWeight: "bold",
               cursor: "pointer",
+              border: "none",
             }}
           >
             🚀 Post
