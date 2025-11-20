@@ -2,7 +2,34 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { sendTokenToBackend, fetchTopTracks } from "../utils";
+
+// ---------- TYPES ----------
+interface SpotifyArtist {
+  name: string;
+}
+
+interface SpotifyImage {
+  url: string;
+}
+
+interface SpotifyAlbum {
+  images: SpotifyImage[];
+}
+
+interface SpotifyTrack {
+  name: string;
+  artists: SpotifyArtist[];
+  external_urls: { spotify: string };
+  album: SpotifyAlbum;
+}
+
+interface SpotifyResponse {
+  spotify_data?: {
+    items: SpotifyTrack[];
+  };
+}
 
 export default function Home() {
   const { data: session } = useSession();
@@ -10,9 +37,9 @@ export default function Home() {
   const [mood, setMood] = useState("");
   const [post, setPost] = useState("");
   const [feed, setFeed] = useState<string[]>([]);
-  const [topTracks, setTopTracks] = useState<any>(null);
+  const [topTracks, setTopTracks] = useState<SpotifyResponse | null>(null);
 
-  // --------------------- SEND SPOTIFY TOKEN TO BACKEND ---------------------
+  // ---------------- SEND TOKEN TO BACKEND ----------------
   useEffect(() => {
     if (session?.accessToken) {
       console.log("Sending token to backend...");
@@ -22,7 +49,7 @@ export default function Home() {
     }
   }, [session?.accessToken]);
 
-  // --------------------- FETCH TOP TRACKS ---------------------
+  // ---------------- FETCH TOP TRACKS ----------------
   async function handleFetchTopTracks() {
     if (!session?.accessToken) {
       console.log("No Spotify token available");
@@ -36,14 +63,14 @@ export default function Home() {
     setTopTracks(result);
   }
 
-  // --------------------- UI HANDLERS ---------------------
+  // ---------------- UI HANDLERS ----------------
   const handleMoodSave = () => {
     alert(`Mood saved: ${mood || "neutral"}`);
   };
 
   const handlePost = () => {
     if (post.trim() !== "") {
-      setFeed((prevFeed) => [...prevFeed, post]);
+      setFeed((prev) => [...prev, post]);
       setPost("");
     }
   };
@@ -95,7 +122,7 @@ export default function Home() {
               marginRight: "auto",
             }}
           >
-            {topTracks.spotify_data.items.map((track: any, index: number) => (
+            {topTracks.spotify_data.items.map((track, index) => (
               <div
                 key={index}
                 style={{
@@ -109,15 +136,15 @@ export default function Home() {
                   textAlign: "center",
                 }}
               >
-                <img
+                <Image
                   src={track.album.images?.[0]?.url}
                   alt={track.name}
+                  width={300}
+                  height={300}
                   style={{
-                    width: "100%",
-                    height: "250px",
-                    objectFit: "cover",
                     borderRadius: "10px",
                     marginBottom: "10px",
+                    objectFit: "cover",
                   }}
                 />
 
@@ -132,7 +159,7 @@ export default function Home() {
                 </h4>
 
                 <p style={{ margin: 0, color: "#666", fontWeight: 500 }}>
-                  {track.artists.map((a: any) => a.name).join(", ")}
+                  {track.artists.map((a) => a.name).join(", ")}
                 </p>
 
                 <a
@@ -157,7 +184,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* ==================== EXISTING UI BELOW ==================== */}
+      {/* ==================== REST OF UI ==================== */}
       <div
         style={{
           display: "grid",
@@ -278,7 +305,6 @@ export default function Home() {
           >
             🚀 Post
           </button>
-
           <div
             style={{
               marginTop: "1rem",
