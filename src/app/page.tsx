@@ -4,6 +4,14 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { sendTokenToBackend, fetchTopTracks } from "../utils";
 
+// LUCIDE ICONS
+import {
+  House,
+  MessagesSquare,
+  Trophy,
+  Settings,
+} from "lucide-react";
+
 // ---------- TYPES ----------
 interface SpotifyArtist {
   name: string;
@@ -61,7 +69,7 @@ export default function Home() {
         style={{
           width: "95px",
           padding: "25px 10px",
-          background: "rgba(0,0,0,0.15)",
+          background: "rgba(0,0,0,0)",
           backdropFilter: "blur(8px)",
           display: "flex",
           flexDirection: "column",
@@ -69,50 +77,49 @@ export default function Home() {
           gap: "50px",
         }}
       >
-        {/* -----  WAVEFORM (moved upward) ----- */}
-<div
-  style={{
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    marginTop: "0px",        // moved up
-    marginBottom: "5px",
-  }}
->
-  <svg
-    width="120"
-    height="220"
-    viewBox="0 0 400 200"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    {/* Play circle */}
-    <circle cx="60" cy="100" r="40" fill="url(#grad)" />
-    <polygon points="50,80 50,120 80,100" fill="white" />
+        {/* -----  WAVEFORM (TOP-LEFT) ----- */}
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "0px", // moved higher
+            marginBottom: "10px",
+          }}
+        >
+          <svg
+            width="120"
+            height="220"
+            viewBox="0 0 400 200"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Play circle */}
+            <circle cx="60" cy="100" r="40" fill="url(#grad)" />
+            <polygon points="50,80 50,120 80,100" fill="white" />
 
-    {/* Left bars */}
-    <rect x="130" y="60" width="20" height="80" rx="10" fill="url(#grad)" />
-    <rect x="170" y="70" width="20" height="60" rx="10" fill="url(#grad)" />
+            {/* Left bars */}
+            <rect x="130" y="60" width="20" height="80" rx="10" fill="url(#grad)" />
+            <rect x="170" y="70" width="20" height="60" rx="10" fill="url(#grad)" />
 
-    {/* Center tall bars */}
-    <rect x="210" y="40" width="20" height="120" rx="10" fill="url(#grad)" />
-    <rect x="250" y="55" width="20" height="90" rx="10" fill="url(#grad)" />
-    <rect x="290" y="45" width="20" height="110" rx="10" fill="url(#grad)" />
+            {/* Center tall bars */}
+            <rect x="210" y="40" width="20" height="120" rx="10" fill="url(#grad)" />
+            <rect x="250" y="55" width="20" height="90" rx="10" fill="url(#grad)" />
+            <rect x="290" y="45" width="20" height="110" rx="10" fill="url(#grad)" />
 
-    {/* Right decreasing bars */}
-    <rect x="330" y="65" width="20" height="70" rx="10" fill="url(#grad)" />
-    <rect x="370" y="80" width="20" height="40" rx="10" fill="url(#grad)" />
+            {/* Right decreasing bars */}
+            <rect x="330" y="65" width="20" height="70" rx="10" fill="url(#grad)" />
+            <rect x="370" y="80" width="20" height="40" rx="10" fill="url(#grad)" />
 
-    <defs>
-      <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#a160ff" />
-        <stop offset="100%" stopColor="#ff985c" />
-      </linearGradient>
-    </defs>
-  </svg>
-</div>
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#a160ff" />
+                <stop offset="100%" stopColor="#ff985c" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
 
-
-        {/* ---------------- ICON NAV ---------------- */}
+        {/* ---------------- ICON NAV (LUCIDE) ---------------- */}
         <nav
           style={{
             display: "flex",
@@ -120,25 +127,10 @@ export default function Home() {
             gap: "35px",
           }}
         >
-          {/* HOME */}
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="#6A56C2">
-            <path d="M12 3l9 7h-3v11H6V10H3l9-7z" />
-          </svg>
-
-          {/* SOCIAL */}
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="#6A56C2">
-            <path d="M4 4h16v12H6l-2 2V4zm3 4v2h10V8H7zm0 4v2h7v-2H7z" />
-          </svg>
-
-          {/* TROPHY */}
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="#6A56C2">
-            <path d="M17 3v2h3v3a4 4 0 01-4 4h-1a6 6 0 01-4 2 6 6 0 01-4-2H6a4 4 0 01-4-4V5h3V3h12z" />
-          </svg>
-
-          {/* SETTINGS */}
-          <svg width="38" height="38" viewBox="0 0 24 24" fill="#6A56C2">
-            <path d="M12 8a4 4 0 100 8 4 4 0 000-8zm9 4a7 7 0 00-.2-1.6l2-1.5-2-3.5-2.4 1a6.9 6.9 0 00-1.7-1L16.5 2h-5L10 5.4a6.9 6.9 0 00-1.7 1l-2.4-1-2 3.5 2 1.5A7 7 0 006 12c0 .6.1 1.1.2 1.6l-2 1.5 2 3.5 2.4-1c.5.4 1.1.8 1.7 1L11.5 22h5l.5-3.4c.6-.3 1.2-.6 1.7-1l2.4 1 2-3.5-2-1.5c.1-.5.2-1 .2-1.6z" />
-          </svg>
+          <House size={38} color="#6A56C2" strokeWidth={2.4} />
+          <MessagesSquare size={38} color="#6A56C2" strokeWidth={2.4} />
+          <Trophy size={38} color="#6A56C2" strokeWidth={2.4} />
+          <Settings size={38} color="#6A56C2" strokeWidth={2.4} />
         </nav>
       </aside>
 
@@ -163,7 +155,7 @@ export default function Home() {
           Your Top Tracks
         </h2>
 
-        {/* ------- REFRESH BUTTON ------- */}
+        {/* ------- REFRESH BUTTON UNDER TITLE ------- */}
         <button
           onClick={handleFetchTopTracks}
           style={{
