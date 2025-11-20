@@ -15,11 +15,11 @@ export default function LoginPage() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <!-- Play circle -->
+          {/* Play circle */}
           <circle cx="30" cy="60" r="22" fill="url(#grad)" />
           <polygon points="25,48 25,72 45,60" fill="#ffffff" />
 
-          <!-- Bars -->
+          {/* Music Bars */}
           <rect x="70" y="30" width="10" height="60" rx="5" fill="url(#grad)" />
           <rect x="90" y="40" width="10" height="40" rx="5" fill="url(#grad)" />
           <rect x="110" y="20" width="10" height="80" rx="5" fill="url(#grad)" />
