@@ -11,21 +11,13 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://trackrecord-fm-ui.onrender.com",  # production frontend
-        "http://localhost:3000",                    # local development
+        "https://trackrecord-fm-ui.onrender.com",  
+        "http://localhost:3000",                   
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-'''
-@app.get("/")
-@app.get("/api/data")
-@app.post("/api/token")
-@app.post("/api/spotify")
-'''
-
 
 # ✅ Home
 @app.get("/")
@@ -37,6 +29,7 @@ def root():
 def get_data():
     return {"message": "Hello from FastAPI backend!"}
 
+# ✅ Receive and store access token
 @app.post("/api/token")
 async def receive_token(request: Request):
     data = await request.json()
@@ -46,7 +39,7 @@ async def receive_token(request: Request):
     user_tokens["active"] = token
     return {"message": "token stored successfully"}
 
-# ✅ Spotify route example
+# ✅ Spotify route (FIXED VERSION)
 @app.post("/api/spotify")
 async def call_spotify(request: Request):
     data = await request.json()
@@ -55,11 +48,13 @@ async def call_spotify(request: Request):
     if not token:
         return {"error": "token not found"}
 
-    # Example call using your wrapper
-    api = SpotifyAPI()
-    proxy = SpotifyAPIProxy(api, token)
+    # FIXED — must pass token into SpotifyAPI
+    api = SpotifyAPI(access_token=token)
 
-    # Example: fetch top tracks
+    # FIXED — SpotifyAPIProxy only accepts (api)
+    proxy = SpotifyAPIProxy(api)
+
+    # request top tracks
     response = proxy.fetch_api(endpoint="me/top/tracks")
 
     return {"spotify_data": response}
