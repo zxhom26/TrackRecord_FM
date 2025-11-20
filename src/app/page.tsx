@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Home, MessageSquare, Trophy, Settings, User, ListMusic } from "lucide-react";
+import { Home, MessagesSquare, Trophy, Settings, User, ListMusic } from "lucide-react";
 import { sendTokenToBackend } from "../utils";
 
 // ───────────────────── TYPES (for future expansion) ─────────────────────
@@ -60,7 +60,7 @@ export default function HomePage() {
         style={{
           width: "95px",
           padding: "16px 10px 24px 10px",
-          background: "rgba(0,0,0,0)",
+          background: "#1a1233",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -192,51 +192,53 @@ export default function HomePage() {
       >
         {/* ------- TOP BAR ------- */}
         <header
-          style={{
-            width: "100%",
-            borderRadius: "18px",
-            background: "rgba(0,0,0,0.12)",
-            backdropFilter: "blur(10px)",
-            padding: "16px 24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          {/* Spacer so gradient text is visually centered with sidebar */}
-          <div style={{ width: 40 }} />
+  style={{
+    width: "100%",
+    height: "70px",
+    backgroundColor: "rgba(43, 34, 90, 1)", // full opaque dark purple
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 30px",
+    borderRadius: 0, // removes the pill shape
+    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+  }}
+>
+  {/* Left spacer to visually align text with sidebar */}
+  <div style={{ width: 40 }} />
 
-          {/* Gradient Welcome Text */}
-          <div
-            style={{
-              fontSize: "1.6rem",
-              fontWeight: 700,
-              backgroundImage: "linear-gradient(135deg,#a160ff,#ff985c)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-              textAlign: "center",
-              flexGrow: 1,
-            }}
-          >
-            Welcome back, {displayName}!
-          </div>
+  {/* Gradient Welcome Text */}
+  <div
+    style={{
+      fontSize: "1.6rem",
+      fontWeight: 700,
+      backgroundImage: "linear-gradient(135deg,#a160ff,#ff985c)",
+      WebkitBackgroundClip: "text",
+      backgroundClip: "text",
+      color: "transparent",
+      textAlign: "center",
+      flexGrow: 1,
+    }}
+  >
+    Welcome back, {displayName}!
+  </div>
 
-          {/* Profile Icon */}
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: "999px",
-              backgroundColor: "#d9c9ff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <User size={22} color="#2b225a" />
-          </div>
-        </header>
+  {/* Profile Icon */}
+  <div
+    style={{
+      width: 42,
+      height: 42,
+      borderRadius: "50%",
+      backgroundColor: "#d9c9ff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <User size={22} color="#2b225a" />
+  </div>
+</header>
+
 
         {/* ------- “Dive Back In” HEADING ------- */}
         <section
