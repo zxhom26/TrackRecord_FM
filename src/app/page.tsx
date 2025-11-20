@@ -69,7 +69,7 @@ export default function Home() {
         style={{
           width: "95px",
           padding: "25px 10px",
-          background: "rgba(0,0,0,0)",
+          background: "rgba(0,0,0,0.15)",
           backdropFilter: "blur(8px)",
           display: "flex",
           flexDirection: "column",
@@ -84,7 +84,7 @@ export default function Home() {
             display: "flex",
             justifyContent: "center",
             marginTop: "0px", // moved higher
-            marginBottom: "10px",
+            marginBottom: "15px",
           }}
         >
           <svg
