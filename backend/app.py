@@ -7,52 +7,67 @@ user_tokens = {}
 
 app = FastAPI()
 
-# ✅ Add correct CORS setup
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://trackrecord-fm-ui.onrender.com",  # production frontend
-        "http://localhost:3000",                    # local development
+        "https://trackrecord-fm-ui.onrender.com",
+        "http://localhost:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Home
 @app.get("/")
 def root():
     return {"message": "✅ TrackRecord.fm API is live!"}
 
-# ✅ Simple test route
 @app.get("/api/data")
 def get_data():
     return {"message": "Hello from FastAPI backend!"}
 
-# ✅ Receive and store access token
+# Receive token from frontend
 @app.post("/api/token")
-async def get_token(request: Request):
+async def receive_token(request: Request):
     data = await request.json()
     token = data.get("accessToken")
+
+    print("\n--- /api/token RECEIVED ---")
+    print("Token:", token)
+
     if not token:
         return {"error": "token not found"}
+
     user_tokens["active"] = token
+    print("Stored token successfully.")
     return {"message": "token stored successfully"}
 
-# ✅ Spotify route example
+# MAIN SPOTIFY CALL
 @app.post("/api/spotify")
 async def call_spotify(request: Request):
     data = await request.json()
-    token = data.get("token")
 
+    print("\n--- /api/spotify CALLED ---")
+    print("Request body:", data)
+
+    token = data.get("token")
     if not token:
+        print("❌ No token received!")
         return {"error": "token not found"}
 
-    # Example call using your wrapper
-    api = SpotifyAPI()
-    proxy = SpotifyAPIProxy(api, token)
+    print("🎵 Token received in /api/spotify:", token[:25] + "...")
 
-    # Example: fetch top tracks
+    # create API wrapper with token
+    api = SpotifyAPI(access_token=token)
+    proxy = SpotifyAPIProxy(api)
+
+    print("📡 Calling Spotify: GET me/top/tracks")
+
+    # make spotify call
     response = proxy.fetch_api(endpoint="me/top/tracks")
+
+    print("📦 Spotify API returned:", response)
+    print("--- END /api/spotify ---\n")
 
     return {"spotify_data": response}

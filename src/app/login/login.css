@@ -1,0 +1,49 @@
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #1e1e1e;
+  color: white;
+  font-family: Inter, sans-serif;
+}
+
+/* Music Bars */
+.waveform {
+  margin-bottom: 2rem;
+}
+
+/* Title */
+.login-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 2.5rem;
+  color: #ffffff;
+}
+
+/* Spotify button */
+.spotify-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #1db954;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.spotify-button:hover {
+  background-color: #1ed760;
+}
+
+.spotify-button img {
+  width: 24px;
+  height: 24px;
+}
