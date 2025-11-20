@@ -145,7 +145,7 @@ export default function HomePage() {
               justifyContent: "center",
             }}
           >
-            <MessageSquare size={24} color="#6A56C2" />
+            <MessagesSquare size={24} color="#6A56C2" />
           </div>
 
           {/* TROPHY */}
