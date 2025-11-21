@@ -194,12 +194,12 @@ export default function HomePage() {
         <header
   style={{
     width: "100%",
-    height: "90px",
+    height: "70px",
     backgroundColor: "#1a1233", // full opaque dark purple
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
-    padding: "0 55px",
+    padding: "0 30px",
     borderRadius: 0, // removes the pill shape
     boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
   }}
