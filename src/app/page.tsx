@@ -197,7 +197,7 @@ export default function HomePage() {
     height: "70px",
     backgroundColor: "#1a1233", // full opaque dark purple
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
     padding: "0 30px",
     borderRadius: 0, // removes the pill shape
