@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Home, MessagesSquare, Trophy, Settings, User, ListMusic } from "lucide-react";
+import { Home, MessagesSquare, Trophy, Settings, User, ListMusic, WandSparkles } from "lucide-react";
 import { sendTokenToBackend } from "../utils";
 
 // ───────────────────── TYPES (for future expansion) ─────────────────────
@@ -393,7 +393,7 @@ export default function HomePage() {
       gap: "8px",
     }}
   >
-    <Settings size={18} color="#6A56C2" />
+    <WandSparkles size={18} color="#6A56C2" />
     Discover Weekly
   </h3>
 
