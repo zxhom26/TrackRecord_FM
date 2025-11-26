@@ -1,4 +1,4 @@
-// --- 11. Call backend helper ---
+// --- Call backend helper ---
 export async function callBackend() {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -19,7 +19,7 @@ export async function callBackend() {
   }
 }
 
-// --- 12. Backend token sender ---
+// --- Backend token sender ---
 export async function sendTokenToBackend(token) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -43,7 +43,7 @@ export async function sendTokenToBackend(token) {
   }
 }
 
-// --- 13. Fetching Top Tracks ---
+// --- Fetching Top Tracks ---
 export async function fetchTopTracks(token) {
   try {
     const response = await fetch(
@@ -68,3 +68,25 @@ export async function fetchTopTracks(token) {
   }
 }
 
+// --- Fetching Discover Weekly Playlist ---
+export async function fetchDiscoverWeekly(token) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/spotify-discover`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Discover Weekly fetch failed: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error("fetchDiscoverWeekly error:", err);
+    return { error: err.message };
+  }
+}
