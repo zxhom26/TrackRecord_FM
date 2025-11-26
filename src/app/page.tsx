@@ -369,46 +369,49 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Leaderboard Panel */}
-          <div
-            style={{
-              borderRadius: "18px",
-              padding: "18px 20px",
-              background: "linear-gradient(135deg,#ffe9f0,#ffd4e1)",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: "1.1rem",
-                fontWeight: 600,
-                marginBottom: "8px",
-              }}
-            >
-              Leaderboard
-            </h3>
-            <p
-              style={{
-                fontSize: "0.9rem",
-                opacity: 0.8,
-                marginBottom: "10px",
-              }}
-            >
-              Top artist & genre summaries (coming soon).
-            </p>
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                fontSize: "0.9rem",
-              }}
-            >
-              <li style={{ marginBottom: "6px" }}>• Top Artist: —</li>
-              <li style={{ marginBottom: "6px" }}>• Top Genre: —</li>
-              <li>• Most played day: —</li>
-            </ul>
-          </div>
+          {/* Discover Panel */}
+<div
+  onClick={() => router.push("/discover")}
+  style={{
+    borderRadius: "18px",
+    padding: "18px 20px",
+    background: "linear-gradient(135deg,#ffe9f0,#ffd4e1)",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+    cursor: "pointer",
+    transition: "transform 0.15s ease",
+  }}
+  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1.0)")}
+>
+  <h3
+    style={{
+      fontSize: "1.1rem",
+      fontWeight: 600,
+      marginBottom: "8px",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+    }}
+  >
+    <Settings size={18} color="#6A56C2" />
+    Discover Weekly
+  </h3>
+
+  <p
+    style={{
+      fontSize: "0.9rem",
+      opacity: 0.8,
+      marginBottom: "10px",
+    }}
+  >
+    Explore your personalized Discover Weekly playlist!
+  </p>
+
+  <p style={{ fontSize: "0.85rem", opacity: 0.6 }}>
+    Click to explore →
+  </p>
+</div>
+
         </section>
       </main>
     </div>
