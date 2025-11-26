@@ -12,6 +12,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://trackrecord-fm-ui.onrender.com",
+        "https://trackrecord-fm-ui.onrender.com/", # added this
         "http://localhost:3000",
     ],
     allow_credentials=True,
@@ -75,46 +76,59 @@ async def call_spotify(request: Request):
 # SPOTIFY CALL TO FETCH DISCOVER WEEKLY PLAYLIST
 @app.post("/api/discover-weekly")
 async def fetch_discover_weekly(request: Request):
-    data = await request.json() # awaiting json
+
+    # -----------------------
+    # 1. SAFELY PARSE TOKEN
+    # -----------------------
+    try:
+        data = await request.json()
+    except:
+        return {"error": "Invalid JSON body"}
+
     token = data.get("token")
-
-    print("\n--- /api/discover-weekly CALLED ---")
-    print("Token received:", token[:25] + "..." if token else "❌ None")
-
     if not token:
+        print("❌ No token received in /api/discover-weekly")
         return {"error": "token not found"}
 
-    # initialize API proxy
+    print("🔑 Token received OK")
+
+    # -----------------------
+    # 2. CREATE API CLIENTS
+    # -----------------------
     api = SpotifyAPI(access_token=token)
     proxy = SpotifyAPIProxy(api)
 
     print("🔍 Searching for Discover Weekly playlist...")
 
-    # 1) Search for Discover Weekly playlist
+    # -----------------------
+    # 3. SEARCH FOR PLAYLIST — FULLY SAFE
+    # -----------------------
     search_result = proxy.fetch_api(
         endpoint="search",
-        params={
-            "q": "Discover Weekly",
-            "type": "playlist",
-            "limit": 1
-        }
+        params={"q": "Discover Weekly", "type": "playlist", "limit": 1}
     )
 
-    # Check if playlist exists
+    # If Spotify returned an error
+    if not search_result or "error" in search_result:
+        print("Spotify search error:", search_result)
+        return {"error": "Spotify search failed", "details": search_result}
+
     playlists = search_result.get("playlists", {}).get("items", [])
     if not playlists:
-        print("❌ Discover Weekly playlist not found.")
-        return {"error": "Discover Weekly playlist not found"}
+        print("Discover Weekly not found in search results")
+        return {"discover_weekly": {"items": []}}
 
-    playlist_id = playlists[0]["id"] # extract playlist ID
-    print(f"🎵 Found Discover Weekly playlist: {playlist_id}")
+    playlist_id = playlists[0]["id"]
+    print("🎵 Found playlist:", playlist_id)
 
-    # 2) Fetch playlist tracks
-    tracks = proxy.fetch_api( 
-        endpoint=f"playlists/{playlist_id}/tracks" # WITHIN discover weekly, fetch top tracks
-    )
+    # -----------------------
+    # 4. FETCH PLAYLIST TRACKS — FULLY SAFE
+    # -----------------------
+    tracks = proxy.fetch_api(endpoint=f"playlists/{playlist_id}/tracks")
 
-    print("📦 Returned Discover Weekly tracks.")
-    print("--- END /api/discover-weekly ---\n")
+    if not tracks or "error" in tracks:
+        print("Spotify track fetch error:", tracks)
+        return {"error": "Track fetch failed", "details": tracks}
 
+    print("Returning Discover Weekly tracks.")
     return {"discover_weekly": tracks}
