@@ -71,3 +71,50 @@ async def call_spotify(request: Request):
     print("--- END /api/spotify ---\n")
 
     return {"spotify_data": response}
+
+# SPOTIFY CALL TO FETCH DISCOVER WEEKLY PLAYLIST
+@app.post("/api/discover-weekly")
+async def fetch_discover_weekly(request: Request):
+    data = await request.json() # awaiting json
+    token = data.get("token")
+
+    print("\n--- /api/discover-weekly CALLED ---")
+    print("Token received:", token[:25] + "..." if token else "❌ None")
+
+    if not token:
+        return {"error": "token not found"}
+
+    # initialize API proxy
+    api = SpotifyAPI(access_token=token)
+    proxy = SpotifyAPIProxy(api)
+
+    print("🔍 Searching for Discover Weekly playlist...")
+
+    # 1) Search for Discover Weekly playlist
+    search_result = proxy.fetch_api(
+        endpoint="search",
+        params={
+            "q": "Discover Weekly",
+            "type": "playlist",
+            "limit": 1
+        }
+    )
+
+    # Check if playlist exists
+    playlists = search_result.get("playlists", {}).get("items", [])
+    if not playlists:
+        print("❌ Discover Weekly playlist not found.")
+        return {"error": "Discover Weekly playlist not found"}
+
+    playlist_id = playlists[0]["id"] # extract playlist ID
+    print(f"🎵 Found Discover Weekly playlist: {playlist_id}")
+
+    # 2) Fetch playlist tracks
+    tracks = proxy.fetch_api( 
+        endpoint=f"playlists/{playlist_id}/tracks" # WITHIN discover weekly, fetch top tracks
+    )
+
+    print("📦 Returned Discover Weekly tracks.")
+    print("--- END /api/discover-weekly ---\n")
+
+    return {"discover_weekly": tracks}
