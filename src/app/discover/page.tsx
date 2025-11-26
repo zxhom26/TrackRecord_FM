@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { sendTokenToBackend, fetchDiscoverWeekly } from "../../utils";
-import { Home, MessageSquare, Trophy, Settings, User } from "lucide-react";
+import { Home, MessageSquare, Trophy, Settings } from "lucide-react";
 
 interface SpotifyTrack {
   name: string;
@@ -12,49 +12,31 @@ interface SpotifyTrack {
   external_urls: { spotify: string };
 }
 
-interface DiscoverResponse {
-  discover_weekly?: {
-    items?: { track: SpotifyTrack }[]; // Spotify returns wrapped {track: {...}}
-  };
-}
-
 export default function DiscoverPage() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const [discover, setDiscover] = useState<SpotifyTrack[] | null>(null);
+  const [tracks, setTracks] = useState<SpotifyTrack[]>([]);
 
-  // ─────────────────────────────────────────────────────────────
-  // Fetch Discover Weekly when token becomes available
-  // ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!session?.accessToken) return;
-
-    async function init() {
-      await sendTokenToBackend(session.accessToken); // ensure backend has token
-      const result = await fetchDiscoverWeekly(session.accessToken);
-
-      if (result?.discover_weekly?.items) {
-        // Spotify playlist tracks return structure: { items: [ { track: {...} } ] }
-        const extracted = result.discover_weekly.items
-          .map((item: any) => item.track) // unwrap each track
-          .filter(Boolean);
-
-        setDiscover(extracted);
-      }
+    if (session?.accessToken) {
+      sendTokenToBackend(session.accessToken);
+      loadDiscover();
     }
-
-    init();
   }, [session?.accessToken]);
 
-  const displayName =
-    session?.user?.name ||
-    session?.user?.email ||
-    "Spotify User";
+  async function loadDiscover() {
+    if (!session?.accessToken) return;
 
-  // ─────────────────────────────────────────────────────────────
-  // UI Render
-  // ─────────────────────────────────────────────────────────────
+    const result = await fetchDiscoverWeekly(session.accessToken);
+
+    // Backend returns { discover_weekly: { items: [...] } }
+    const items = result?.discover_weekly?.items;
+    if (items) setTracks(items);
+  }
+
+  const displayName =
+    session?.user?.email || session?.user?.name || "Spotify User";
 
   return (
     <div
@@ -66,7 +48,7 @@ export default function DiscoverPage() {
         color: "#2b225a",
       }}
     >
-      {/* ================= LEFT SIDEBAR ================= */}
+      {/* LEFT SIDEBAR */}
       <aside
         style={{
           width: "95px",
@@ -112,11 +94,12 @@ export default function DiscoverPage() {
         </nav>
       </aside>
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* MAIN CONTENT */}
       <main
         style={{
           flexGrow: 1,
           padding: "40px",
+          color: "#2b225a",
         }}
       >
         <h1
@@ -126,17 +109,15 @@ export default function DiscoverPage() {
             marginBottom: "16px",
           }}
         >
-          Your Discover Weekly,{" "}
+          Discover Weekly for{" "}
           <span style={{ color: "#6A56C2" }}>{displayName}</span>
         </h1>
 
-        {/* LOADING STATE */}
-        {!discover && (
-          <p style={{ opacity: 0.7 }}>Loading Discover Weekly...</p>
+        {!tracks.length && (
+          <p style={{ opacity: 0.7 }}>Loading Discover Weekly…</p>
         )}
 
-        {/* TRACK GRID */}
-        {discover && (
+        {tracks.length > 0 && (
           <div
             style={{
               display: "grid",
@@ -144,9 +125,9 @@ export default function DiscoverPage() {
               gap: "20px",
             }}
           >
-            {discover.map((track, index) => (
+            {tracks.map((track, i) => (
               <div
-                key={index}
+                key={i}
                 style={{
                   background: "#e5daf5",
                   borderRadius: "14px",
@@ -155,11 +136,9 @@ export default function DiscoverPage() {
                 }}
               >
                 <div style={{ fontWeight: 700 }}>{track.name}</div>
-
                 <div style={{ opacity: 0.7, marginTop: "4px" }}>
-                  {track.artists?.map((a) => a.name).join(", ")}
+                  {track.artists.map((a) => a.name).join(", ")}
                 </div>
-
                 <a
                   href={track.external_urls.spotify}
                   target="_blank"
