@@ -13,27 +13,53 @@ interface SpotifyTrack {
 }
 
 export default function DiscoverPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   const [tracks, setTracks] = useState<SpotifyTrack[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // 🔥 New: fully-safe load flow
   useEffect(() => {
-    if (session?.accessToken) {
-      sendTokenToBackend(session.accessToken);
-      loadDiscover();
+    async function load() {
+      // 1) Ensure session is done loading
+      if (status !== "authenticated") {
+        console.log("Session not ready yet:", status);
+        return;
+      }
+
+      // 2) Ensure access token is present
+      const token = session?.accessToken;
+      if (!token) {
+        console.log("❌ No access token found yet.");
+        return;
+      }
+
+      console.log("🔑 Token ready. Sending to backend...");
+
+      // 3) Send token to backend AND wait for confirmation
+      const stored = await sendTokenToBackend(token);
+      console.log("Backend token store response:", stored);
+
+      if (!stored || stored.error) {
+        console.error("❌ Could not store token in backend.");
+        return;
+      }
+
+      console.log("🎉 Token confirmed stored. Fetching Discover Weekly…");
+
+      // 4) Now safely fetch Discover Weekly
+      const result = await fetchDiscoverWeekly(token);
+      console.log("Discover Weekly result:", result);
+
+      const items = result?.discover_weekly?.items;
+      if (items) setTracks(items);
+
+      setLoading(false);
     }
-  }, [session?.accessToken]);
 
-  async function loadDiscover() {
-    if (!session?.accessToken) return;
-
-    const result = await fetchDiscoverWeekly(session.accessToken);
-
-    // Backend returns { discover_weekly: { items: [...] } }
-    const items = result?.discover_weekly?.items;
-    if (items) setTracks(items);
-  }
+    load();
+  }, [session, status]);
 
   const displayName =
     session?.user?.email || session?.user?.name || "Spotify User";
@@ -60,7 +86,6 @@ export default function DiscoverPage() {
           gap: "40px",
         }}
       >
-        {/* Waveform */}
         <div style={{ marginTop: "0px" }}>
           <svg
             width="120"
@@ -79,7 +104,6 @@ export default function DiscoverPage() {
           </svg>
         </div>
 
-        {/* Icons */}
         <nav
           style={{
             display: "flex",
@@ -94,27 +118,25 @@ export default function DiscoverPage() {
         </nav>
       </aside>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN */}
       <main
         style={{
           flexGrow: 1,
           padding: "40px",
-          color: "#2b225a",
         }}
       >
-        <h1
-          style={{
-            fontSize: "2rem",
-            fontWeight: 700,
-            marginBottom: "16px",
-          }}
-        >
+        <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "16px" }}>
           Discover Weekly for{" "}
           <span style={{ color: "#6A56C2" }}>{displayName}</span>
         </h1>
 
-        {!tracks.length && (
-          <p style={{ opacity: 0.7 }}>Loading Discover Weekly…</p>
+        {loading && <p style={{ opacity: 0.7 }}>Loading Discover Weekly…</p>}
+
+        {!loading && tracks.length === 0 && (
+          <p style={{ opacity: 0.7 }}>
+            No tracks found — Spotify may not have generated your Discover
+            Weekly yet.
+          </p>
         )}
 
         {tracks.length > 0 && (
