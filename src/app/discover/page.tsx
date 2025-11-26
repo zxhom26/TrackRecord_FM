@@ -4,184 +4,134 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { sendTokenToBackend, fetchDiscoverWeekly } from "../../utils";
-import { Home, MessageSquare, Trophy, Settings } from "lucide-react";
-
-interface SpotifyTrack {
-  name: string;
-  artists: { name: string }[];
-  external_urls: { spotify: string };
-}
 
 export default function DiscoverPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [tracks, setTracks] = useState<SpotifyTrack[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("Loading Discover Weekly…");
 
-  // 🔥 New: fully-safe load flow
+  // ------------ Auto-load with safe timing ------------
   useEffect(() => {
-    async function load() {
-      // 1) Ensure session is done loading
-      if (status !== "authenticated") {
-        console.log("Session not ready yet:", status);
-        return;
-      }
+    if (status !== "authenticated") return;
 
-      // 2) Ensure access token is present
-      const token = session?.accessToken;
-      if (!token) {
-        console.log("❌ No access token found yet.");
-        return;
-      }
+    // Small delay: allows Render warm-up & token registration
+    const timer = setTimeout(() => {
+      handleLoad();
+    }, 300);
 
-      console.log("🔑 Token ready. Sending to backend...");
+    return () => clearTimeout(timer);
+  }, [status]);
 
-      // 3) Send token to backend AND wait for confirmation
-      const stored = await sendTokenToBackend(token);
-      console.log("Backend token store response:", stored);
-
-      if (!stored || stored.error) {
-        console.error("❌ Could not store token in backend.");
-        return;
-      }
-
-      console.log("🎉 Token confirmed stored. Fetching Discover Weekly…");
-
-      // 4) Now safely fetch Discover Weekly
-      const result = await fetchDiscoverWeekly(token);
-      console.log("Discover Weekly result:", result);
-
-      const items = result?.discover_weekly?.items;
-      if (items) setTracks(items);
-
-      setLoading(false);
+  // ------------ Unified load handler (button + auto) ------------
+  async function handleLoad() {
+    if (!session?.accessToken) {
+      setMessage("No access token.");
+      return;
     }
 
-    load();
-  }, [session, status]);
+    setLoading(true);
+    setMessage("Loading Discover Weekly…");
+
+    // 1. Send token to backend
+    const stored = await sendTokenToBackend(session.accessToken);
+
+    if (!stored || stored.error) {
+      setLoading(false);
+      setMessage("Error storing token. Try again.");
+      return;
+    }
+
+    // 2. Fetch Discover Weekly
+    const result = await fetchDiscoverWeekly(session.accessToken);
+
+    const items = result?.discover_weekly?.items;
+    if (!items) {
+      setLoading(false);
+      setMessage("Spotify may not have generated your Discover Weekly yet.");
+      return;
+    }
+
+    setTracks(items);
+    setLoading(false);
+    setMessage("");
+  }
 
   const displayName =
     session?.user?.email || session?.user?.name || "Spotify User";
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        fontFamily: "Inter, sans-serif",
-        background: "linear-gradient(135deg,#e8defa,#d0bcf5)",
-        color: "#2b225a",
-      }}
-    >
-      {/* LEFT SIDEBAR */}
-      <aside
+    <div style={{ padding: "40px" }}>
+      <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "16px" }}>
+        Discover Weekly for{" "}
+        <span style={{ color: "#6A56C2" }}>{displayName}</span>
+      </h1>
+
+      {/* --- Manual Reload Button --- */}
+      <button
+        onClick={handleLoad}
         style={{
-          width: "95px",
-          padding: "16px 10px",
-          backgroundColor: "#1a1233",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "40px",
+          background: "#6A56C2",
+          color: "white",
+          padding: "10px 16px",
+          borderRadius: "8px",
+          marginBottom: "20px",
+          cursor: "pointer",
         }}
       >
-        <div style={{ marginTop: "0px" }}>
-          <svg
-            width="120"
-            height="180"
-            viewBox="0 0 400 200"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="60" cy="80" r="40" fill="url(#grad)" />
-            <polygon points="50,60 50,100 80,80" fill="white" />
-            <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#a160ff" />
-                <stop offset="100%" stopColor="#ff985c" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
+        Reload Discover Weekly
+      </button>
 
-        <nav
+      {/* --- Loading / Error Message --- */}
+      {message && (
+        <p style={{ opacity: 0.7, marginBottom: "20px" }}>{message}</p>
+      )}
+
+      {/* --- Tracks Grid --- */}
+      {tracks.length > 0 && (
+        <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "30px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+            gap: "20px",
           }}
         >
-          <Home size={26} color="#d8cfff" onClick={() => router.push("/")} />
-          <MessageSquare size={26} color="#d8cfff" />
-          <Trophy size={26} color="#d8cfff" />
-          <Settings size={26} color="#d8cfff" />
-        </nav>
-      </aside>
-
-      {/* MAIN */}
-      <main
-        style={{
-          flexGrow: 1,
-          padding: "40px",
-        }}
-      >
-        <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "16px" }}>
-          Discover Weekly for{" "}
-          <span style={{ color: "#6A56C2" }}>{displayName}</span>
-        </h1>
-
-        {loading && <p style={{ opacity: 0.7 }}>Loading Discover Weekly…</p>}
-
-        {!loading && tracks.length === 0 && (
-          <p style={{ opacity: 0.7 }}>
-            No tracks found — Spotify may not have generated your Discover
-            Weekly yet.
-          </p>
-        )}
-
-        {tracks.length > 0 && (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-              gap: "20px",
-            }}
-          >
-            {tracks.map((track, i) => (
-              <div
-                key={i}
+          {tracks.map((track, i) => (
+            <div
+              key={i}
+              style={{
+                background: "#e5daf5",
+                borderRadius: "14px",
+                padding: "16px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              }}
+            >
+              <div style={{ fontWeight: 700 }}>{track.name}</div>
+              <div style={{ opacity: 0.7, marginTop: "4px" }}>
+                {track.artists.map((a) => a.name).join(", ")}
+              </div>
+              <a
+                href={track.external_urls.spotify}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{
-                  background: "#e5daf5",
-                  borderRadius: "14px",
-                  padding: "16px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  marginTop: "12px",
+                  display: "inline-block",
+                  background: "#1DB954",
+                  padding: "8px 12px",
+                  color: "white",
+                  borderRadius: "18px",
+                  fontSize: "0.85rem",
                 }}
               >
-                <div style={{ fontWeight: 700 }}>{track.name}</div>
-                <div style={{ opacity: 0.7, marginTop: "4px" }}>
-                  {track.artists.map((a) => a.name).join(", ")}
-                </div>
-                <a
-                  href={track.external_urls.spotify}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    marginTop: "12px",
-                    display: "inline-block",
-                    background: "#1DB954",
-                    padding: "8px 12px",
-                    color: "white",
-                    borderRadius: "18px",
-                    fontSize: "0.85rem",
-                  }}
-                >
-                  Open →
-                </a>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
+                Open →
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
