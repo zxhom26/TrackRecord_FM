@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { sendTokenToBackend, fetchDiscoverWeekly } from "../../utils";
 
@@ -17,60 +17,38 @@ interface SpotifyTrack {
   external_urls: { spotify: string };
 }
 
+interface DiscoverWeekResponse {
+  discover_weekly?: {
+    items: SpotifyTrack[];
+  };
+}
+
 export default function DiscoverPage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
-  const [tracks, setTracks] = useState<SpotifyTrack[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("Loading Discover Weekly…");
+  const [tracks, setTracks] = useState<SpotifyTrack[] | null>(null);
 
-  // 🔥 Unified load handler (button + auto)
-  async function handleLoad() {
-    if (!session?.accessToken) {
-      setMessage("No access token available.");
-      return;
+  // Send token to backend if available (IDENTICAL TO TOP TRACKS LOGIC)
+  useEffect(() => {
+    if (session?.accessToken) {
+      sendTokenToBackend(session.accessToken);
     }
+  }, [session?.accessToken]);
 
-    setLoading(true);
-    setMessage("Loading Discover Weekly…");
+  // Load Discover Weekly ONLY when user presses button
+  async function loadDiscoverWeekly() {
+    if (!session?.accessToken) return;
 
-    // 1. Sync token with backend
-    const saved = await sendTokenToBackend(session.accessToken);
-    if (!saved || saved.error) {
-      setMessage("Error storing token. Try again.");
-      setLoading(false);
-      return;
-    }
+    const result: DiscoverWeekResponse = await fetchDiscoverWeekly(
+      session.accessToken
+    );
 
-    // 2. Fetch Discover Weekly playlist
-    const result = await fetchDiscoverWeekly(session.accessToken);
-    const items = result?.discover_weekly?.items;
-
-    if (!items) {
-      setMessage("Spotify may not have generated your Discover Weekly yet.");
-      setLoading(false);
-      return;
-    }
-
+    const items = result?.discover_weekly?.items || [];
     setTracks(items);
-    setMessage("");
-    setLoading(false);
   }
 
-  // ⏱ Auto-load with a slight delay to prevent race conditions
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (status === "authenticated") {
-      const timer = setTimeout(() => {
-        handleLoad();
-      }, 300); // 300ms delay prevents token timing issues
-
-      return () => clearTimeout(timer);
-    }
-  }, [status]);
-
-  const displayName =
-    session?.user?.name || session?.user?.email || "Spotify User";
+  const username =
+    session?.user?.email || session?.user?.name || "Spotify User";
 
   return (
     <div
@@ -131,7 +109,6 @@ export default function DiscoverPage() {
         style={{
           flexGrow: 1,
           padding: "40px",
-          color: "#2b225a",
         }}
       >
         <h1
@@ -142,45 +119,38 @@ export default function DiscoverPage() {
           }}
         >
           Discover Weekly for{" "}
-          <span style={{ color: "#6A56C2" }}>{displayName}</span>
+          <span style={{ color: "#6A56C2" }}>{username}</span>
         </h1>
 
-        {/* --- Reload button --- */}
+        {/* --- Load Button (IDENTICAL BEHAVIOR TO TOP TRACKS) --- */}
         <button
-          onClick={handleLoad}
+          onClick={loadDiscoverWeekly}
           style={{
+            padding: "12px 24px",
             background: "#6A56C2",
             color: "white",
-            padding: "10px 16px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            cursor: "pointer",
+            borderRadius: "25px",
             fontWeight: 600,
+            border: "none",
+            cursor: "pointer",
+            marginBottom: "20px",
           }}
         >
-          Reload Discover Weekly
+          Load Discover Weekly
         </button>
 
-        {/* --- Messages --- */}
-        {message && (
-          <p style={{ opacity: 0.7, marginBottom: "20px" }}>{message}</p>
-        )}
-
-        {/* --- Loading state --- */}
-        {loading && <p style={{ opacity: 0.7 }}>Fetching…</p>}
-
-        {/* --- Tracks Grid --- */}
-        {tracks.length > 0 && (
+        {/* --- Track Cards Grid --- */}
+        {tracks && tracks.length > 0 && (
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))",
               gap: "20px",
             }}
           >
-            {tracks.map((track, i) => (
+            {tracks.map((track, index) => (
               <div
-                key={i}
+                key={index}
                 style={{
                   background: "#e5daf5",
                   borderRadius: "14px",
@@ -213,6 +183,12 @@ export default function DiscoverPage() {
               </div>
             ))}
           </div>
+        )}
+
+        {tracks && tracks.length === 0 && (
+          <p style={{ opacity: 0.7 }}>
+            Spotify may not have generated your Discover Weekly yet.
+          </p>
         )}
       </main>
     </div>
