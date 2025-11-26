@@ -72,7 +72,7 @@ export async function fetchTopTracks(token) {
 export async function fetchDiscoverWeekly(token) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/spotify-discover`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/spotify-weekly`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
