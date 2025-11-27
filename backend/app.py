@@ -78,9 +78,18 @@ async def call_spotify(request: Request):
 async def fetch_discover_weekly(request: Request):
     print("\n--- /api/discover-weekly CALLED ---")
 
-    data = await request.json()
+    # ------------------------
+    # 1. Safe JSON load
+    # ------------------------
+    try:
+        data = await request.json()
+    except Exception as e:
+        print("❌ JSON parse error:", e)
+        return {"error": "invalid_json"}
+
     token = data.get("token")
     if not token:
+        print("❌ No token provided")
         return {"error": "token_missing"}
 
     api = SpotifyAPI(access_token=token)
@@ -88,60 +97,82 @@ async def fetch_discover_weekly(request: Request):
 
     playlist_id = None
 
-    # ------------------------------------------------------------
-    # 1) Try finding Discover Weekly via search (correct method)
-    # ------------------------------------------------------------
-    print("🔍 Searching for Discover Weekly via search...")
+    # ------------------------
+    # 2. SEARCH method
+    # ------------------------
+    print("🔍 Searching for Discover Weekly via /search...")
     try:
         search_res = proxy.fetch_api(
             endpoint="search",
             params={"q": "Discover Weekly", "type": "playlist", "limit": 5},
         )
     except Exception as e:
-        print("❌ Search request failed:", e)
-        search_res = None
+        print("❌ Error during search:", e)
+        search_res = {}
 
-    if search_res and "playlists" in search_res:
-        matches = [
-            p for p in search_res["playlists"]["items"]
-            if "discover weekly" in p.get("name", "").lower()
-        ]
-        if matches:
-            playlist_id = matches[0]["id"]
+    playlists = (
+        search_res.get("playlists", {}) or {}
+    ).get("items", []) or []
+
+    for p in playlists:
+        name = (p.get("name") or "").lower()
+        if "discover weekly" in name:
+            playlist_id = p.get("id")
             print("🎉 Found via search:", playlist_id)
+            break
 
-    # ------------------------------------------------------------
-    # 2) Optional fallback: check user library
-    #    (Will NOT catch algorithmic playlists — but harmless)
-    # ------------------------------------------------------------
+    # ------------------------
+    # 3. Fallback: /me/playlists (optional)
+    # ------------------------
     if not playlist_id:
-        print("🔎 Checking user playlists (fallback)...")
-        lib = proxy.fetch_api("me/playlists", params={"limit": 50})
-        if lib and "items" in lib:
-            for p in lib["items"]:
-                if p.get("name", "").lower() == "discover weekly":
-                    playlist_id = p.get("id")
-                    print("🎉 Found in library:", playlist_id)
-                    break
+        print("🔎 Checking /me/playlists (fallback)...")
 
-    # ------------------------------------------------------------
-    # 3) If still none → user has no Discover Weekly
-    # ------------------------------------------------------------
+        try:
+            lib = proxy.fetch_api(
+                endpoint="me/playlists",
+                params={"limit": 50}
+            )
+        except Exception as e:
+            print("❌ Error reading library:", e)
+            lib = {}
+
+        items = lib.get("items", []) or []
+        for p in items:
+            if (p.get("name") or "").lower() == "discover weekly":
+                playlist_id = p.get("id")
+                print("🎉 Found in library:", playlist_id)
+                break
+
+    # ------------------------
+    # 4. Still missing
+    # ------------------------
     if not playlist_id:
-        print("❌ Discover Weekly not found anywhere")
+        print("❌ Discover Weekly not found (search + library)")
         return {"discover_weekly": {"items": []}}
 
-    # ------------------------------------------------------------
-    # 4) Fetch tracks
-    # ------------------------------------------------------------
-    tracks = proxy.fetch_api(f"playlists/{playlist_id}/tracks")
+    # ------------------------
+    # 5. Fetch tracks
+    # ------------------------
+    print("📡 Fetching tracks for playlist:", playlist_id)
+    try:
+        tracks_res = proxy.fetch_api(
+            endpoint=f"playlists/{playlist_id}/tracks"
+        )
+    except Exception as e:
+        print("❌ Track fetch exception:", e)
+        return {"error": "track_fetch_failed"}
 
-    if not tracks or "error" in tracks:
-        print("❌ Error fetching tracks:", tracks)
-        return {"error": "track_fetch_error", "details": tracks}
+    if not tracks_res:
+        print("❌ Track fetch returned None")
+        return {"discover_weekly": {"items": []}}
 
-    print("📦 Returning Discover Weekly tracks")
-    return {"discover_weekly": tracks}
+    if isinstance(tracks_res, dict) and "error" in tracks_res:
+        print("❌ Spotify track error:", tracks_res)
+        return {"discover_weekly": {"items": []}}
+
+    print("📦 Returning tracks")
+    return {"discover_weekly": tracks_res}
+
 
 
 # DEBUGGING DISCOVER WEEKLY ISSUE
