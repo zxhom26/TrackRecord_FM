@@ -25,17 +25,16 @@ interface DiscoverWeekResponse {
 
 export default function DiscoverPage() {
   const { data: session } = useSession();
-
   const [tracks, setTracks] = useState<SpotifyTrack[] | null>(null);
 
-  // Send token to backend if available (IDENTICAL TO TOP TRACKS LOGIC)
+  // Send token to backend if available (same as Top Tracks)
   useEffect(() => {
     if (session?.accessToken) {
       sendTokenToBackend(session.accessToken);
     }
   }, [session?.accessToken]);
 
-  // Load Discover Weekly ONLY when user presses button
+  // Load Discover Weekly (only runs when button is clicked)
   async function loadDiscoverWeekly() {
     if (!session?.accessToken) return;
 
@@ -45,6 +44,23 @@ export default function DiscoverPage() {
 
     const items = result?.discover_weekly?.items || [];
     setTracks(items);
+  }
+
+  // TEMPORARY DEBUG HELPER
+  async function debugPlaylists() {
+    if (!session?.accessToken) return;
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/debug-playlists`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: session.accessToken }),
+      }
+    );
+
+    const data = await res.json();
+    console.log("DEBUG PLAYLIST DATA:", data);
   }
 
   const username =
@@ -122,7 +138,7 @@ export default function DiscoverPage() {
           <span style={{ color: "#6A56C2" }}>{username}</span>
         </h1>
 
-        {/* --- Load Button (IDENTICAL BEHAVIOR TO TOP TRACKS) --- */}
+        {/* --- Load DW Button --- */}
         <button
           onClick={loadDiscoverWeekly}
           style={{
@@ -137,6 +153,24 @@ export default function DiscoverPage() {
           }}
         >
           Load Discover Weekly
+        </button>
+
+        {/* --- TEMPORARY DEBUG BUTTON --- */}
+        <button
+          onClick={debugPlaylists}
+          style={{
+            padding: "12px 24px",
+            marginLeft: "10px",
+            background: "#444",
+            color: "white",
+            borderRadius: "25px",
+            fontWeight: 600,
+            border: "none",
+            cursor: "pointer",
+            marginBottom: "20px",
+          }}
+        >
+          Debug Playlists
         </button>
 
         {/* --- Track Cards Grid --- */}
