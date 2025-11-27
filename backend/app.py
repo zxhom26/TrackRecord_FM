@@ -144,3 +144,15 @@ async def fetch_discover_weekly(request: Request):
 
     print("📦 Returning Discover Weekly tracks")
     return {"discover_weekly": tracks}
+
+# DEBUGGING DISCOVER WEEKLY ISSUE
+@app.post("/api/debug-playlists")
+async def debug_playlists(request: Request):
+    data = await request.json()
+    token = data.get("token")
+
+    api = SpotifyAPI(access_token=token)
+    proxy = SpotifyAPIProxy(api)
+
+    playlists = proxy.fetch_api("me/playlists", params={"limit": 50})
+    return playlists
