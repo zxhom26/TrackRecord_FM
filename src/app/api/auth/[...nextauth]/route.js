@@ -49,8 +49,14 @@ export const authOptions = {
       authorization: {
         url: "https://accounts.spotify.com/authorize",
         params: {
-          scope:
-            "user-read-email user-top-read user-read-recently-played user-read-private",
+          scope: [
+  "user-read-email",
+  "playlist-read-private",
+  "playlist-read-collaborative",
+  "user-library-read",
+  "user-read-private",
+  "user-top-read"
+].join(" ")
         },
       },
     }),
