@@ -55,7 +55,7 @@ async def get_top_tracks():
         return {"error": "no active token found"}
 
     analytics = UserAnalytics(access_token=token)
-    top_tracks = analytics.getTopTracks(n=20)
+    top_tracks = await analytics.getTopTracks(n=20)
 
     return {"top_tracks": top_tracks}
 
@@ -67,7 +67,7 @@ async def get_top_artists():
         return {"error": "no active token found"}
 
     analytics = UserAnalytics(access_token=token)
-    top_artists = analytics.getTopArtists(n=20)
+    top_artists = await analytics.getTopArtists(n=20)
 
     return {"top_artists": top_artists}
 
@@ -79,8 +79,7 @@ async def get_recently_played():
         return {"error": "no active token found"}
 
     analytics = UserAnalytics(access_token=token)
-
-    recently_played = analytics.getRecentlyPlayed(n=50)
+    recently_played = await analytics.getRecentlyPlayed(n=50)
 
     return {"recently_played": recently_played}
 
@@ -92,7 +91,7 @@ async def get_top_genres():
         return {"error": "no active token found"}
 
     analytics = UserAnalytics(access_token=token)
-    top_genres = analytics.getTopGenres(n=50)
+    top_genres = await analytics.getTopGenres(n=50)
 
     return {"top_genres": top_genres}
 
@@ -104,7 +103,7 @@ async def get_quick_stats():
         return {"error": "no active token found"}
 
     analytics = UserAnalytics(access_token=token)
-    quick_stats = analytics.getQuickStats()
+    quick_stats = await analytics.getQuickStats()
 
     return {"quick_stats": quick_stats}
 
@@ -116,7 +115,7 @@ async def get_song_recommendations():
         return {"error": "no active token found"}
 
     analytics = UserAnalytics(access_token=token)
-    recommendations = analytics.getSongRecommendations(n=20)
+    recommendations = await analytics.getSongRecommendations(n=20)
 
     return {"recommendations": recommendations}
 
