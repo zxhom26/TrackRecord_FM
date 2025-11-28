@@ -1,55 +1,108 @@
-"use client"; // client component -- displays on client side 
+"use client";
 
-import AuthButton from "../components/AuthButton"; // importing AuthButton component to redirect to Spotify Login upon click
-import "./login.css"; // importing stylistic elements
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const handleLogin = () => {
+    router.push("/api/auth/signin");
+  };
+
   return (
-    <main className="login-page">
-      {/* Waveform SVG */}
-      <div className="waveform">
-        <svg
-          width="400"
-          height="120"
-          viewBox="0 0 400 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Play circle */}
-          <circle cx="30" cy="60" r="22" fill="url(#grad)" />
-          <polygon points="25,48 25,72 45,60" fill="#ffffff" />
+    <div className="min-h-screen w-full bg-[#1b1b1b] text-white flex flex-col items-center justify-center p-8 relative overflow-hidden">
 
-          {/* Music Bars */}
-          <rect x="70" y="30" width="10" height="60" rx="5" fill="url(#grad)" />
-          <rect x="90" y="40" width="10" height="40" rx="5" fill="url(#grad)" />
-          <rect x="110" y="20" width="10" height="80" rx="5" fill="url(#grad)" />
-          <rect x="130" y="45" width="10" height="30" rx="5" fill="url(#grad)" />
-          <rect x="150" y="50" width="10" height="20" rx="5" fill="url(#grad)" />
-
-          <rect x="170" y="35" width="10" height="50" rx="5" fill="url(#grad)" />
-          <rect x="190" y="45" width="10" height="30" rx="5" fill="url(#grad)" />
-          <rect x="210" y="25" width="10" height="70" rx="5" fill="url(#grad)" />
-          <rect x="230" y="45" width="10" height="30" rx="5" fill="url(#grad)" />
-          <rect x="250" y="35" width="10" height="50" rx="5" fill="url(#grad)" />
-
-          <rect x="270" y="50" width="10" height="20" rx="5" fill="url(#grad)" />
-          <rect x="290" y="40" width="10" height="40" rx="5" fill="url(#grad)" />
-          <rect x="310" y="20" width="10" height="80" rx="5" fill="url(#grad)" />
-          <rect x="330" y="40" width="10" height="40" rx="5" fill="url(#grad)" />
-          <rect x="350" y="55" width="10" height="10" rx="5" fill="url(#grad)" />
-
+      {/* ================= LOGO (SVG) ================= */}
+      <div className="absolute top-6 left-6 flex items-center gap-3">
+        <svg width="55" height="35" viewBox="0 0 200 100">
           <defs>
-            <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+            <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#a160ff" />
               <stop offset="100%" stopColor="#ff985c" />
             </linearGradient>
           </defs>
+
+          {/* circular eye */}
+          <circle cx="28" cy="50" r="12" fill="url(#logoGradient)" />
+
+          {/* waveform bars */}
+          <rect x="60" y="30" width="10" height="40" fill="url(#logoGradient)" rx="3" />
+          <rect x="80" y="20" width="10" height="60" fill="url(#logoGradient)" rx="3" />
+          <rect x="100" y="10" width="10" height="80" fill="url(#logoGradient)" rx="3" />
+          <rect x="120" y="25" width="10" height="50" fill="url(#logoGradient)" rx="3" />
+          <rect x="140" y="35" width="10" height="30" fill="url(#logoGradient)" rx="3" />
         </svg>
+
+        <span className="text-xl font-semibold tracking-wide text-white/95">
+          TrackRecord FM
+        </span>
       </div>
 
-      <h1 className="login-title">Welcome to TrackRecordFM</h1>
+      {/* ================= LOGIN BUTTON ================= */}
+      <button
+        onClick={handleLogin}
+        className="
+          absolute top-6 right-6 px-6 py-2 rounded-full 
+          text-white font-semibold text-lg
+          bg-gradient-to-r from-[#50d784] to-[#25b76b]
+          shadow-[0_0_12px_rgba(80,215,132,0.55)]
+          hover:shadow-[0_0_18px_rgba(80,215,132,0.75)]
+          transition-all duration-300
+        "
+      >
+        Log In
+      </button>
 
-      <AuthButton />
-    </main>
+      {/* ================= BACKGROUND WAVES (SVG) ================= */}
+      <svg
+        className="absolute inset-0 opacity-[0.22] scale-125 pointer-events-none"
+        viewBox="0 0 1600 900"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="
+            M0 450 
+            C200 300 400 600 600 450
+            S1000 300 1200 450
+            S1600 600 1800 450
+          "
+          stroke="#a160ff"
+          strokeWidth="60"
+          fill="none"
+          strokeLinecap="round"
+        />
+      </svg>
+
+      {/* ================= HERO CONTENT ================= */}
+      <div className="relative flex flex-col md:flex-row items-center gap-12 md:gap-20">
+
+        {/* LAPTOP MOCKUP */}
+        <div className="relative">
+          <Image
+            src="/laptop-mock.png"
+            alt="Laptop Preview"
+            width={580}
+            height={380}
+            className="rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.55)] contrast-[1.15] brightness-[1.1]"
+          />
+        </div>
+
+        {/* MAIN TEXT */}
+        <div className="flex flex-col items-start max-w-lg">
+          <h1 className="text-5xl md:text-6xl font-semibold leading-tight">
+            Meet Your <br />
+            <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
+              Musical Identity.
+            </span>
+          </h1>
+
+          <p className="text-lg mt-4 text-white/80 max-w-sm">
+            Explore your listening patterns, discover your mood profile,
+            and dive into the sound that makes you—you.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
