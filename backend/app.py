@@ -7,12 +7,11 @@ user_tokens = {}
 
 app = FastAPI()
 
-# ---------------------- CORS ----------------------
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://trackrecord-fm-ui.onrender.com",
-        "https://trackrecord-fm-ui.onrender.com/*",
         "http://localhost:3000",
     ],
     allow_credentials=True,
@@ -20,7 +19,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------------- BASIC ROUTES ----------------------
 @app.get("/")
 def root():
     return {"message": "✅ TrackRecord.fm API is live!"}
@@ -29,7 +27,7 @@ def root():
 def get_data():
     return {"message": "Hello from FastAPI backend!"}
 
-# ---------------------- STORE TOKEN ----------------------
+# Receive token from frontend
 @app.post("/api/token")
 async def receive_token(request: Request):
     data = await request.json()
@@ -43,69 +41,95 @@ async def receive_token(request: Request):
 
     user_tokens["active"] = token
     print("Stored token successfully.")
-
     return {"message": "token stored successfully"}
 
-# ---------------------- FETCH TOP TRACKS ----------------------
+# ---------------------------------------------------------
+#   TOP TRACKS ENDPOINT  
+# ---------------------------------------------------------
+
 @app.post("/api/top-tracks")
-async def get_top_tracks(request: Request):
+async def top_tracks(request: Request):
     data = await request.json()
     token = data.get("token")
 
-    print("\n--- /api/top-tracks CALLED ---")
-    print("Token:", token)
-
     if not token:
-        return {"spotify_data": {"items": []}}
+        print("❌ Missing token for /api/top-tracks")
+        return {"error": "token missing"}
 
     api = SpotifyAPI(access_token=token)
     proxy = SpotifyAPIProxy(api)
 
-    # Fetch top tracks (short_term = last 4 weeks)
+    print("📡 Calling Spotify: GET me/top/tracks")
+
     response = proxy.fetch_api(
         endpoint="me/top/tracks",
         params={"limit": 20, "time_range": "short_term"}
     )
 
-    print("Top Tracks Response:", response)
-
+    print("📦 Spotify top tracks returned:", response)
     return {"spotify_data": response}
 
-# ---------------------- FETCH AUDIO FEATURES ----------------------
+# ---------------------------------------------------------
+#   AUDIO FEATURES ENDPOINT (FOR MOOD PAGE)
+# ---------------------------------------------------------
+
 @app.post("/api/audio-features")
 async def audio_features(request: Request):
     data = await request.json()
     token = data.get("token")
     track_ids = data.get("track_ids", [])
 
-    print("\n--- /api/audio-features CALLED ---")
-    print("Track IDs:", track_ids)
+    if not token:
+        print("❌ Missing token for /api/audio-features")
+        return {"error": "token missing"}
 
-    if not token or not track_ids:
-        return {"audio_features": []}
-
-    ids_str = ",".join(track_ids)
+    if not track_ids:
+        print("❌ Missing track_ids in /api/audio-features")
+        return {"error": "track_ids missing"}
 
     api = SpotifyAPI(access_token=token)
     proxy = SpotifyAPIProxy(api)
+
+    # Convert Python list → comma-separated string
+    ids_str = ",".join(track_ids)
+
+    print(f"🎶 Fetching audio features for {len(track_ids)} tracks")
 
     response = proxy.fetch_api(
         endpoint="audio-features",
         params={"ids": ids_str}
     )
 
-    print("Audio Features Response:", response)
-
+    print("📦 Spotify audio features returned")
     return {"audio_features": response.get("audio_features", [])}
 
-# ---------------------- DEBUG PLAYLISTS (OPTIONAL) ----------------------
-@app.post("/api/debug-playlists")
-async def debug_playlists(request: Request):
+# ---------------------------------------------------------
+#   ORIGINAL MAIN SPOTIFY CALL 
+# ---------------------------------------------------------
+
+@app.post("/api/spotify")
+async def call_spotify(request: Request):
     data = await request.json()
+
+    print("\n--- /api/spotify CALLED ---")
+    print("Request body:", data)
+
     token = data.get("token")
+    if not token:
+        print("❌ No token received!")
+        return {"error": "token not found"}
+
+    print("🎵 Token received in /api/spotify:", token[:25] + "...")
 
     api = SpotifyAPI(access_token=token)
     proxy = SpotifyAPIProxy(api)
 
-    playlists = proxy.fetch_api("me/playlists", params={"limit": 50})
-    return playlists
+    print("📡 Calling Spotify: GET me/top/tracks")
+
+    # make spotify call
+    response = proxy.fetch_api(endpoint="me/top/tracks")
+
+    print("📦 Spotify API returned:", response)
+    print("--- END /api/spotify ---\n")
+
+    return {"spotify_data": response}
