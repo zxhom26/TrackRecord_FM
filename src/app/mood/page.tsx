@@ -7,7 +7,6 @@ import {
   fetchAudioFeatures,
   fetchTopTracks,
 } from "../../utils";
-
 import {
   RadarChart,
   Radar,
@@ -17,143 +16,86 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// ---------- TYPES ----------
-interface SpotifyArtist {
-  name: string;
-}
-
-interface SpotifyTrack {
-  id: string;
-  name: string;
-  artists: SpotifyArtist[];
-  external_urls: { spotify: string };
-}
-
-interface AudioFeature {
-  energy: number;
-  danceability: number;
-  valence: number;
-  acousticness: number;
-  tempo: number;
-}
-
-// ---------- COMPONENT ----------
 export default function MoodPage() {
   const { data: session } = useSession();
 
-  const [moodStats, setMoodStats] = useState<{
-    energy: number;
-    danceability: number;
-    happiness: number;
-    acousticness: number;
-    tempo: number;
-    vibe: string;
-  } | null>(null);
+  const [moodStats, setMoodStats] = useState(null);
 
   async function analyzeMood() {
     if (!session?.accessToken) return;
 
-    // Sync token to backend
     await sendTokenToBackend(session.accessToken);
 
-    // 1. Fetch user's top tracks
+    // 1. Get top tracks
     const topRes = await fetchTopTracks(session.accessToken);
-    const tracks: SpotifyTrack[] = topRes?.spotify_data?.items || [];
+    const tracks = topRes?.spotify_data?.items || [];
 
-    if (tracks.length === 0) {
-      alert("No top tracks available.");
+    console.log("Tracks returned:", tracks);
+
+    const trackIds = tracks
+      .map((t) => t?.id)
+      .filter((id) => typeof id === "string" && id.length > 0);
+
+    console.log("Track IDs:", trackIds);
+
+    if (trackIds.length === 0) {
+      alert("❌ No valid track IDs found.");
       return;
     }
 
-    const trackIds = tracks.map((t) => t.id);
+    // 2. Get audio features
+    const featuresRes = await fetchAudioFeatures(
+      session.accessToken,
+      trackIds
+    );
 
-    // 2. Fetch audio features
-    const featuresRes = await fetchAudioFeatures(session.accessToken, trackIds);
-    const features: AudioFeature[] = featuresRes?.audio_features || [];
+    const features = featuresRes?.audio_features?.filter(Boolean) || [];
+
+    console.log("Audio features returned:", features);
+
+    if (features.length === 0) {
+      alert("❌ Audio features not returned by Spotify.");
+      return;
+    }
 
     // 3. Compute mood stats
-    const mood = computeMoodStats(features);
-    setMoodStats(mood);
+    setMoodStats(computeMoodStats(features));
   }
 
-  // ---------- FRONTEND ANALYTICS ----------
-  function computeMoodStats(features: AudioFeature[]) {
-    const avg = (arr: number[]): number =>
-      arr.reduce((a, b) => a + b, 0) / arr.length;
-
-    const energy = avg(features.map((f) => f.energy));
-    const dance = avg(features.map((f) => f.danceability));
-    const happiness = avg(features.map((f) => f.valence));
-    const acousticness = avg(features.map((f) => f.acousticness));
-    const tempo = avg(features.map((f) => f.tempo));
-
-    const vibe = classifyMood(energy, happiness, dance, acousticness);
+  function computeMoodStats(features) {
+    const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
     return {
-      energy,
-      danceability: dance,
-      happiness,
-      acousticness,
-      tempo,
-      vibe,
+      energy: avg(features.map((f) => f.energy)),
+      danceability: avg(features.map((f) => f.danceability)),
+      happiness: avg(features.map((f) => f.valence)),
+      acousticness: avg(features.map((f) => f.acousticness)),
+      tempo: avg(features.map((f) => f.tempo)),
+      vibe: classifyMood(
+        avg(features.map((f) => f.energy)),
+        avg(features.map((f) => f.valence)),
+        avg(features.map((f) => f.danceability)),
+        avg(features.map((f) => f.acousticness))
+      ),
     };
   }
 
-  function classifyMood(
-    energy: number,
-    valence: number,
-    dance: number,
-    acoustic: number
-  ): string {
+  function classifyMood(energy, valence, dance, acoustic) {
     if (energy > 0.7 && valence > 0.6) return "✨ Upbeat & Happy";
     if (energy > 0.7 && valence < 0.4) return "🔥 Intense & Emotional";
     if (energy < 0.5 && acoustic > 0.5) return "🌿 Calm & Acoustic";
     return "🎧 Balanced Vibes";
   }
 
-  // ---------- RENDER ----------
   return (
-    <main
-      style={{
-        padding: "40px",
-        fontFamily: "Inter, sans-serif",
-        background: "linear-gradient(135deg, #8A4FFF, #E454FF)",
-        minHeight: "100vh",
-        color: "white",
-      }}
-    >
-      <h1 style={{ fontSize: "2.5rem", fontWeight: 700 }}>
-        Your <span style={{ color: "#FFD96A" }}>Mood Profile</span>
-      </h1>
+    <main style={{ padding: "40px", color: "white" }}>
+      <h1>Your Mood Profile</h1>
 
-      <button
-        onClick={analyzeMood}
-        style={{
-          marginTop: "20px",
-          background: "#FFD96A",
-          color: "#4A1F7A",
-          padding: "14px 28px",
-          borderRadius: "25px",
-          fontWeight: 700,
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Analyze My Music Mood
-      </button>
+      <button onClick={analyzeMood}>Analyze My Music Mood</button>
 
-      {/* MOOD SUMMARY */}
       {moodStats && (
-        <div
-          style={{
-            marginTop: "30px",
-            padding: "25px",
-            borderRadius: "20px",
-            background: "rgba(255,255,255,0.15)",
-            backdropFilter: "blur(6px)",
-          }}
-        >
-          <h2 style={{ marginBottom: "10px" }}>{moodStats.vibe}</h2>
+        <div>
+          <h2>{moodStats.vibe}</h2>
           <p>Energy: {(moodStats.energy * 100).toFixed(0)}%</p>
           <p>Danceability: {(moodStats.danceability * 100).toFixed(0)}%</p>
           <p>Happiness: {(moodStats.happiness * 100).toFixed(0)}%</p>
@@ -162,9 +104,8 @@ export default function MoodPage() {
         </div>
       )}
 
-      {/* RADAR CHART */}
       {moodStats && (
-        <div style={{ height: "350px", marginTop: "40px" }}>
+        <div style={{ height: "350px" }}>
           <ResponsiveContainer>
             <RadarChart
               data={[
@@ -177,12 +118,7 @@ export default function MoodPage() {
               <PolarGrid />
               <PolarAngleAxis dataKey="metric" />
               <PolarRadiusAxis angle={30} domain={[0, 1]} />
-              <Radar
-                dataKey="value"
-                stroke="#FFD96A"
-                fill="#FFD96A"
-                fillOpacity={0.6}
-              />
+              <Radar dataKey="value" stroke="#FFD96A" fill="#FFD96A" />
             </RadarChart>
           </ResponsiveContainer>
         </div>
