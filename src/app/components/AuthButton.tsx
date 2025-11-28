@@ -3,16 +3,19 @@
 import { useSession, signIn } from "next-auth/react";
 import { useEffect } from "react";
 
-export default function AuthButton({ onAnalyzing }) {
+interface AuthButtonProps {
+  onAnalyzing?: () => void;  // ✅ typed
+}
+
+export default function AuthButton({ onAnalyzing }: AuthButtonProps) {
   const { data: session } = useSession();
 
   useEffect(() => {
     if (session?.accessToken) {
-      onAnalyzing?.(); // ⭐ notify parent to hide UI
+      onAnalyzing?.(); // trigger parent analyzing screen
     }
   }, [session?.accessToken]);
 
-  // Normal button
   return (
     <button
       onClick={() => signIn("spotify")}
