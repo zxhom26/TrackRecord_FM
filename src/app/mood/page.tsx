@@ -37,10 +37,19 @@ interface AudioFeature {
   tempo: number;
 }
 
+interface MoodStats {
+  energy: number;
+  danceability: number;
+  happiness: number;
+  acousticness: number;
+  tempo: number;
+  vibe: string;
+}
+
 export default function MoodPage() {
   const { data: session } = useSession();
 
-  const [moodStats, setMoodStats] = useState<null | any>(null);
+const [moodStats, setMoodStats] = useState<MoodStats | null>(null);
 
   async function analyzeMood() {
     if (!session?.accessToken) {
