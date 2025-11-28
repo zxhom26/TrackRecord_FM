@@ -161,3 +161,26 @@ async def debug_playlists(request: Request):
 
     playlists = proxy.fetch_api("me/playlists", params={"limit": 50})
     return playlists
+
+# CALL FOR MOODS
+@app.post("/api/audio-features")
+async def audio_features(request: Request):
+    data = await request.json()
+    token = data.get("token")
+    track_ids = data.get("track_ids", [])
+
+    if not token or not track_ids:
+        return {"error": "Missing token or track_ids"}
+
+    api = SpotifyAPI(access_token=token)
+    proxy = SpotifyAPIProxy(api)
+
+    # Convert list to comma-separated string
+    ids_str = ",".join(track_ids)
+
+    response = proxy.fetch_api(
+        endpoint="audio-features",
+        params={"ids": ids_str}
+    )
+
+    return {"audio_features": response.get("audio_features", [])}
