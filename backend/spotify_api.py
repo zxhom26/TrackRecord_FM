@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import time
 from typing import Dict, Any, Optional
 import copy
-import urllib.parse  # ⭐ (added for cache key fix)
+import urllib.parse  # ⭐
 
 class APIInterface(ABC):
     @abstractmethod
@@ -16,23 +16,20 @@ class SpotifyAPIProxy(APIInterface):
         self.cache = {}
         self.base_url = "https://api.spotify.com/v1"
         self.access_token = api.get_token()
-        pass
-    
+
     def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Dict[str, Any]:
         try:
-            # build full URL
             url = f"{self.base_url}/{endpoint}"
-            
-            # ⭐ build cache key INCLUDING params
-            query = urllib.parse.urlencode(params or {})  # ⭐
+
+            # ⭐ include params in cache key
+            query = urllib.parse.urlencode(params or {})
             cache_key = f"{url}?{query}"  # ⭐
-            
-            # ⭐ look up by the improved cache key
+
             isCached = self.cache.get(cache_key)  # ⭐
-            
+
             access_token = self.access_token
             if not access_token:
-                raise Exception('Access token not found. Unable to call on behalf of user.')
+                raise Exception('Access token not found.')
 
             headers = {
                 "Authorization": f"Bearer {access_token}",
@@ -46,41 +43,35 @@ class SpotifyAPIProxy(APIInterface):
 
             if response is None:
                 raise Exception('API response empty')
+
             elif response.status_code == 304:
                 return isCached["data"]
+
             else:
                 etag = response.headers.get("ETag")
-                
-                # ⭐ save to cache using improved cache key
                 self.cache[cache_key] = {  # ⭐
                     "ETag": etag,
                     "data": response.json(),
                     "timestamp": time.time()
                 }
-                
-                # ⭐ return cached data using improved key
                 return self.cache[cache_key]["data"]  # ⭐
 
         except Exception as e:
             print(f"API cache search failed: {e}")
             return {}
 
-    def get_cache(self):
-        return copy.deepcopy(self.cache)
-
 class SpotifyAPI(APIInterface):
     def __init__(self, access_token: str):
         self.access_token = access_token
         self.base_url = "https://api.spotify.com/v1"
-        pass
 
     def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Optional[requests.Response]:
         try:
-            url = f"{self.base_url}/{endpoint.lstrip('/')}"  # FIX trailing slashes
+            url = f"{self.base_url}/{endpoint.lstrip('/')}"  # ⭐ fix double slash
 
             access_token = self.access_token
             if not access_token:
-                raise Exception('Access token not found. Unable to call on behalf of user.')
+                raise Exception('Access token not found.')
 
             if headers is None:
                 headers = {
@@ -88,28 +79,27 @@ class SpotifyAPI(APIInterface):
                     "Content-Type": "application/json"
                 }
 
+            print("🎯 FINAL URL:", url, "PARAMS:", params)  # ⭐ moved outside request()
+
+            # ⭐ FIXED — no more broken syntax
             response = requests.request(
-                print("🎯 FINAL URL:", url, "PARAMS:", params)
                 method=method,
-                url=url, 
+                url=url,
                 headers=headers,
                 json=data,
                 params=params
             )
 
             if response.status_code not in range(200, 400):
-                raise Exception(f"Spotify API request failed with code {response.status_code}: {response.text}")
-            else:
-                return response
+                raise Exception(
+                    f"Spotify API request failed with code {response.status_code}: {response.text}"
+                )
+
+            return response
 
         except Exception as e:
             print(f"{e}")
             return None
-    
+
     def get_token(self):
         return copy.copy(self.access_token)
-
-# Sample Usage ---------------------------------------------------------
-# api = SpotifyAPI(token='token1234')
-# proxy = SpotifyAPIProxy(api=api)
-# user_data = proxy.fetch_api(endpoint="me")
