@@ -4,9 +4,14 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchTopArtists, getMoodFromGenres } from "../../utils";
 
+interface TopArtist {
+  name: string;
+  genres: string[];
+}
+
 export default function MoodTestPage() {
   const { data: session } = useSession();
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<any>(null);
   const [mood, setMood] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +32,7 @@ export default function MoodTestPage() {
     console.log("🔍 Top Artists JSON:", response);
     setResult(response);
 
-    const items = response?.spotify_data?.items || [];
+    const items: TopArtist[] = response?.spotify_data?.items || [];
 
     if (items.length === 0) {
       setMood("No top artists available.");
@@ -35,13 +40,11 @@ export default function MoodTestPage() {
       return;
     }
 
-    // Gather all genres from all top artists
     const allGenres = items.flatMap((artist) => artist.genres ?? []);
     console.log("🎨 ALL GENRES:", allGenres);
 
-    // Convert genres → mood
-    const derivedMood = getMoodFromGenres(allGenres);
-    setMood(derivedMood);
+    const moodResult = getMoodFromGenres(allGenres);
+    setMood(moodResult);
 
     setLoading(false);
   };
