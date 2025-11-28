@@ -10,7 +10,6 @@ class APIInterface(ABC):
     def fetch_api(self, endpoint, headers, method, data, params):
         pass
 
-
 class SpotifyAPIProxy(APIInterface):
     def __init__(self, api: APIInterface):
         self.api = api
@@ -24,7 +23,7 @@ class SpotifyAPIProxy(APIInterface):
 
             # ⭐ include params in cache key
             query = urllib.parse.urlencode(params or {})
-            cache_key = f"{url}?{query}"
+            cache_key = f"{url}?{query}"  # ⭐
 
             isCached = self.cache.get(cache_key)
 
@@ -40,14 +39,9 @@ class SpotifyAPIProxy(APIInterface):
             if isCached and "ETag" in isCached:
                 headers["If-None-Match"] = isCached["ETag"]
 
-            # ⭐ FIX — Build endpoint WITH query params so backend hits correct URL
-            if params:
-                endpoint_with_params = f"{endpoint}?{urllib.parse.urlencode(params)}"   # ⭐ FIX
-            else:
-                endpoint_with_params = endpoint
-
-            # ⭐ FIX — pass None for params so base class doesn't override
-            response = self.api.fetch_api(endpoint_with_params, headers, method, data, None)  # ⭐ FIX
+            # ⭐ REVERTED: do NOT append params manually into endpoint
+            # ⭐ CORRECT: pass params directly down to API layer
+            response = self.api.fetch_api(endpoint, headers, method, data, params)  # ⭐
 
             if response is None:
                 raise Exception("API response empty")
@@ -68,7 +62,6 @@ class SpotifyAPIProxy(APIInterface):
             print(f"API cache search failed: {e}")
             return {}
 
-
 class SpotifyAPI(APIInterface):
     def __init__(self, access_token: str):
         self.access_token = access_token
@@ -76,8 +69,7 @@ class SpotifyAPI(APIInterface):
 
     def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Optional[requests.Response]:
         try:
-            # ⭐ FIX: endpoint may already include "?...", so do NOT add another slash
-            url = f"{self.base_url}/{endpoint.lstrip('/')}"  
+            url = f"{self.base_url}/{endpoint.lstrip('/')}"  # ⭐ keep the fix for slashes
 
             access_token = self.access_token
             if not access_token:
@@ -89,15 +81,15 @@ class SpotifyAPI(APIInterface):
                     "Content-Type": "application/json"
                 }
 
-            print("🎯 FINAL URL:", url, "PARAMS:", params)
+            print("🎯 FINAL URL:", url, "PARAMS:", params)  # logging is fine
 
-            # ⭐ FIX — your previous syntax error is corrected here
+            # ⭐ Correct: requests handles params itself
             response = requests.request(
                 method=method,
                 url=url,
                 headers=headers,
                 json=data,
-                params=params
+                params=params  # ⭐ correct usage
             )
 
             if response.status_code not in range(200, 400):
