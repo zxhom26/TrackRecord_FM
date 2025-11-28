@@ -93,7 +93,7 @@ async def get_top_artists(request: Request):
 
     # We use Spotify's "Get User's Top Artists" endpoint
     # Spotify default is medium_term; we can make it explicit & set limit.
-    endpoint = "me/top/artists?limit=20&time_range=short_term"
+    endpoint = "me/top/artists?limit=20&time_range=medium_term"
     print(f"📡 Calling Spotify: GET {endpoint}")
 
     response = proxy.fetch_api(endpoint=endpoint)
