@@ -36,7 +36,7 @@ export async function sendTokenToBackend(token) {
       throw new Error(`Backend responded with status ${res.status}`);
     }
 
-    return await res.json(); // e.g., { message: "token stored successfully" }
+    return await res.json();
   } catch (err) {
     console.error("Error sending token to backend:", err);
     return { error: err.message };
@@ -52,7 +52,7 @@ export async function fetchTopTracks(token) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: token  
+          token: token,
         }),
       }
     );
@@ -61,7 +61,6 @@ export async function fetchTopTracks(token) {
       throw new Error(`Spotify request failed: ${response.status}`);
     }
     return await response.json();
-
   } catch (err) {
     console.error("fetchTopTracks error:", err);
     return { error: err.message };
@@ -86,20 +85,17 @@ export async function fetchTopArtists(token) {
       throw new Error(`Top artists request failed: ${response.status}`);
     }
 
-    return await response.json(); // { spotify_data: { items: [...] } }
-
+    return await response.json();
   } catch (err) {
     console.error("fetchTopArtists error:", err);
     return { error: err.message };
   }
 }
 
-// --- MOOD MAPPING ---
 // --- Mood Mapping by Genre ---
 export function getMoodFromGenres(genres) {
   if (!genres || genres.length === 0) return "Unknown Mood";
 
-  // Normalize genres
   const g = genres.map((s) => s.toLowerCase());
 
   if (g.some((x) => x.includes("rap") || x.includes("hip hop"))) {
@@ -128,7 +124,7 @@ export function getMoodFromGenres(genres) {
   }
   if (g.some((x) => x.includes("classical"))) {
     return "🌙 Calm & Peaceful";
+  }
 
   return "🎧 Balanced Vibes";
 }
-
