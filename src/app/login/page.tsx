@@ -1,19 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import AuthButton from "../components/AuthButton"; // ⭐ BRING BACK AUTHBUTTON
 
 export default function LoginPage() {
-  const router = useRouter();
-
-  const handleLogin = () => {
-    router.push("/api/auth/signin");
-  };
-
   return (
     <div className="min-h-screen w-full bg-[#1b1b1b] text-white flex flex-col p-8 relative">
 
-      {/* ================= LOGO (fixed spacing) ================= */}
+      {/* ================= LOGO ================= */}
       <div className="flex items-center gap-3 mb-10">
         <svg width="55" height="35" viewBox="0 0 200 100">
           <defs>
@@ -23,10 +17,7 @@ export default function LoginPage() {
             </linearGradient>
           </defs>
 
-          {/* circular eye */}
           <circle cx="28" cy="50" r="12" fill="url(#logoGradient)" />
-
-          {/* waveform bars */}
           <rect x="60" y="30" width="10" height="40" fill="url(#logoGradient)" rx="3" />
           <rect x="80" y="20" width="10" height="60" fill="url(#logoGradient)" rx="3" />
           <rect x="100" y="10" width="10" height="80" fill="url(#logoGradient)" rx="3" />
@@ -39,22 +30,23 @@ export default function LoginPage() {
         </span>
       </div>
 
-      {/* LOGIN BUTTON */}
-      <button
-        onClick={handleLogin}
-        className="
-          absolute top-8 right-8 px-6 py-2 rounded-full 
-          text-white font-semibold text-lg
-          bg-gradient-to-r from-[#50d784] to-[#25b76b]
-          shadow-[0_0_12px_rgba(80,215,132,0.55)]
-          hover:shadow-[0_0_18px_rgba(80,215,132,0.75)]
-          transition-all duration-300
-        "
-      >
-        Log In
-      </button>
+      {/* ================= LOGIN BUTTON (using AuthButton) ================= */}
+      <div className="absolute top-8 right-8">
+        <div
+          className="
+            px-6 py-2 rounded-full
+            bg-gradient-to-r from-[#50d784] to-[#25b76b]
+            shadow-[0_0_12px_rgba(80,215,132,0.55)]
+            hover:shadow-[0_0_18px_rgba(80,215,132,0.75)]
+            transition-all duration-300
+          "
+        >
+          {/* ⭐ Replace the raw button with your component */}
+          <AuthButton />
+        </div>
+      </div>
 
-      {/* ================= WAVE BEHIND LAPTOP ================= */}
+      {/* ================= WAVE ================= */}
       <div className="absolute top-[180px] left-0 w-full overflow-hidden pointer-events-none">
         <svg
           viewBox="0 0 1600 400"
@@ -97,7 +89,7 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* TEXT CONTENT */}
+        {/* TEXT */}
         <div className="z-10 flex flex-col items-start max-w-lg mt-6 md:mt-0">
           <h1 className="text-5xl md:text-6xl font-semibold leading-tight">
             Meet Your <br />
@@ -111,6 +103,7 @@ export default function LoginPage() {
             and dive into the sound that makes you—you.
           </p>
         </div>
+
       </div>
     </div>
   );
