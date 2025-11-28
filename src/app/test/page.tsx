@@ -1,4 +1,4 @@
-"use client";
+/*"use client";
 
 import { useState } from "react";
 import { callBackend } from "../../utils";
@@ -31,4 +31,4 @@ export default function TestBackendPage() {
       )}
     </div>
   );
-}
+}*/
