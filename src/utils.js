@@ -92,39 +92,65 @@ export async function fetchTopArtists(token) {
   }
 }
 
-// --- Mood Mapping by Genre ---
-export function getMoodFromGenres(genres) {
-  if (!genres || genres.length === 0) return "Unknown Mood";
+// ─────────────────────────────────────────────
+//   Composite Mood Classifier (Top 3 Moods)
+// ─────────────────────────────────────────────
 
-  const g = genres.map((s) => s.toLowerCase());
+// 1️⃣ Base map: genre keyword → mood label
+const GENRE_TO_MOOD_MAP = [
+  { key: "rap", mood: "🔥 Bold & Confident" },
+  { key: "hip hop", mood: "🔥 Bold & Confident" },
+  { key: "trap", mood: "🔥 Bold & Confident" },
 
-  if (g.some((x) => x.includes("rap") || x.includes("hip hop"))) {
-    return "🔥 Bold & Confident";
-  }
-  if (g.some((x) => x.includes("pop"))) {
-    return "🎉 Upbeat & Fun";
-  }
-  if (g.some((x) => x.includes("edm") || x.includes("dance"))) {
-    return "⚡ High Energy";
-  }
-  if (g.some((x) => x.includes("r&b"))) {
-    return "💙 Smooth & Chill";
-  }
-  if (g.some((x) => x.includes("indie"))) {
-    return "🌿 Mellow & Indie";
-  }
-  if (g.some((x) => x.includes("rock"))) {
-    return "🤘 Intense & Driven";
-  }
-  if (g.some((x) => x.includes("lofi") || x.includes("lo-fi"))) {
-    return "📚 Chill Study Vibes";
-  }
-  if (g.some((x) => x.includes("latin"))) {
-    return "💃 Vibrant & Rhythmic";
-  }
-  if (g.some((x) => x.includes("classical"))) {
-    return "🌙 Calm & Peaceful";
+  { key: "pop", mood: "🎉 Upbeat & Fun" },
+
+  { key: "r&b", mood: "💙 Smooth & Chill" },
+  { key: "dark r&b", mood: "💙 Smooth & Chill" },
+  { key: "trap soul", mood: "💙 Smooth & Chill" },
+
+  { key: "indie", mood: "🌿 Mellow & Indie" },
+
+  { key: "edm", mood: "⚡ High Energy" },
+  { key: "dance", mood: "⚡ High Energy" },
+
+  { key: "rock", mood: "🤘 Intense & Driven" },
+
+  { key: "lofi", mood: "📚 Chill Study Vibes" },
+  { key: "lo-fi", mood: "📚 Chill Study Vibes" },
+
+  { key: "latin", mood: "💃 Vibrant & Rhythmic" },
+
+  { key: "classical", mood: "🌙 Calm & Peaceful" },
+];
+
+// 2️⃣ Compute top moods from genres
+export function getTopMoodsFromGenres(genres) {
+  if (!genres || genres.length === 0) {
+    return ["Unknown Mood"];
   }
 
-  return "🎧 Balanced Vibes";
+  const lowerGenres = genres.map((g) => g.toLowerCase());
+  const moodScores = {};
+
+  // Assign mood points based on genre matches
+  for (const g of lowerGenres) {
+    for (const entry of GENRE_TO_MOOD_MAP) {
+      if (g.includes(entry.key)) {
+        moodScores[entry.mood] = (moodScores[entry.mood] || 0) + 1;
+      }
+    }
+  }
+
+  // If no moods matched
+  if (Object.keys(moodScores).length === 0) {
+    return ["🎧 Balanced Vibes"];
+  }
+
+  // Sort by frequency (descending)
+  const sorted = Object.entries(moodScores)
+    .sort((a, b) => b[1] - a[1]) // sort by score
+    .map((pair) => pair[0]); // return mood labels only
+
+  // Return the TOP 3 moods
+  return sorted.slice(0, 3);
 }
