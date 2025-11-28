@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { fetchTopArtists } from "@/app/utils";
+import { fetchTopArtists } from "../../utils";
 
 export default function MoodTestPage() {
   const { data: session } = useSession();
