@@ -7,7 +7,6 @@ import {
   fetchAudioFeatures,
   fetchTopTracks,
 } from "../../utils";
-
 import {
   RadarChart,
   Radar,
@@ -37,11 +36,19 @@ interface AudioFeature {
   tempo: number;
 }
 
+interface MoodStats {
+  energy: number;
+  danceability: number;
+  happiness: number;
+  acousticness: number;
+  tempo: number;
+  vibe: string;
+}
+
 export default function MoodPage() {
   const { data: session } = useSession();
 
-  const [audioData, setAudioData] = useState<AudioFeature[] | null>(null);
-  const [moodStats, setMoodStats] = useState<any>(null);
+  const [moodStats, setMoodStats] = useState<MoodStats | null>(null);
 
   async function analyzeMood() {
     if (!session?.accessToken) return;
@@ -49,7 +56,7 @@ export default function MoodPage() {
     // Sync token with backend
     await sendTokenToBackend(session.accessToken);
 
-    // 1. Fetch user's top tracks
+    // 1. Fetch user's top tracks (short_term = last 4 weeks)
     const topRes = await fetchTopTracks(session.accessToken);
     const tracks: SpotifyTrack[] = topRes?.spotify_data?.items || [];
 
@@ -58,21 +65,21 @@ export default function MoodPage() {
       return;
     }
 
-    const trackIds = tracks.map((t) => t.id);
+    // Extract IDs
+    const trackIds = tracks.map((t: SpotifyTrack) => t.id);
 
     // 2. Fetch audio features
     const featuresRes = await fetchAudioFeatures(session.accessToken, trackIds);
     const features: AudioFeature[] = featuresRes?.audio_features || [];
-
-    setAudioData(features);
 
     // 3. Compute mood stats
     const mood = computeMoodStats(features);
     setMoodStats(mood);
   }
 
-  function computeMoodStats(features: AudioFeature[]) {
-    const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+  function computeMoodStats(features: AudioFeature[]): MoodStats {
+    const avg = (arr: number[]) =>
+      arr.reduce((a, b) => a + b, 0) / arr.length;
 
     const energy = avg(features.map((f) => f.energy));
     const dance = avg(features.map((f) => f.danceability));
@@ -97,7 +104,7 @@ export default function MoodPage() {
     valence: number,
     dance: number,
     acoustic: number
-  ) {
+  ): string {
     if (energy > 0.7 && valence > 0.6) return "✨ Upbeat & Happy";
     if (energy > 0.7 && valence < 0.4) return "🔥 Intense & Emotional";
     if (energy < 0.5 && acoustic > 0.5) return "🌿 Calm & Acoustic";
