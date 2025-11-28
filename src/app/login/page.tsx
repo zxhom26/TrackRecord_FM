@@ -11,10 +11,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#1b1b1b] text-white flex flex-col items-center justify-center p-8 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-[#1b1b1b] text-white flex flex-col p-8 relative">
 
-      {/* ================= LOGO (SVG) ================= */}
-      <div className="absolute top-6 left-6 flex items-center gap-3">
+      {/* ================= LOGO (fixed spacing) ================= */}
+      <div className="flex items-center gap-3 mb-10">
         <svg width="55" height="35" viewBox="0 0 200 100">
           <defs>
             <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
@@ -39,11 +39,11 @@ export default function LoginPage() {
         </span>
       </div>
 
-      {/* ================= LOGIN BUTTON ================= */}
+      {/* LOGIN BUTTON */}
       <button
         onClick={handleLogin}
         className="
-          absolute top-6 right-6 px-6 py-2 rounded-full 
+          absolute top-8 right-8 px-6 py-2 rounded-full 
           text-white font-semibold text-lg
           bg-gradient-to-r from-[#50d784] to-[#25b76b]
           shadow-[0_0_12px_rgba(80,215,132,0.55)]
@@ -54,42 +54,51 @@ export default function LoginPage() {
         Log In
       </button>
 
-      {/* ================= BACKGROUND WAVES (SVG) ================= */}
-      <svg
-        className="absolute inset-0 opacity-[0.22] scale-125 pointer-events-none"
-        viewBox="0 0 1600 900"
-        preserveAspectRatio="none"
-      >
-        <path
-          d="
-            M0 450 
-            C200 300 400 600 600 450
-            S1000 300 1200 450
-            S1600 600 1800 450
-          "
-          stroke="#a160ff"
-          strokeWidth="60"
-          fill="none"
-          strokeLinecap="round"
-        />
-      </svg>
+      {/* ================= WAVE BEHIND LAPTOP ================= */}
+      <div className="absolute top-[180px] left-0 w-full overflow-hidden pointer-events-none">
+        <svg
+          viewBox="0 0 1600 400"
+          preserveAspectRatio="none"
+          className="w-full h-[300px] opacity-[0.35]"
+        >
+          <defs>
+            <linearGradient id="waveGradient" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#6a3ff8" />
+              <stop offset="100%" stopColor="#ff985c" />
+            </linearGradient>
+          </defs>
 
-      {/* ================= HERO CONTENT ================= */}
-      <div className="relative flex flex-col md:flex-row items-center gap-12 md:gap-20">
+          <path
+            d="
+              M0 200 
+              C250 100 450 300 700 200
+              S1150 100 1400 200
+              S1650 300 1900 200
+            "
+            stroke="url(#waveGradient)"
+            strokeWidth="110"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
 
-        {/* LAPTOP MOCKUP */}
-        <div className="relative">
+      {/* ================= MAIN CONTENT ================= */}
+      <div className="relative flex flex-col md:flex-row items-center gap-12 md:gap-20 mt-10">
+
+        {/* LAPTOP MOCK */}
+        <div className="relative z-10">
           <Image
             src="/laptop-mock.png"
             alt="Laptop Preview"
             width={580}
             height={380}
-            className="rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.55)] contrast-[1.15] brightness-[1.1]"
+            className="rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.55)] contrast-[1.2] brightness-[1.1]"
           />
         </div>
 
-        {/* MAIN TEXT */}
-        <div className="flex flex-col items-start max-w-lg">
+        {/* TEXT CONTENT */}
+        <div className="z-10 flex flex-col items-start max-w-lg mt-6 md:mt-0">
           <h1 className="text-5xl md:text-6xl font-semibold leading-tight">
             Meet Your <br />
             <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
