@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { fetchTopArtists } from "../../utils";
+import { fetchTopArtists, getMoodFromGenres } from "../../utils";
 
 export default function MoodTestPage() {
   const { data: session } = useSession();
   const [result, setResult] = useState(null);
+  const [mood, setMood] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleFetch = async () => {
@@ -17,6 +18,7 @@ export default function MoodTestPage() {
 
     setLoading(true);
     setResult(null);
+    setMood("");
 
     console.log("🎫 Access Token:", session.accessToken);
 
@@ -25,24 +27,34 @@ export default function MoodTestPage() {
     console.log("🔍 Top Artists JSON:", response);
     setResult(response);
 
+    const items = response?.spotify_data?.items || [];
+
+    if (items.length === 0) {
+      setMood("No top artists available.");
+      setLoading(false);
+      return;
+    }
+
+    // Gather all genres from all top artists
+    const allGenres = items.flatMap((artist) => artist.genres ?? []);
+    console.log("🎨 ALL GENRES:", allGenres);
+
+    // Convert genres → mood
+    const derivedMood = getMoodFromGenres(allGenres);
+    setMood(derivedMood);
+
     setLoading(false);
   };
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1>🎵 Mood Test Page (Top Artists)</h1>
-
-      {!session && (
-        <p style={{ color: "red" }}>
-          You must be logged in to test this.
-        </p>
-      )}
+      <h1>🎵 Mood Test Page (Genre Mood)</h1>
 
       <button
         onClick={handleFetch}
         disabled={loading}
         style={{
-          padding: "10px 20px",
+          padding: "12px 20px",
           background: "#1DB954",
           border: "none",
           borderRadius: "5px",
@@ -51,8 +63,14 @@ export default function MoodTestPage() {
           marginTop: "1rem",
         }}
       >
-        {loading ? "Loading..." : "Fetch Top Artists"}
+        {loading ? "Loading..." : "Get My Mood"}
       </button>
+
+      {mood && (
+        <h2 style={{ marginTop: "2rem", fontSize: "1.5rem" }}>
+          Your Mood: {mood}
+        </h2>
+      )}
 
       <pre
         style={{
