@@ -18,7 +18,7 @@ export default function MoodPage() {
     await sendTokenToBackend(session.accessToken);
 
     // 1. Fetch user's top 20 tracks (last 4 weeks)
-    const topRes = await fetchTopTracks(session.accessToken, "short_term");
+    const topRes = await fetchTopTracks(session.accessToken);
     const tracks = topRes?.spotify_data?.items || [];
 
     if (tracks.length === 0) {
