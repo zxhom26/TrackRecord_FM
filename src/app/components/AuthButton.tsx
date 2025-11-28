@@ -1,48 +1,23 @@
-'use client';
+"use client";
 
 import { useSession, signIn } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-export default function AuthButton() {
+export default function AuthButton({ onAnalyzing }) {
   const { data: session } = useSession();
-  const router = useRouter();
-  const [showAnalyzing, setShowAnalyzing] = useState(false);
-
-  console.log("Session in AuthButton:", session);
 
   useEffect(() => {
-    // Only trigger redirect if FULLY authenticated (token available)
     if (session?.accessToken) {
-      setShowAnalyzing(true);
-
-      const timer = setTimeout(() => {
-        router.push("/");
-      }, 3000);
-
-      return () => clearTimeout(timer);
+      onAnalyzing?.(); // ⭐ notify parent to hide UI
     }
-  }, [session?.accessToken, router]);
+  }, [session?.accessToken]);
 
-  // Show “Analyzing…” only when token is ready + we’re redirecting
-  if (session?.accessToken && showAnalyzing) {
-    return (
-      <div
-        style={{
-          color: "#b5adde",
-          fontSize: "1.5rem",
-          opacity: 1,
-          transition: "opacity 1s ease",
-        }}
-      >
-        Analyzing...
-      </div>
-    );
-  }
-
-  // Default: user not logged in
+  // Normal button
   return (
-    <button className="spotify-button" onClick={() => signIn("spotify")}>
+    <button
+      onClick={() => signIn("spotify")}
+      className="spotify-button"
+    >
       Sign in with Spotify
     </button>
   );
