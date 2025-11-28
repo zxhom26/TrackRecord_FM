@@ -100,7 +100,7 @@ async def audio_features(request: Request):
     print("🔗 Requesting Spotify audio features for:", ids_str)
 
     response = proxy.fetch_api(
-        endpoint="audio-features",
+        endpoint="/audio-features",
         params={"ids": ids_str}
     )
 
