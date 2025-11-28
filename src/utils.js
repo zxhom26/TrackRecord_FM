@@ -90,3 +90,27 @@ export async function fetchDiscoverWeekly(token) {
     return { error: err.message };
   }
 }
+
+// --- MOOD PROFILE FETCH ---
+export async function fetchAudioFeatures(token, trackIds) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/audio-features`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, track_ids: trackIds }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch audio features");
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error("fetchAudioFeatures error:", err);
+    return { error: err.message };
+  }
+}
+
