@@ -4,18 +4,29 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
-interface TopArtist {
+// ---------- TYPES ----------
+interface SpotifyArtist {
   name: string;
   genres: string[];
 }
 
+interface SpotifyTopArtistResponse {
+  spotify_data?: {
+    items: SpotifyArtist[];
+  };
+}
+
 export default function MoodPage() {
   const { data: session } = useSession();
-  const [result, setResult] = useState<any>(null);
+
+  const [result, setResult] =
+    useState<SpotifyTopArtistResponse | null>(null);
+
   const [mood, setMood] = useState<string>("");
   const [genres, setGenres] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
+  // ---------- MAIN FUNCTION ----------
   const handleFetch = async () => {
     if (!session?.accessToken) {
       alert("No access token found.");
@@ -34,7 +45,8 @@ export default function MoodPage() {
 
     setResult(response);
 
-    const items: TopArtist[] = response?.spotify_data?.items ?? [];
+    const items: SpotifyArtist[] =
+      response?.spotify_data?.items ?? [];
 
     if (items.length === 0) {
       setMood("No top artists available.");
@@ -42,22 +54,27 @@ export default function MoodPage() {
       return;
     }
 
-    // Gather ALL genres from all top artists
-    const allGenres = items.flatMap((artist: TopArtist) => artist.genres ?? []);
+    // Collect all genres
+    const allGenres: string[] = items.flatMap(
+      (artist: SpotifyArtist) => artist.genres ?? []
+    );
+
     console.log("🎨 ALL GENRES:", allGenres);
 
-    setGenres(allGenres);
+    // Compute top 3 moods
+    const topThreeMoods = getTopMoodsFromGenres(allGenres);
+    console.log("🏆 TOP 3 MOODS:", topThreeMoods);
 
-    // Compute Top 3 Mood Profile
-    const topMoods = getTopMoodsFromGenres(allGenres);
-    setMood(topMoods.join(" • "));
+    setMood(topThreeMoods.join(", "));
+    setGenres(allGenres);
 
     setLoading(false);
   };
 
+  // ---------- UI ----------
   return (
     <div style={{ padding: "2rem", fontFamily: "Inter, sans-serif" }}>
-      <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1rem" }}>
+      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
         🎵 Your Mood Profile
       </h1>
 
@@ -68,66 +85,53 @@ export default function MoodPage() {
           padding: "12px 20px",
           background: "#1DB954",
           border: "none",
-          borderRadius: "8px",
+          borderRadius: "5px",
           color: "white",
           cursor: "pointer",
-          fontSize: "1rem",
+          marginTop: "1rem",
           fontWeight: 600,
         }}
       >
-        {loading ? "Loading..." : "Generate Mood Profile"}
+        {loading ? "Loading..." : "Get My Mood Profile"}
       </button>
 
-      {/* --- Mood Result --- */}
       {mood && (
-        <div
-          style={{
-            marginTop: "2rem",
-            padding: "1.2rem",
-            borderRadius: "12px",
-            background: "#f4f4f4",
-          }}
-        >
-          <h2 style={{ fontSize: "1.4rem", fontWeight: 600 }}>Your Top Moods:</h2>
-          <p style={{ fontSize: "1.2rem", marginTop: "0.5rem" }}>{mood}</p>
+        <div style={{ marginTop: "2rem" }}>
+          <h2 style={{ fontSize: "1.4rem", marginBottom: "0.5rem" }}>
+            🧠 Top Mood Signals:
+          </h2>
+          <p style={{ fontSize: "1.2rem" }}>{mood}</p>
         </div>
       )}
 
-      {/* --- Genre List --- */}
       {genres.length > 0 && (
-        <div
-          style={{
-            marginTop: "2rem",
-            padding: "1rem",
-            background: "#fafafa",
-            borderRadius: "10px",
-            maxHeight: "300px",
-            overflowY: "auto",
-          }}
-        >
-          <h3 style={{ marginBottom: "0.5rem" }}>Genres Detected:</h3>
-          <ul style={{ paddingLeft: "1.2rem" }}>
-            {genres.map((g, i) => (
-              <li key={i} style={{ marginBottom: "4px" }}>
-                {g}
-              </li>
-            ))}
-          </ul>
+        <div style={{ marginTop: "2rem" }}>
+          <h3 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>
+            🎨 Genres Detected:
+          </h3>
+          <pre
+            style={{
+              background: "#f7f7f7",
+              padding: "1rem",
+              borderRadius: "6px",
+            }}
+          >
+            {JSON.stringify(genres, null, 2)}
+          </pre>
         </div>
       )}
 
-      {/* --- Raw JSON Data (debug) --- */}
       <pre
         style={{
           background: "#f4f4f4",
           padding: "1rem",
           marginTop: "2rem",
-          borderRadius: "8px",
-          maxHeight: "350px",
+          borderRadius: "6px",
+          maxHeight: "400px",
           overflowY: "auto",
         }}
       >
-        {result ? JSON.stringify(result, null, 2) : "No data yet..."}
+        {result ? JSON.stringify(result, null, 2) : "— No data yet —"}
       </pre>
     </div>
   );
