@@ -1,23 +1,34 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import AuthButton from "../components/AuthButton";
+import Image from "next/image";
 
 export default function LoginPage() {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { data: session, status } = useSession();
+  const [analyzing, setAnalyzing] = useState(false);
 
-  // If analyzing, show ONLY the black screen
-  if (isAnalyzing) {
+  // Redirect when accessToken appears
+  useEffect(() => {
+    if (session?.accessToken) {
+      setAnalyzing(true);
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
+    }
+  }, [session?.accessToken]);
+
+  // === Analyzing Screen ===
+  if (analyzing) {
     return (
       <div className="min-h-screen w-full bg-black flex items-center justify-center">
-        <p className="text-white text-3xl animate-pulse">
-          Analyzing...
-        </p>
+        <h1 className="text-white text-4xl animate-pulse">Analyzing…</h1>
       </div>
     );
   }
 
+  // === Normal Login Page ===
   return (
     <div className="min-h-screen w-full bg-[#1b1b1b] text-white flex flex-col p-8 relative">
 
@@ -30,7 +41,11 @@ export default function LoginPage() {
               <stop offset="100%" stopColor="#ff985c" />
             </linearGradient>
           </defs>
+
+          {/* circular eye */}
           <circle cx="28" cy="50" r="12" fill="url(#logoGradient)" />
+
+          {/* waveform bars */}
           <rect x="60" y="30" width="10" height="40" fill="url(#logoGradient)" rx="3" />
           <rect x="80" y="20" width="10" height="60" fill="url(#logoGradient)" rx="3" />
           <rect x="100" y="10" width="10" height="80" fill="url(#logoGradient)" rx="3" />
@@ -45,25 +60,15 @@ export default function LoginPage() {
 
       {/* LOGIN BUTTON */}
       <div className="absolute top-8 right-8">
-        <div
-          className="
-            px-6 py-2 rounded-full
-            bg-gradient-to-r from-[#50d784] to-[#25b76b]
-            shadow-[0_0_12px_rgba(80,215,132,0.55)]
-            hover:shadow-[0_0_18px_rgba(80,215,132,0.75)]
-            transition-all duration-300
-          "
-        >
-          <AuthButton onAnalyzing={() => setIsAnalyzing(true)} />
-        </div>
+        <AuthButton />
       </div>
 
-      {/* WAVE */}
-      <div className="absolute top-[180px] left-0 w-full overflow-hidden pointer-events-none">
+      {/* WAVE + LAPTOP */}
+      <div className="absolute top-[180px] left-0 w-full pointer-events-none opacity-40">
         <svg
           viewBox="0 0 1600 400"
           preserveAspectRatio="none"
-          className="w-full h-[300px] opacity-[0.35]"
+          className="w-full h-[300px]"
         >
           <defs>
             <linearGradient id="waveGradient" x1="0" y1="0" x2="1" y2="0">
@@ -89,8 +94,6 @@ export default function LoginPage() {
 
       {/* MAIN CONTENT */}
       <div className="relative flex flex-col md:flex-row items-center gap-12 md:gap-20 mt-10">
-
-        {/* LAPTOP */}
         <div className="relative z-10">
           <Image
             src="/laptop-mock.png"
@@ -101,7 +104,6 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* TEXT */}
         <div className="z-10 flex flex-col items-start max-w-lg mt-6 md:mt-0">
           <h1 className="text-5xl md:text-6xl font-semibold leading-tight">
             Meet Your <br />
