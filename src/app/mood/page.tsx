@@ -4,17 +4,25 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchTopArtists, getMoodFromGenres } from "../../utils";
 
-// ---- Define Type for Artists ----
+// ---- Define Types ----
 interface TopArtist {
   name: string;
   genres: string[];
 }
 
+interface TopArtistsResponse {
+  spotify_data?: {
+    items: TopArtist[];
+  };
+}
+
 export default function MoodTestPage() {
   const { data: session } = useSession();
-  const [result, setResult] = useState<any>(null);
-  const [mood, setMood] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  // ❌ NO ANY — fully typed now
+  const [result, setResult] = useState<TopArtistsResponse | null>(null);
+  const [mood, setMood] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleFetch = async () => {
     if (!session?.accessToken) {
@@ -28,14 +36,15 @@ export default function MoodTestPage() {
 
     console.log("🎫 Access Token:", session.accessToken);
 
-    // ---- Fetch top artists ----
-    const response = await fetchTopArtists(session.accessToken);
-    console.log("🔍 Top Artists JSON:", response);
+    // Fetch backend data
+    const response: TopArtistsResponse = await fetchTopArtists(
+      session.accessToken
+    );
 
+    console.log("🔍 Top Artists JSON:", response);
     setResult(response);
 
-    // ---- Safely extract artists array ----
-    const items: TopArtist[] = response?.spotify_data?.items ?? [];
+    const items: TopArtist[] = response.spotify_data?.items ?? [];
 
     if (items.length === 0) {
       setMood("No top artists available.");
@@ -43,11 +52,9 @@ export default function MoodTestPage() {
       return;
     }
 
-    // ---- Collect all genres ----
-    const allGenres = items.flatMap((artist: TopArtist) => artist.genres ?? []);
+    const allGenres: string[] = items.flatMap((artist) => artist.genres ?? []);
     console.log("🎨 ALL GENRES:", allGenres);
 
-    // ---- Compute mood ----
     const moodLabel = getMoodFromGenres(allGenres);
     setMood(moodLabel);
 
