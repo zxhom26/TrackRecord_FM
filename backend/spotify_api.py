@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import time
 from typing import Dict, Any, Optional
 import copy
+import urllib.parse  # ⭐ (added for cache key fix)
 
 class APIInterface(ABC):
     @abstractmethod
@@ -18,18 +19,16 @@ class SpotifyAPIProxy(APIInterface):
         pass
     
     def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Dict[str, Any]:
-        """
-        Calls the Spotify Web API with OAuth access token.
-        :param endpoint: Spotify API endpoint (e.g. "/v1/me" or "/v1/playlists/{id}")
-        :param access_token: Valid Spotify OAuth token string
-        :param method: HTTP method 
-        :param data: Dictionary for JSON body
-        :param params: Dictionary for query parameters
-        :return: Parsed JSON response
-        """
         try:
+            # build full URL
             url = f"{self.base_url}/{endpoint}"
-            isCached = self.cache.get(url)
+            
+            # ⭐ build cache key INCLUDING params
+            query = urllib.parse.urlencode(params or {})  # ⭐
+            cache_key = f"{url}?{query}"  # ⭐
+            
+            # ⭐ look up by the improved cache key
+            isCached = self.cache.get(cache_key)  # ⭐
             
             access_token = self.access_token
             if not access_token:
@@ -38,37 +37,36 @@ class SpotifyAPIProxy(APIInterface):
             headers = {
                 "Authorization": f"Bearer {access_token}",
                 "Content-Type": "application/json"
-                }
+            }
 
-            if isCached and "ETag" in isCached: # check if url is already cached
-                headers["If-None-Match"] = isCached["ETag"] # notify Spotify api that url is cached
-            
+            if isCached and "ETag" in isCached:
+                headers["If-None-Match"] = isCached["ETag"]
+
             response = self.api.fetch_api(endpoint, headers, method, data, params)
 
             if response is None:
                 raise Exception('API response empty')
-
-            elif response.status_code == 304: # cache response is NOT EXPIRED
-                print(f"Using cached data for [{url}]")
+            elif response.status_code == 304:
                 return isCached["data"]
-
-            else: # cache new url or recache EXPIRED response
+            else:
                 etag = response.headers.get("ETag")
-                self.cache[url] = {
-                                "ETag": etag,
-                                "data": response.json(),
-                                "timestamp": time.time()
-                                }
-                return self.cache[url]["data"]
+                
+                # ⭐ save to cache using improved cache key
+                self.cache[cache_key] = {  # ⭐
+                    "ETag": etag,
+                    "data": response.json(),
+                    "timestamp": time.time()
+                }
+                
+                # ⭐ return cached data using improved key
+                return self.cache[cache_key]["data"]  # ⭐
 
         except Exception as e:
             print(f"API cache search failed: {e}")
-            return {} # return empty dict on failure
+            return {}
 
     def get_cache(self):
         return copy.deepcopy(self.cache)
-
-    
 
 class SpotifyAPI(APIInterface):
     def __init__(self, access_token: str):
@@ -77,15 +75,6 @@ class SpotifyAPI(APIInterface):
         pass
 
     def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Optional[requests.Response]:
-        """
-        Calls the Spotify Web API with OAuth access token.
-        :param url: Spotify API full url 
-        :param headers: Valid Spotify token and headers
-        :param method: HTTP method
-        :param data: Dictionary for JSON body
-        :param params: Dictionary for query parameters
-        :return: raw requests.Response object
-        """
         try:
             url = f"{self.base_url}/{endpoint}"
 
@@ -95,8 +84,8 @@ class SpotifyAPI(APIInterface):
 
             if headers is None:
                 headers = {
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json"
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json"
                 }
 
             response = requests.request(
@@ -107,9 +96,9 @@ class SpotifyAPI(APIInterface):
                 params=params
             )
 
-            if response.status_code not in range(200, 400): # request failed
+            if response.status_code not in range(200, 400):
                 raise Exception(f"Spotify API request failed with code {response.status_code}: {response.text}")
-            else:   
+            else:
                 return response
 
         except Exception as e:
@@ -118,8 +107,6 @@ class SpotifyAPI(APIInterface):
     
     def get_token(self):
         return copy.copy(self.access_token)
-
-
 
 # Sample Usage ---------------------------------------------------------
 # api = SpotifyAPI(token='token1234')
