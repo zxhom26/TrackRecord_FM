@@ -10,6 +10,7 @@ class APIInterface(ABC):
     def fetch_api(self, endpoint, headers, method, data, params):
         pass
 
+
 class SpotifyAPIProxy(APIInterface):
     def __init__(self, api: APIInterface):
         self.api = api
@@ -23,13 +24,13 @@ class SpotifyAPIProxy(APIInterface):
 
             # ⭐ include params in cache key
             query = urllib.parse.urlencode(params or {})
-            cache_key = f"{url}?{query}"  # ⭐
+            cache_key = f"{url}?{query}"
 
-            isCached = self.cache.get(cache_key)  # ⭐
+            isCached = self.cache.get(cache_key)
 
             access_token = self.access_token
             if not access_token:
-                raise Exception('Access token not found.')
+                raise Exception("Access token not found.")
 
             headers = {
                 "Authorization": f"Bearer {access_token}",
@@ -39,26 +40,34 @@ class SpotifyAPIProxy(APIInterface):
             if isCached and "ETag" in isCached:
                 headers["If-None-Match"] = isCached["ETag"]
 
-            response = self.api.fetch_api(endpoint, headers, method, data, params)
+            # ⭐ FIX — Build endpoint WITH query params so backend hits correct URL
+            if params:
+                endpoint_with_params = f"{endpoint}?{urllib.parse.urlencode(params)}"   # ⭐ FIX
+            else:
+                endpoint_with_params = endpoint
+
+            # ⭐ FIX — pass None for params so base class doesn't override
+            response = self.api.fetch_api(endpoint_with_params, headers, method, data, None)  # ⭐ FIX
 
             if response is None:
-                raise Exception('API response empty')
+                raise Exception("API response empty")
 
             elif response.status_code == 304:
                 return isCached["data"]
 
             else:
                 etag = response.headers.get("ETag")
-                self.cache[cache_key] = {  # ⭐
+                self.cache[cache_key] = {
                     "ETag": etag,
                     "data": response.json(),
                     "timestamp": time.time()
                 }
-                return self.cache[cache_key]["data"]  # ⭐
+                return self.cache[cache_key]["data"]
 
         except Exception as e:
             print(f"API cache search failed: {e}")
             return {}
+
 
 class SpotifyAPI(APIInterface):
     def __init__(self, access_token: str):
@@ -67,11 +76,12 @@ class SpotifyAPI(APIInterface):
 
     def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Optional[requests.Response]:
         try:
-            url = f"{self.base_url}/{endpoint.lstrip('/')}"  # ⭐ fix double slash
+            # ⭐ FIX: endpoint may already include "?...", so do NOT add another slash
+            url = f"{self.base_url}/{endpoint.lstrip('/')}"  
 
             access_token = self.access_token
             if not access_token:
-                raise Exception('Access token not found.')
+                raise Exception("Access token not found.")
 
             if headers is None:
                 headers = {
@@ -79,9 +89,9 @@ class SpotifyAPI(APIInterface):
                     "Content-Type": "application/json"
                 }
 
-            print("🎯 FINAL URL:", url, "PARAMS:", params)  # ⭐ moved outside request()
+            print("🎯 FINAL URL:", url, "PARAMS:", params)
 
-            # ⭐ FIXED — no more broken syntax
+            # ⭐ FIX — your previous syntax error is corrected here
             response = requests.request(
                 method=method,
                 url=url,
