@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchTopArtists, getMoodFromGenres } from "../../utils";
 
+// ---- Define Type for Artists ----
 interface TopArtist {
   name: string;
   genres: string[];
@@ -27,12 +28,14 @@ export default function MoodTestPage() {
 
     console.log("🎫 Access Token:", session.accessToken);
 
+    // ---- Fetch top artists ----
     const response = await fetchTopArtists(session.accessToken);
-
     console.log("🔍 Top Artists JSON:", response);
+
     setResult(response);
 
-    const items: TopArtist[] = response?.spotify_data?.items || [];
+    // ---- Safely extract artists array ----
+    const items: TopArtist[] = response?.spotify_data?.items ?? [];
 
     if (items.length === 0) {
       setMood("No top artists available.");
@@ -40,11 +43,13 @@ export default function MoodTestPage() {
       return;
     }
 
-    const allGenres = items.flatMap((artist) => artist.genres ?? []);
+    // ---- Collect all genres ----
+    const allGenres = items.flatMap((artist: TopArtist) => artist.genres ?? []);
     console.log("🎨 ALL GENRES:", allGenres);
 
-    const moodResult = getMoodFromGenres(allGenres);
-    setMood(moodResult);
+    // ---- Compute mood ----
+    const moodLabel = getMoodFromGenres(allGenres);
+    setMood(moodLabel);
 
     setLoading(false);
   };
