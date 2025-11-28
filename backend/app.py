@@ -86,33 +86,29 @@ async def audio_features(request: Request):
     if not token:
         return {"error": "Missing token"}
 
-    if not isinstance(track_ids, list) or len(track_ids) == 0:
-        print("❌ No track IDs received at backend")
+    if not track_ids:
         return {"error": "Missing track_ids"}
 
-    # Create API wrapper
     api = SpotifyAPI(access_token=token)
     proxy = SpotifyAPIProxy(api)
 
-    # Convert track IDs to comma-separated string
     ids_str = ",".join(track_ids)
 
-    print("🔗 Requesting Spotify audio features for:", ids_str)
+    import urllib.parse
+    encoded_ids = urllib.parse.quote(ids_str, safe=",")
+
+    print("REQUESTED PARAMS:", {"ids": encoded_ids})
 
     response = proxy.fetch_api(
         endpoint="audio-features",
-        params={"ids": ids_str}
+        params={"ids": encoded_ids}
     )
 
     print("🎵 Spotify audio features response:", response)
 
-    # Spotify returns:
-    # { "audio_features": [ {...}, {...} ] }
     audio = response.get("audio_features", [])
-
-    print("Parsed audio features:", audio)
-
     return {"audio_features": audio}
+
 
 
 # ---------------------------------------------------------
