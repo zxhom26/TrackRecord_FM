@@ -1,13 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import AuthButton from "../components/AuthButton"; // ⭐ BRING BACK AUTHBUTTON
+import { useState } from "react";
+import AuthButton from "../components/AuthButton";
 
 export default function LoginPage() {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // If analyzing, show ONLY the black screen
+  if (isAnalyzing) {
+    return (
+      <div className="min-h-screen w-full bg-black flex items-center justify-center">
+        <p className="text-white text-3xl animate-pulse">
+          Analyzing...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full bg-[#1b1b1b] text-white flex flex-col p-8 relative">
 
-      {/* ================= LOGO ================= */}
+      {/* LOGO */}
       <div className="flex items-center gap-3 mb-10">
         <svg width="55" height="35" viewBox="0 0 200 100">
           <defs>
@@ -16,7 +30,6 @@ export default function LoginPage() {
               <stop offset="100%" stopColor="#ff985c" />
             </linearGradient>
           </defs>
-
           <circle cx="28" cy="50" r="12" fill="url(#logoGradient)" />
           <rect x="60" y="30" width="10" height="40" fill="url(#logoGradient)" rx="3" />
           <rect x="80" y="20" width="10" height="60" fill="url(#logoGradient)" rx="3" />
@@ -30,7 +43,7 @@ export default function LoginPage() {
         </span>
       </div>
 
-      {/* ================= LOGIN BUTTON (using AuthButton) ================= */}
+      {/* LOGIN BUTTON */}
       <div className="absolute top-8 right-8">
         <div
           className="
@@ -41,12 +54,11 @@ export default function LoginPage() {
             transition-all duration-300
           "
         >
-          {/* ⭐ Replace the raw button with your component */}
-          <AuthButton />
+          <AuthButton onAnalyzing={() => setIsAnalyzing(true)} />
         </div>
       </div>
 
-      {/* ================= WAVE ================= */}
+      {/* WAVE */}
       <div className="absolute top-[180px] left-0 w-full overflow-hidden pointer-events-none">
         <svg
           viewBox="0 0 1600 400"
@@ -75,10 +87,10 @@ export default function LoginPage() {
         </svg>
       </div>
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* MAIN CONTENT */}
       <div className="relative flex flex-col md:flex-row items-center gap-12 md:gap-20 mt-10">
 
-        {/* LAPTOP MOCK */}
+        {/* LAPTOP */}
         <div className="relative z-10">
           <Image
             src="/laptop-mock.png"
@@ -103,7 +115,6 @@ export default function LoginPage() {
             and dive into the sound that makes you—you.
           </p>
         </div>
-
       </div>
     </div>
   );
