@@ -2,14 +2,46 @@
 
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
-import { sendTokenToBackend, fetchAudioFeatures, fetchTopTracks } from "../../utils";
-import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  sendTokenToBackend,
+  fetchAudioFeatures,
+  fetchTopTracks,
+} from "../../utils";
+
+import {
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+} from "recharts";
+
+// ---------- TYPES ----------
+interface SpotifyArtist {
+  name: string;
+}
+
+interface SpotifyTrack {
+  id: string;
+  name: string;
+  artists: SpotifyArtist[];
+  external_urls: { spotify: string };
+}
+
+interface AudioFeature {
+  energy: number;
+  danceability: number;
+  valence: number;
+  acousticness: number;
+  tempo: number;
+}
 
 export default function MoodPage() {
   const { data: session } = useSession();
 
-  const [audioData, setAudioData] = useState(null);
-  const [moodStats, setMoodStats] = useState(null);
+  const [audioData, setAudioData] = useState<AudioFeature[] | null>(null);
+  const [moodStats, setMoodStats] = useState<any>(null);
 
   async function analyzeMood() {
     if (!session?.accessToken) return;
@@ -17,9 +49,9 @@ export default function MoodPage() {
     // Sync token with backend
     await sendTokenToBackend(session.accessToken);
 
-    // 1. Fetch user's top 20 tracks (last 4 weeks)
+    // 1. Fetch user's top tracks
     const topRes = await fetchTopTracks(session.accessToken);
-    const tracks = topRes?.spotify_data?.items || [];
+    const tracks: SpotifyTrack[] = topRes?.spotify_data?.items || [];
 
     if (tracks.length === 0) {
       alert("No top tracks available.");
@@ -28,19 +60,19 @@ export default function MoodPage() {
 
     const trackIds = tracks.map((t) => t.id);
 
-    // 2. Fetch audio features for these tracks
+    // 2. Fetch audio features
     const featuresRes = await fetchAudioFeatures(session.accessToken, trackIds);
-    const features = featuresRes?.audio_features || [];
+    const features: AudioFeature[] = featuresRes?.audio_features || [];
 
     setAudioData(features);
 
-    // 3. Compute mood stats (frontend)
+    // 3. Compute mood stats
     const mood = computeMoodStats(features);
     setMoodStats(mood);
   }
 
-  function computeMoodStats(features) {
-    const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+  function computeMoodStats(features: AudioFeature[]) {
+    const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
     const energy = avg(features.map((f) => f.energy));
     const dance = avg(features.map((f) => f.danceability));
@@ -48,7 +80,7 @@ export default function MoodPage() {
     const acoustic = avg(features.map((f) => f.acousticness));
     const tempo = avg(features.map((f) => f.tempo));
 
-    const vibe = classifyMood(energy, valence, dance);
+    const vibe = classifyMood(energy, valence, dance, acoustic);
 
     return {
       energy,
@@ -60,7 +92,12 @@ export default function MoodPage() {
     };
   }
 
-  function classifyMood(energy, valence, dance) {
+  function classifyMood(
+    energy: number,
+    valence: number,
+    dance: number,
+    acoustic: number
+  ) {
     if (energy > 0.7 && valence > 0.6) return "✨ Upbeat & Happy";
     if (energy > 0.7 && valence < 0.4) return "🔥 Intense & Emotional";
     if (energy < 0.5 && acoustic > 0.5) return "🌿 Calm & Acoustic";
