@@ -1,4 +1,4 @@
-// --- 11. Call backend helper ---
+// ---  Call backend helper ---
 export async function callBackend() {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -19,7 +19,7 @@ export async function callBackend() {
   }
 }
 
-// --- 12. Backend token sender ---
+// ---  Backend token sender ---
 export async function sendTokenToBackend(token) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -43,7 +43,7 @@ export async function sendTokenToBackend(token) {
   }
 }
 
-// --- 13. Fetching Top Tracks ---
+// --- Fetching Top Tracks ---
 export async function fetchTopTracks(token) {
   try {
     const response = await fetch(
@@ -68,7 +68,7 @@ export async function fetchTopTracks(token) {
   }
 }
 
-// --- 14. Fetching Top Artists (for genre-based mood) ---
+// --- Fetching Top Artists (for genre-based mood) ---
 export async function fetchTopArtists(token) {
   try {
     const response = await fetch(
@@ -93,3 +93,42 @@ export async function fetchTopArtists(token) {
     return { error: err.message };
   }
 }
+
+// --- MOOD MAPPING ---
+// --- Mood Mapping by Genre ---
+export function getMoodFromGenres(genres) {
+  if (!genres || genres.length === 0) return "Unknown Mood";
+
+  // Normalize genres
+  const g = genres.map((s) => s.toLowerCase());
+
+  if (g.some((x) => x.includes("rap") || x.includes("hip hop"))) {
+    return "🔥 Bold & Confident";
+  }
+  if (g.some((x) => x.includes("pop"))) {
+    return "🎉 Upbeat & Fun";
+  }
+  if (g.some((x) => x.includes("edm") || x.includes("dance"))) {
+    return "⚡ High Energy";
+  }
+  if (g.some((x) => x.includes("r&b"))) {
+    return "💙 Smooth & Chill";
+  }
+  if (g.some((x) => x.includes("indie"))) {
+    return "🌿 Mellow & Indie";
+  }
+  if (g.some((x) => x.includes("rock"))) {
+    return "🤘 Intense & Driven";
+  }
+  if (g.some((x) => x.includes("lofi") || x.includes("lo-fi"))) {
+    return "📚 Chill Study Vibes";
+  }
+  if (g.some((x) => x.includes("latin"))) {
+    return "💃 Vibrant & Rhythmic";
+  }
+  if (g.some((x) => x.includes("classical"))) {
+    return "🌙 Calm & Peaceful";
+
+  return "🎧 Balanced Vibes";
+}
+
