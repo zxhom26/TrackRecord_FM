@@ -119,7 +119,7 @@ async def audio_features(request: Request):
 #   ORIGINAL MAIN SPOTIFY CALL 
 # ---------------------------------------------------------
 
-@app.post("/api/spotify")
+'''@app.post("/api/spotify")
 async def call_spotify(request: Request):
     data = await request.json()
 
@@ -144,4 +144,4 @@ async def call_spotify(request: Request):
     print("📦 Spotify API returned:", response)
     print("--- END /api/spotify ---\n")
 
-    return {"spotify_data": response}
+    return {"spotify_data": response}'''
