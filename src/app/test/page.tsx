@@ -32,3 +32,7 @@ export default function TestBackendPage() {
     </div>
   );
 }*/
+export default function TestPage() {
+  return <div style={{ padding: 40 }}>Test page disabled.</div>;
+}
+
