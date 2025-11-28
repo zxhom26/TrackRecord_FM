@@ -76,7 +76,7 @@ class SpotifyAPI(APIInterface):
 
     def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Optional[requests.Response]:
         try:
-            url = f"{self.base_url}/{endpoint}"
+            url = f"{self.base_url}/{endpoint.lstrip('/')}"  # FIX trailing slashes
 
             access_token = self.access_token
             if not access_token:
@@ -89,6 +89,7 @@ class SpotifyAPI(APIInterface):
                 }
 
             response = requests.request(
+                print("🎯 FINAL URL:", url, "PARAMS:", params)
                 method=method,
                 url=url, 
                 headers=headers,
