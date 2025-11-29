@@ -47,9 +47,9 @@ export async function sendTokenToBackend(token) {
 export async function fetchTopTracks(token) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/spotify`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-tracks`,
       {
-        method: "POST",
+        method: "GET",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token: token,
