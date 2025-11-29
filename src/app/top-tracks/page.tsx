@@ -15,16 +15,14 @@ interface SpotifyTrack {
 }
 
 interface SpotifyResponse {
-  spotify_data?: {
-    items: SpotifyTrack[];
-  };
+  top_tracks?: SpotifyTrack[];
 }
 
 export default function TopTracksPage() {
   const { data: session } = useSession();
   const [tracks, setTracks] = useState<SpotifyResponse | null>(null);
 
-  // Send token to backend if available
+  // Send token to backend on login
   useEffect(() => {
     if (session?.accessToken) {
       sendTokenToBackend(session.accessToken);
@@ -32,9 +30,8 @@ export default function TopTracksPage() {
   }, [session?.accessToken]);
 
   async function loadTracks() {
-    if (!session?.accessToken) return;
-
-    const result = await fetchTopTracks(session.accessToken);
+    const result = await fetchTopTracks();  // no token needed
+    console.log("Top Tracks Response:", result);
     setTracks(result);
   }
 
@@ -53,7 +50,6 @@ export default function TopTracksPage() {
         color: "#2b225a",
       }}
     >
-      {/* Header */}
       <h1
         style={{
           fontSize: "2rem",
@@ -64,7 +60,6 @@ export default function TopTracksPage() {
         Your Top Tracks, <span style={{ color: "#6A56C2" }}>{username}</span>
       </h1>
 
-      {/* Load Button */}
       <button
         onClick={loadTracks}
         style={{
@@ -81,8 +76,8 @@ export default function TopTracksPage() {
         Load Top Tracks
       </button>
 
-      {/* Track Cards */}
-      {tracks?.spotify_data?.items && (
+      {/* RENDER NEW FORMAT */}
+      {tracks?.top_tracks && (
         <div
           style={{
             display: "grid",
@@ -90,7 +85,7 @@ export default function TopTracksPage() {
             gap: "20px",
           }}
         >
-          {tracks.spotify_data.items.slice(0, 20).map((track, index) => (
+          {tracks.top_tracks.slice(0, 20).map((track, index) => (
             <div
               key={index}
               style={{
