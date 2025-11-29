@@ -10,21 +10,17 @@ interface SpotifyArtist {
   genres: string[];
 }
 
-interface SpotifyTopArtistResponse {
-  spotify_data?: {
-    items: SpotifyArtist[];
-  };
+interface BackendTopArtistsResponse {
+  top_artists: SpotifyArtist[];
 }
 
 export default function MoodPage() {
   const { data: session } = useSession();
 
-  const [result, setResult] =
-    useState<SpotifyTopArtistResponse | null>(null);
-
-  const [mood, setMood] = useState<string>("");
+  const [result, setResult] = useState<BackendTopArtistsResponse | null>(null);
+  const [mood, setMood] = useState("");
   const [genres, setGenres] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   // ---------- MAIN FUNCTION ----------
   const handleFetch = async () => {
@@ -45,8 +41,7 @@ export default function MoodPage() {
 
     setResult(response);
 
-    const items: SpotifyArtist[] =
-      response?.spotify_data?.items ?? [];
+    const items: SpotifyArtist[] = response?.top_artists ?? [];
 
     if (items.length === 0) {
       setMood("No top artists available.");
@@ -56,7 +51,7 @@ export default function MoodPage() {
 
     // Collect all genres
     const allGenres: string[] = items.flatMap(
-      (artist: SpotifyArtist) => artist.genres ?? []
+      (artist) => artist.genres ?? []
     );
 
     console.log("🎨 ALL GENRES:", allGenres);
