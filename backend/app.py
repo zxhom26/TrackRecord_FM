@@ -48,7 +48,7 @@ async def receive_token(request: Request):
     return {"message": "token stored successfully"}
 
 # SEND TOP TRACKS TO FRONTEND
-@app.get("/api/top-tracks")
+@app.post("/api/top-tracks")
 async def get_top_tracks(): 
     token = user_tokens.get("active")
     if not token:
