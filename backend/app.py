@@ -60,7 +60,7 @@ async def get_top_tracks():
     return {"top_tracks": top_tracks}
 
 # SEND TOP ARTISTS TO FRONTEND
-@app.get("/api/top-artists")
+@app.post("/api/top-artists")
 async def get_top_artists(): 
     token = user_tokens.get("active")
     if not token:
@@ -72,7 +72,7 @@ async def get_top_artists():
     return {"top_artists": top_artists}
 
 # SEND RECENTLY PLAYED TO FRONTEND
-@app.get("/api/recently-played")
+@app.post("/api/recently-played")
 async def get_recently_played(): 
     token = user_tokens.get("active")
     if not token:
@@ -84,7 +84,7 @@ async def get_recently_played():
     return {"recently_played": recently_played}
 
 # SEND TOP GENRES TO FRONTEND
-@app.get("/api/top-genres")
+@app.post("/api/top-genres")
 async def get_top_genres(): 
     token = user_tokens.get("active")
     if not token:
@@ -96,7 +96,7 @@ async def get_top_genres():
     return {"top_genres": top_genres}
 
 # SEND QUICK STATS TO FRONTEND
-@app.get("/api/quick-stats")
+@app.post("/api/quick-stats")
 async def get_quick_stats(): 
     token = user_tokens.get("active")
     if not token:
@@ -108,7 +108,7 @@ async def get_quick_stats():
     return {"quick_stats": quick_stats}
 
 # SEND SONG RECOMMENDATIONS TO FRONTEND
-@app.get("/api/recommendations")
+@app.post("/api/recommendations")
 async def get_song_recommendations(): 
     token = user_tokens.get("active")
     if not token:
@@ -119,65 +119,3 @@ async def get_song_recommendations():
 
     return {"recommendations": recommendations}
 
-
-# ------------- DEPRECATED ---------------
-# MAIN SPOTIFY CALL
-@app.post("/api/spotify")
-async def call_spotify(request: Request):
-    data = await request.json()
-
-    print("\n--- /api/spotify CALLED ---")
-    print("Request body:", data)
-
-    token = data.get("token")
-    if not token:
-        print("❌ No token received!")
-        return {"error": "token not found"}
-
-    print("🎵 Token received in /api/spotify:", token[:25] + "...")
-
-    # create API wrapper with token
-    api = SpotifyAPI(access_token=token)
-    proxy = SpotifyAPIProxy(api)
-
-    print("📡 Calling Spotify: GET me/top/tracks")
-
-    # make spotify call
-    response = proxy.fetch_api(endpoint="me/top/tracks")
-
-    print("📦 Spotify API returned:", response)
-    print("--- END /api/spotify ---\n")
-
-    return {"spotify_data": response}
-
-'''# NEW: Fetch user's top artists (for mood via genres)
-@app.post("/api/top-artists")
-async def get_top_artists(request: Request):
-    data = await request.json()
-
-    print("\n--- /api/top-artists CALLED ---")
-    print("Request body:", data)
-
-    token = data.get("token")
-    if not token:
-        print("❌ No token received in /api/top-artists!")
-        return {"error": "token not found"}
-
-    print("🎵 Token received in /api/top-artists:", token[:25] + "...")
-
-    # create API wrapper with token
-    api = SpotifyAPI(access_token=token)
-    proxy = SpotifyAPIProxy(api)
-
-    # We use Spotify's "Get User's Top Artists" endpoint
-    # Spotify default is medium_term; we can make it explicit & set limit.
-    endpoint = "me/top/artists?limit=20&time_range=medium_term"
-    print(f"📡 Calling Spotify: GET {endpoint}")
-
-    response = proxy.fetch_api(endpoint=endpoint)
-
-    print("📦 Spotify top artists returned:", response)
-    print("--- END /api/top-artists ---\n")
-
-    # Keep return structure consistent with /api/spotify
-    return {"spotify_data": response}'''
