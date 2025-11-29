@@ -1,49 +1,21 @@
-'use client';
+"use client";
 
-import { useSession, signIn } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function AuthButton() {
-  const { data: session } = useSession();
-  const router = useRouter();
-  const [showAnalyzing, setShowAnalyzing] = useState(false);
-
-  console.log("Session in AuthButton:", session);
-
-  useEffect(() => {
-    // Only trigger redirect if FULLY authenticated (token available)
-    if (session?.accessToken) {
-      setShowAnalyzing(true);
-
-      const timer = setTimeout(() => {
-        router.push("/");
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [session?.accessToken, router]);
-
-  // Show “Analyzing…” only when token is ready + we’re redirecting
-  if (session?.accessToken && showAnalyzing) {
-    return (
-      <div
-        style={{
-          color: "#b5adde",
-          fontSize: "1.5rem",
-          opacity: 1,
-          transition: "opacity 1s ease",
-        }}
-      >
-        Analyzing...
-      </div>
-    );
-  }
-
-  // Default: user not logged in
   return (
-    <button className="spotify-button" onClick={() => signIn("spotify")}>
-      Sign in with Spotify
+    <button
+      className="
+        px-6 py-2 rounded-full
+        text-white font-semibold text-lg
+        bg-gradient-to-r from-[#50d784] to-[#25b76b]
+        shadow-[0_0_12px_rgba(80,215,132,0.55)]
+        hover:shadow-[0_0_18px_rgba(80,215,132,0.75)]
+        transition-all duration-300
+      "
+      onClick={() => signIn("spotify")}
+    >
+      Log In 
     </button>
   );
 }

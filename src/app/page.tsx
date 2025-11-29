@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Home, MessagesSquare, Trophy, Settings, User, ListMusic } from "lucide-react";
 import { sendTokenToBackend } from "../utils";
 
-// ───────────────────── TYPES (for future expansion) ─────────────────────
+// ───────────────────── TYPES ─────────────────────
 interface SpotifyArtist {
   name: string;
 }
@@ -23,13 +23,13 @@ interface SpotifyResponse {
   };
 }
 
-// ───────────────────────── COMPONENT ─────────────────────────
+// ───────────────────── COMPONENT ─────────────────────
 
 export default function HomePage() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  // send token to backend when available
+  // send token to backend
   useEffect(() => {
     if (session?.accessToken) {
       sendTokenToBackend(session.accessToken);
@@ -37,9 +37,7 @@ export default function HomePage() {
   }, [session?.accessToken]);
 
   const displayName =
-    session?.user?.email ||
-    session?.user?.name ||
-    "Spotify User";
+    session?.user?.email || session?.user?.name || "Spotify User";
 
   const handleGoToTopTracks = () => {
     router.push("/top-tracks");
@@ -109,7 +107,7 @@ export default function HomePage() {
           </svg>
         </div>
 
-        {/* ---------------- ICON NAV (LUCIDE) ---------------- */}
+        {/* ---------------- ICON NAV ---------------- */}
         <nav
           style={{
             display: "flex",
@@ -118,7 +116,6 @@ export default function HomePage() {
             marginTop: "8px",
           }}
         >
-          {/* HOME */}
           <div
             style={{
               width: 42,
@@ -133,7 +130,6 @@ export default function HomePage() {
             <Home size={24} color="#dccbf2" />
           </div>
 
-          {/* SOCIAL */}
           <div
             style={{
               width: 42,
@@ -148,7 +144,6 @@ export default function HomePage() {
             <MessagesSquare size={24} color="#dccbf2" />
           </div>
 
-          {/* TROPHY */}
           <div
             style={{
               width: 42,
@@ -163,7 +158,6 @@ export default function HomePage() {
             <Trophy size={24} color="#dccbf2" />
           </div>
 
-          {/* SETTINGS */}
           <div
             style={{
               width: 42,
@@ -192,61 +186,51 @@ export default function HomePage() {
       >
         {/* ------- TOP BAR ------- */}
         <header
-  style={{
-    width: "100%",
-    height: "70px",
-    backgroundColor: "#1a1233", // full opaque dark purple
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "0 30px",
-    borderRadius: 0, // removes the pill shape
-    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-  }}
->
-  {/* Left spacer to visually align text with sidebar */}
-  <div style={{ width: 40 }} />
-
-  {/* Gradient Welcome Text */}
-  <div
-    style={{
-      fontSize: "1.6rem",
-      fontWeight: 700,
-      backgroundImage: "linear-gradient(135deg,#a160ff,#ff985c)",
-      WebkitBackgroundClip: "text",
-      backgroundClip: "text",
-      color: "transparent",
-      textAlign: "center",
-      flexGrow: 1,
-    }}
-  >
-    Welcome back, {displayName}!
-  </div>
-
-  {/* Profile Icon */}
-  <div
-    style={{
-      width: 42,
-      height: 42,
-      borderRadius: "50%",
-      backgroundColor: "#d9c9ff",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    <User size={22} color="#2b225a" />
-  </div>
-</header>
-
-
-        {/* ------- “Dive Back In” HEADING ------- */}
-        <section
           style={{
-            textAlign: "center",
-            marginTop: "10px",
+            width: "100%",
+            height: "70px",
+            backgroundColor: "#1a1233",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 30px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           }}
         >
+          <div style={{ width: 40 }} />
+
+          <div
+            style={{
+              fontSize: "1.6rem",
+              fontWeight: 700,
+              backgroundImage: "linear-gradient(135deg,#a160ff,#ff985c)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+              textAlign: "center",
+              flexGrow: 1,
+            }}
+          >
+            Welcome back, {displayName}!
+          </div>
+
+          <div
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: "50%",
+              backgroundColor: "#d9c9ff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <User size={22} color="#2b225a" />
+          </div>
+        </header>
+
+        {/* ------- TOP BUTTON ------- */}
+        <section style={{ textAlign: "center", marginTop: "10px" }}>
           <h2
             style={{
               fontSize: "1.8rem",
@@ -257,7 +241,6 @@ export default function HomePage() {
             Dive Back In to Your Favorites…
           </h2>
 
-          {/* OBLONG BUTTON WITH LUCIDE ICON */}
           <button
             onClick={handleGoToTopTracks}
             style={{
@@ -280,7 +263,10 @@ export default function HomePage() {
           </button>
         </section>
 
-        {/* ------- 3 DASHBOARD PANELS (UI ONLY FOR NOW) ------- */}
+        {/* ==================================================== */}
+        {/*              UPDATED 3-PANEL DASHBOARD               */}
+        {/* ==================================================== */}
+
         <section
           style={{
             marginTop: "24px",
@@ -289,7 +275,7 @@ export default function HomePage() {
             gap: "20px",
           }}
         >
-          {/* Weekly Listening Analytics */}
+          {/* 1 — QUICK STATS */}
           <div
             style={{
               borderRadius: "18px",
@@ -302,31 +288,29 @@ export default function HomePage() {
               style={{
                 fontSize: "1.1rem",
                 fontWeight: 600,
-                marginBottom: "8px",
+                marginBottom: "10px",
               }}
             >
-              Weekly Listening
+              Quick Stats
             </h3>
-            <p
+
+            <ul
               style={{
-                fontSize: "0.9rem",
-                opacity: 0.8,
-                marginBottom: "12px",
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                fontSize: "0.92rem",
+                lineHeight: 1.5,
+                opacity: 0.85,
               }}
             >
-              Minutes listened by day of week (coming soon).
-            </p>
-            <div
-              style={{
-                height: "120px",
-                borderRadius: "12px",
-                background:
-                  "repeating-linear-gradient(90deg,#c8ddff 0px,#c8ddff 40px,#d9e7ff 40px,#d9e7ff 80px)",
-              }}
-            />
+              <li>• Total Artists Analyzed: —</li>
+              <li>• Most Common Genre: —</li>
+              <li>• Average Popularity: —</li>
+            </ul>
           </div>
 
-          {/* Mood Diary */}
+          {/* 2 — ANALYTICS */}
           <div
             style={{
               borderRadius: "18px",
@@ -339,75 +323,73 @@ export default function HomePage() {
               style={{
                 fontSize: "1.1rem",
                 fontWeight: 600,
-                marginBottom: "8px",
+                marginBottom: "10px",
               }}
             >
-              Mood Diary
+              Analytics
             </h3>
+
             <p
               style={{
                 fontSize: "0.9rem",
                 opacity: 0.8,
-                marginBottom: "10px",
+                lineHeight: 1.4,
               }}
             >
-              Jot down how you’re feeling as you listen.
+              Listening trends and patterns will appear here soon.
             </p>
-            <textarea
-              placeholder="How are you feeling today?"
-              style={{
-                width: "100%",
-                height: "90px",
-                borderRadius: "10px",
-                border: "none",
-                padding: "10px",
-                resize: "none",
-                fontFamily: "inherit",
-                fontSize: "0.9rem",
-                boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.08)",
-              }}
-            />
           </div>
 
-          {/* Leaderboard Panel */}
+          {/* 3 — MOOD PROFILE */}
           <div
             style={{
               borderRadius: "18px",
               padding: "18px 20px",
-              background: "linear-gradient(135deg,#ffe9f0,#ffd4e1)",
+              background: "linear-gradient(135deg,#fff2e5,#ffd7b8)",
               boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <h3
               style={{
                 fontSize: "1.1rem",
                 fontWeight: 600,
-                marginBottom: "8px",
+                marginBottom: "10px",
               }}
             >
-              Leaderboard
+              Mood Profile
             </h3>
+
             <p
               style={{
                 fontSize: "0.9rem",
                 opacity: 0.8,
-                marginBottom: "10px",
+                marginBottom: "14px",
               }}
             >
-              Top artist & genre summaries (coming soon).
+              Discover your unique listening mood.
             </p>
-            <ul
+
+            <div style={{ fontSize: "2rem", marginBottom: "16px" }}>🎧</div>
+
+            <button
+              onClick={() => router.push("/mood")}
               style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
+                marginTop: "auto",
+                padding: "10px 16px",
+                background: "linear-gradient(135deg,#a160ff,#ff985c)",
+                border: "none",
+                borderRadius: "10px",
+                color: "white",
+                cursor: "pointer",
+                fontWeight: 600,
                 fontSize: "0.9rem",
+                boxShadow: "0 5px 12px rgba(0,0,0,0.15)",
               }}
             >
-              <li style={{ marginBottom: "6px" }}>• Top Artist: —</li>
-              <li style={{ marginBottom: "6px" }}>• Top Genre: —</li>
-              <li>• Most played day: —</li>
-            </ul>
+              View Mood Profile
+            </button>
           </div>
         </section>
       </main>

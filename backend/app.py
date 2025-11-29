@@ -71,3 +71,35 @@ async def call_spotify(request: Request):
     print("--- END /api/spotify ---\n")
 
     return {"spotify_data": response}
+
+# NEW: Fetch user's top artists (for mood via genres)
+@app.post("/api/top-artists")
+async def get_top_artists(request: Request):
+    data = await request.json()
+
+    print("\n--- /api/top-artists CALLED ---")
+    print("Request body:", data)
+
+    token = data.get("token")
+    if not token:
+        print("❌ No token received in /api/top-artists!")
+        return {"error": "token not found"}
+
+    print("🎵 Token received in /api/top-artists:", token[:25] + "...")
+
+    # create API wrapper with token
+    api = SpotifyAPI(access_token=token)
+    proxy = SpotifyAPIProxy(api)
+
+    # We use Spotify's "Get User's Top Artists" endpoint
+    # Spotify default is medium_term; we can make it explicit & set limit.
+    endpoint = "me/top/artists?limit=20&time_range=medium_term"
+    print(f"📡 Calling Spotify: GET {endpoint}")
+
+    response = proxy.fetch_api(endpoint=endpoint)
+
+    print("📦 Spotify top artists returned:", response)
+    print("--- END /api/top-artists ---\n")
+
+    # Keep return structure consistent with /api/spotify
+    return {"spotify_data": response}
