@@ -3,3 +3,5 @@ uvicorn
 requests
 pandas
 python-dotenv
+httpx==0.27.0
+
