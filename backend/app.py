@@ -150,7 +150,7 @@ async def call_spotify(request: Request):
 
     return {"spotify_data": response}
 
-# NEW: Fetch user's top artists (for mood via genres)
+'''# NEW: Fetch user's top artists (for mood via genres)
 @app.post("/api/top-artists")
 async def get_top_artists(request: Request):
     data = await request.json()
@@ -180,4 +180,4 @@ async def get_top_artists(request: Request):
     print("--- END /api/top-artists ---\n")
 
     # Keep return structure consistent with /api/spotify
-    return {"spotify_data": response}
+    return {"spotify_data": response}'''
