@@ -32,25 +32,34 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen w-full bg-[#1b1b1b] text-white overflow-hidden">
 
-      {/* ================== TOP BAR (Logo + Login Button) ================== */}
-      <div className="absolute top-0 left-0 w-full flex items-center justify-between px-8 py-6 z-20">
+      {/* ================== TOP BAR ================== */}
+      <div className="w-full flex items-center justify-between px-8 pt-6 relative z-20">
 
         {/* LOGO */}
         <div className="flex items-center gap-3">
-          <svg width="60" height="40" viewBox="0 0 200 100">
+          <svg
+            width="120"
+            height="40"
+            viewBox="0 0 400 200"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="60" cy="80" r="40" fill="url(#grad)" />
+            <polygon points="50,60 50,100 80,80" fill="white" />
+
+            <rect x="130" y="50" width="20" height="80" rx="10" fill="url(#grad)" />
+            <rect x="170" y="60" width="20" height="60" rx="10" fill="url(#grad)" />
+            <rect x="210" y="30" width="20" height="120" rx="10" fill="url(#grad)" />
+            <rect x="250" y="45" width="20" height="90" rx="10" fill="url(#grad)" />
+            <rect x="290" y="35" width="20" height="110" rx="10" fill="url(#grad)" />
+            <rect x="330" y="55" width="20" height="70" rx="10" fill="url(#grad)" />
+            <rect x="370" y="70" width="20" height="40" rx="10" fill="url(#grad)" />
+
             <defs>
-              <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
+              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#a160ff" />
                 <stop offset="100%" stopColor="#ff985c" />
               </linearGradient>
             </defs>
-
-            <circle cx="28" cy="50" r="12" fill="url(#logoGradient)" />
-            <rect x="60" y="30" width="10" height="40" fill="url(#logoGradient)" rx="3" />
-            <rect x="80" y="20" width="10" height="60" fill="url(#logoGradient)" rx="3" />
-            <rect x="100" y="10" width="10" height="80" fill="url(#logoGradient)" rx="3" />
-            <rect x="120" y="25" width="10" height="50" fill="url(#logoGradient)" rx="3" />
-            <rect x="140" y="35" width="10" height="30" fill="url(#logoGradient)" rx="3" />
           </svg>
 
           <span className="text-xl font-semibold tracking-wide text-white/95">
@@ -59,12 +68,10 @@ export default function LoginPage() {
         </div>
 
         {/* LOGIN BUTTON */}
-        <div>
-          <AuthButton />
-        </div>
+        <AuthButton />
       </div>
 
-      {/* ================== BACKGROUND IMAGE (90% of screen) ================== */}
+      {/* ================== BACKGROUND IMAGE ================== */}
       <div className="absolute bottom-0 left-0 w-full h-[90vh] z-0">
         <Image
           src="/laptop-full.png"
@@ -76,7 +83,6 @@ export default function LoginPage() {
       </div>
 
       {/* ================== OVERLAY TEXT ================== */}
-            {/* ================== OVERLAY TEXT (RIGHT-ALIGNED) ================== */}
       <div className="absolute top-1/2 right-16 -translate-y-1/2 z-20 text-right max-w-xl">
 
         <h1 className="text-5xl md:text-6xl font-bold leading-tight">
@@ -87,12 +93,11 @@ export default function LoginPage() {
         </h1>
 
         <p className="text-lg mt-4 text-white/90 font-semibold">
-          Explore your listening patterns, discover your mood profile,  
+          Explore your listening patterns, discover your mood profile,
           and dive into the sound that makes you—you.
         </p>
 
       </div>
-
 
     </div>
   );
