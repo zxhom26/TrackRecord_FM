@@ -1,13 +1,15 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from spotify_api import SpotifyAPI, SpotifyAPIProxy
+from analytics import UserAnalytics
 
 # Temporary token storage (for development)
 user_tokens = {}
 
+# FastAPI app setup
 app = FastAPI()
 
-# CORS setup
+# CORS setup to enable requests from frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -16,18 +18,20 @@ app.add_middleware(
     ],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
+# Basic root endpoint
 @app.get("/")
 def root():
-    return {"message": "✅ TrackRecord.fm API is live!"}
+    return {"message": "TrackRecord.fm backend API is live!"}
 
-@app.get("/api/data")
+# Testing endpoint
+@app.get("/api/test") 
 def get_data():
     return {"message": "Hello from FastAPI backend!"}
 
-# Receive token from frontend
+# RECEIVE FRESH TOKEN FROM FRONTEND
 @app.post("/api/token")
 async def receive_token(request: Request):
     data = await request.json()
@@ -43,6 +47,80 @@ async def receive_token(request: Request):
     print("Stored token successfully.")
     return {"message": "token stored successfully"}
 
+# SEND TOP TRACKS TO FRONTEND
+@app.get("/api/top-tracks")
+async def get_top_tracks(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
+
+    analytics = UserAnalytics(access_token=token)
+    top_tracks = await analytics.getTopTracks(n=20)
+
+    return {"top_tracks": top_tracks}
+
+# SEND TOP ARTISTS TO FRONTEND
+@app.get("/api/top-artists")
+async def get_top_artists(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
+
+    analytics = UserAnalytics(access_token=token)
+    top_artists = await analytics.getTopArtists(n=20)
+
+    return {"top_artists": top_artists}
+
+# SEND RECENTLY PLAYED TO FRONTEND
+@app.get("/api/recently-played")
+async def get_recently_played(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
+
+    analytics = UserAnalytics(access_token=token)
+    recently_played = await analytics.getRecentlyPlayed(n=50)
+
+    return {"recently_played": recently_played}
+
+# SEND TOP GENRES TO FRONTEND
+@app.get("/api/top-genres")
+async def get_top_genres(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
+
+    analytics = UserAnalytics(access_token=token)
+    top_genres = await analytics.getTopGenres(n=50)
+
+    return {"top_genres": top_genres}
+
+# SEND QUICK STATS TO FRONTEND
+@app.get("/api/quick-stats")
+async def get_quick_stats(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
+
+    analytics = UserAnalytics(access_token=token)
+    quick_stats = await analytics.getQuickStats()
+
+    return {"quick_stats": quick_stats}
+
+# SEND SONG RECOMMENDATIONS TO FRONTEND
+@app.get("/api/recommendations")
+async def get_song_recommendations(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
+
+    analytics = UserAnalytics(access_token=token)
+    recommendations = await analytics.getSongRecommendations(n=20)
+
+    return {"recommendations": recommendations}
+
+
+# ------------- DEPRECATED ---------------
 # MAIN SPOTIFY CALL
 @app.post("/api/spotify")
 async def call_spotify(request: Request):

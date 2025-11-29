@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import time
 from typing import Dict, Any, Optional
 import copy
+import httpx
 
 class APIInterface(ABC):
     @abstractmethod
@@ -14,10 +15,10 @@ class SpotifyAPIProxy(APIInterface):
         self.api = api
         self.cache = {}
         self.base_url = "https://api.spotify.com/v1"
-        self.access_token = api.get_token()
+        self.access_token = self.api.get_token()
         pass
     
-    def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Dict[str, Any]:
+    async def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Dict[str, Any]:
         """
         Calls the Spotify Web API with OAuth access token.
         :param endpoint: Spotify API endpoint (e.g. "/v1/me" or "/v1/playlists/{id}")
@@ -43,7 +44,7 @@ class SpotifyAPIProxy(APIInterface):
             if isCached and "ETag" in isCached: # check if url is already cached
                 headers["If-None-Match"] = isCached["ETag"] # notify Spotify api that url is cached
             
-            response = self.api.fetch_api(endpoint, headers, method, data, params)
+            response = await self.api.fetch_api(endpoint, headers, method, data, params)
 
             if response is None:
                 raise Exception('API response empty')
@@ -76,7 +77,7 @@ class SpotifyAPI(APIInterface):
         self.base_url = "https://api.spotify.com/v1"
         pass
 
-    def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Optional[requests.Response]:
+    async def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None) -> Optional[httpx.Response]:
         """
         Calls the Spotify Web API with OAuth access token.
         :param url: Spotify API full url 
@@ -98,14 +99,9 @@ class SpotifyAPI(APIInterface):
                 "Authorization": f"Bearer {access_token}",
                 "Content-Type": "application/json"
                 }
-
-            response = requests.request(
-                method=method,
-                url=url, 
-                headers=headers,
-                json=data,
-                params=params
-            )
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.request(method=method, url=url, headers=headers, json=data, params=params)
 
             if response.status_code not in range(200, 400): # request failed
                 raise Exception(f"Spotify API request failed with code {response.status_code}: {response.text}")
