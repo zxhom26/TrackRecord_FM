@@ -36,14 +36,15 @@ def get_data():
 async def receive_token(request: Request):
     data = await request.json()
     token = data.get("accessToken")
+    sessionId = data.get("sessionId")
 
     print("\n--- /api/token RECEIVED ---")
     print("Token:", token)
 
-    if not token:
-        return {"error": "token not found"}
+    if not token or sessionId:
+        return {"error": "token or sessionId not found"}
 
-    user_tokens["active"] = token
+    user_tokens[sessionId] = token
     print("Stored token successfully.")
     return {"message": "token stored successfully"}
 

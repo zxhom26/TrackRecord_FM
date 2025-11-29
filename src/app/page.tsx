@@ -32,7 +32,7 @@ export default function HomePage() {
   // send token to backend
   useEffect(() => {
     if (session?.accessToken) {
-      sendTokenToBackend(session.accessToken);
+      sendTokenToBackend(session); // MODIFIED THIS TO SEND WHOLE SESSION OBJECT
     }
   }, [session?.accessToken]);
 

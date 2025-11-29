@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
+import crypto from "crypto";
 
 async function refreshAccessToken(token) {
   try {
@@ -31,6 +32,7 @@ async function refreshAccessToken(token) {
       accessToken: refreshed.access_token,
       expiresAt: Date.now() + refreshed.expires_in * 1000,
       refreshToken: refreshed.refresh_token ?? token.refreshToken,
+      sessionId: token.sessionId
     };
   } catch (error) {
     console.error("Error refreshing access token:", error);
@@ -67,6 +69,7 @@ export const authOptions = {
           accessToken: account.access_token,
           refreshToken: account.refresh_token,
           expiresAt: Date.now() + account.expires_in * 1000,
+          sessionId: crypto.randomUUID()
         };
       }
 
@@ -84,6 +87,7 @@ export const authOptions = {
       session.refreshToken = token.refreshToken;
       session.expiresAt = token.expiresAt;
       session.error = token.error;
+      session.sessionId = token.sessionId;
       return session;
     },
   },

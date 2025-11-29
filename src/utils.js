@@ -20,7 +20,7 @@ export async function callBackend() {
 }
 
 // ---  Backend token sender ---
-export async function sendTokenToBackend(token) {
+export async function sendTokenToBackend(session) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -29,7 +29,7 @@ export async function sendTokenToBackend(token) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ accessToken: token }),
+      body: JSON.stringify(session), // modified from token.AccessToken --------------------
     });
 
     if (!res.ok) {
