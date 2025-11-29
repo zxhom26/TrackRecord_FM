@@ -35,22 +35,27 @@ def get_data():
 @app.post("/api/token")
 async def receive_token(request: Request):
     data = await request.json()
+
+    sessionId = data.get("sessionId")
     token = data.get("accessToken")
 
     print("\n--- /api/token RECEIVED ---")
     print("Token:", token)
 
-    if not token:
+    if not token or sessionId:
         return {"error": "token not found"}
 
-    user_tokens["active"] = token
+    user_tokens[sessionId] = token
     print("Stored token successfully.")
     return {"message": "token stored successfully"}
 
 # SEND TOP TRACKS TO FRONTEND
 @app.post("/api/top-tracks")
-async def get_top_tracks(): 
-    token = user_tokens.get("active")
+async def get_top_tracks(request: Request): 
+    data = await request.json()
+    sessionId = data.get("sessionId")
+
+    token = user_tokens.get(sessionId)
     if not token:
         return {"error": "no active token found"}
 
@@ -60,9 +65,12 @@ async def get_top_tracks():
     return {"top_tracks": top_tracks}
 
 # SEND TOP ARTISTS TO FRONTEND
-@app.get("/api/top-artists")
-async def get_top_artists(): 
-    token = user_tokens.get("active")
+@app.post("/api/top-artists")
+async def get_top_artists(request: Request): 
+    data = await request.json()
+    sessionId = data.get("sessionId")
+
+    token = user_tokens.get(sessionId)
     if not token:
         return {"error": "no active token found"}
 
@@ -72,9 +80,12 @@ async def get_top_artists():
     return {"top_artists": top_artists}
 
 # SEND RECENTLY PLAYED TO FRONTEND (DOES NOT SUPPORT PAGINATION)
-@app.get("/api/recently-played")
-async def get_recently_played(): 
-    token = user_tokens.get("active")
+@app.post("/api/recently-played")
+async def get_recently_played(request: Request): 
+    data = await request.json()
+    sessionId = data.get("sessionId")
+
+    token = user_tokens.get(sessionId)
     if not token:
         return {"error": "no active token found"}
 
@@ -84,9 +95,12 @@ async def get_recently_played():
     return {"recently_played": recently_played}
 
 # SEND TOP GENRES TO FRONTEND
-@app.get("/api/top-genres")
-async def get_top_genres(): 
-    token = user_tokens.get("active")
+@app.post("/api/top-genres")
+async def get_top_genres(request: Request): 
+    data = await request.json()
+    sessionId = data.get("sessionId")
+
+    token = user_tokens.get(sessionId)
     if not token:
         return {"error": "no active token found"}
 
@@ -96,9 +110,12 @@ async def get_top_genres():
     return {"top_genres": top_genres}
 
 # SEND QUICK STATS TO FRONTEND
-@app.get("/api/quick-stats")
-async def get_quick_stats(): 
-    token = user_tokens.get("active")
+@app.post("/api/quick-stats")
+async def get_quick_stats(request: Request): 
+    data = await request.json()
+    sessionId = data.get("sessionId")
+
+    token = user_tokens.get(sessionId)
     if not token:
         return {"error": "no active token found"}
 
@@ -108,9 +125,12 @@ async def get_quick_stats():
     return {"quick_stats": quick_stats}
 
 # SEND SONG RECOMMENDATIONS TO FRONTEND
-@app.get("/api/recommendations")
-async def get_song_recommendations(): 
-    token = user_tokens.get("active")
+@app.post("/api/recommendations")
+async def get_song_recommendations(request: Request): 
+    data = await request.json()
+    sessionId = data.get("sessionId")
+    
+    token = user_tokens.get(sessionId)
     if not token:
         return {"error": "no active token found"}
 
