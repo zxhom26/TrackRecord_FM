@@ -1,138 +1,164 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
-// ---------- TYPES ----------
+import {
+  Home,
+  User,
+  BarChart3,
+  Music,
+  RefreshCw,
+  Flame,
+  Cloud,
+  PartyPopper,
+} from "lucide-react";
+
+// Mood → Icon map
+const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
+  "🔥 Bold & Confident": <Flame size={42} className="text-red-400" />,
+  "💙 Smooth & Chill": <Cloud size={42} className="text-blue-400" />,
+  "🎉 Upbeat & Fun": <PartyPopper size={42} className="text-purple-400" />,
+  "🌿 Mellow & Indie": <Cloud size={42} className="text-green-400" />,
+  "⚡ High Energy": <Flame size={42} className="text-yellow-300" />,
+  "🤘 Intense & Driven": <Flame size={42} className="text-orange-400" />,
+  "📚 Chill Study Vibes": <Cloud size={42} className="text-indigo-300" />,
+  "💃 Vibrant & Rhythmic": <PartyPopper size={42} className="text-pink-400" />,
+  "🌙 Calm & Peaceful": <Cloud size={42} className="text-sky-300" />,
+};
+
+
 interface SpotifyArtist {
   name: string;
   genres: string[];
 }
 
-interface SpotifyTopArtistResponse {
-  spotify_data?: {
-    items: SpotifyArtist[];
-  };
-}
-
 export default function MoodPage() {
   const { data: session } = useSession();
 
-  const [result, setResult] =
-    useState<SpotifyTopArtistResponse | null>(null);
+  const [moods, setMoods] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const [mood, setMood] = useState<string>("");
-  const [genres, setGenres] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  // ---------- MAIN FUNCTION ----------
-  const handleFetch = async () => {
-    if (!session?.accessToken) {
-      alert("No access token found.");
-      return;
-    }
+  const handleRefresh = async () => {
+    if (!session?.accessToken) return;
 
     setLoading(true);
-    setMood("");
-    setGenres([]);
-    setResult(null);
-
-    console.log("🎫 Access Token:", session.accessToken);
+    setMoods([]);
 
     const response = await fetchTopArtists(session.accessToken);
-    console.log("🔍 Top Artists JSON:", response);
 
-    setResult(response);
+    const items: SpotifyArtist[] = response?.top_artists ?? [];
 
-    const items: SpotifyArtist[] =
-      response?.spotify_data?.items ?? [];
+    const allGenres = items.flatMap((artist: SpotifyArtist) => artist.genres);
 
-    if (items.length === 0) {
-      setMood("No top artists available.");
-      setLoading(false);
-      return;
-    }
-
-    // Collect all genres
-    const allGenres: string[] = items.flatMap(
-      (artist: SpotifyArtist) => artist.genres ?? []
-    );
-
-    console.log("🎨 ALL GENRES:", allGenres);
-
-    // Compute top 3 moods
-    const topThreeMoods = getTopMoodsFromGenres(allGenres);
-    console.log("🏆 TOP 3 MOODS:", topThreeMoods);
-
-    setMood(topThreeMoods.join(", "));
-    setGenres(allGenres);
+    const topMoods = getTopMoodsFromGenres(allGenres);
+    setMoods(topMoods);
 
     setLoading(false);
   };
 
-  // ---------- UI ----------
   return (
-    <div style={{ padding: "2rem", fontFamily: "Inter, sans-serif" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        🎵 Your Mood Profile
-      </h1>
+    <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white">
 
-      <button
-        onClick={handleFetch}
-        disabled={loading}
-        style={{
-          padding: "12px 20px",
-          background: "#1DB954",
-          border: "none",
-          borderRadius: "5px",
-          color: "white",
-          cursor: "pointer",
-          marginTop: "1rem",
-          fontWeight: 600,
-        }}
+      {/* ================== SIDEBAR ================== */}
+      <aside
+        className="
+          w-[150px]
+          bg-[#141414]
+          flex flex-col
+          items-center
+          py-10
+          gap-10
+          shadow-xl
+        "
       >
-        {loading ? "Loading..." : "Get My Mood Profile"}
-      </button>
+        {/* Logo */}
+        <div>
+          <svg width="80" height="60" viewBox="0 0 400 200">
+            {/* Play circle */}
+            <circle cx="60" cy="80" r="40" fill="url(#grad)" />
+            <polygon points="50,60 50,100 80,80" fill="white" />
 
-      {mood && (
-        <div style={{ marginTop: "2rem" }}>
-          <h2 style={{ fontSize: "1.4rem", marginBottom: "0.5rem" }}>
-            🧠 Top Mood Signals:
-          </h2>
-          <p style={{ fontSize: "1.2rem" }}>{mood}</p>
+            {/* Waveform bars */}
+            <rect x="130" y="50" width="20" height="80" rx="10" fill="url(#grad)" />
+            <rect x="170" y="60" width="20" height="60" rx="10" fill="url(#grad)" />
+            <rect x="210" y="30" width="20" height="120" rx="10" fill="url(#grad)" />
+            <rect x="250" y="45" width="20" height="90" rx="10" fill="url(#grad)" />
+            <rect x="290" y="35" width="20" height="110" rx="10" fill="url(#grad)" />
+
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#a160ff" />
+                <stop offset="100%" stopColor="#ff985c" />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
-      )}
 
-      {genres.length > 0 && (
-        <div style={{ marginTop: "2rem" }}>
-          <h3 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>
-            🎨 Genres Detected:
-          </h3>
-          <pre
-            style={{
-              background: "#f7f7f7",
-              padding: "1rem",
-              borderRadius: "6px",
-            }}
-          >
-            {JSON.stringify(genres, null, 2)}
-          </pre>
+        {/* Sidebar Icons */}
+        <div className="flex flex-col items-center gap-8 text-white/70">
+          <User size={28} className="hover:text-white cursor-pointer" />
+          <Home size={28} className="hover:text-white cursor-pointer" />
+          <BarChart3 size={28} className="hover:text-white cursor-pointer" />
+          <Music size={28} className="hover:text-white cursor-pointer" />
         </div>
-      )}
+      </aside>
 
-      <pre
-        style={{
-          background: "#f4f4f4",
-          padding: "1rem",
-          marginTop: "2rem",
-          borderRadius: "6px",
-          maxHeight: "400px",
-          overflowY: "auto",
-        }}
-      >
-        {result ? JSON.stringify(result, null, 2) : "— No data yet —"}
-      </pre>
+      {/* ================== MAIN CONTENT ================== */}
+      <main className="flex-1 p-12">
+
+        {/* Page Title */}
+        <h1 className="text-4xl font-bold">
+          <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
+            Mood Profile
+          </span>{" "}
+          On {new Date().toLocaleDateString()}:
+        </h1>
+
+        {/* Refresh Button */}
+        <button
+          onClick={handleRefresh}
+          disabled={loading}
+          className="
+            flex items-center gap-2
+            mt-6 px-5 py-3 rounded-full
+            bg-white/10 hover:bg-white/20
+            transition-all shadow
+          "
+        >
+          <RefreshCw size={20} />
+          {loading ? "Refreshing..." : "Refresh Mood Profile"}
+        </button>
+
+        {/* ================== MOOD CARDS ================== */}
+        <div className="mt-10 flex flex-col gap-6 max-w-3xl">
+          {moods.map((mood, idx) => (
+            <div
+              key={idx}
+              className="
+                bg-[#2b2b2b]
+                p-6 rounded-xl
+                shadow-lg flex items-center gap-6
+              "
+            >
+              {/* Icon */}
+              <div className="w-[70px] h-[70px] bg-[#ffffff15] rounded-xl flex items-center justify-center">
+                {MOOD_ICON_MAP[mood] ?? <Flame size={42} />}
+              </div>
+
+              {/* Mood Text */}
+              <div>
+                <h2 className="text-2xl font-bold">{mood}</h2>
+                <p className="text-white/70 mt-1">
+                  Fun facts & lifestyle insights about this mood coming soon.
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </main>
     </div>
   );
 }
