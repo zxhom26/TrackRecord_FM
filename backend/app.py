@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from spotify_api import SpotifyAPI, SpotifyAPIProxy
 from analytics import UserAnalytics
 
-# Temporary token storage (for development)
 user_tokens = {}
 
 # FastAPI app setup
@@ -49,8 +48,9 @@ async def receive_token(request: Request):
 
 # SEND TOP TRACKS TO FRONTEND
 @app.post("/api/top-tracks")
-async def get_top_tracks(): 
-    token = user_tokens.get("active")
+async def get_top_tracks(request: Request): 
+    data = await request.json()
+    token = data.get("accessToken")
     if not token:
         return {"error": "no active token found"}
 
@@ -61,8 +61,9 @@ async def get_top_tracks():
 
 # SEND TOP ARTISTS TO FRONTEND
 @app.post("/api/top-artists")
-async def get_top_artists(): 
-    token = user_tokens.get("active")
+async def get_top_artists(request: Request): 
+    data = await request.json()
+    token = data.get("accessToken")
     if not token:
         return {"error": "no active token found"}
 
@@ -73,8 +74,9 @@ async def get_top_artists():
 
 # SEND RECENTLY PLAYED TO FRONTEND
 @app.post("/api/recently-played")
-async def get_recently_played(): 
-    token = user_tokens.get("active")
+async def get_recently_played(request: Request): 
+    data = await request.json()
+    token = data.get("accessToken")
     if not token:
         return {"error": "no active token found"}
 
@@ -85,8 +87,9 @@ async def get_recently_played():
 
 # SEND TOP GENRES TO FRONTEND
 @app.post("/api/top-genres")
-async def get_top_genres(): 
-    token = user_tokens.get("active")
+async def get_top_genres(request: Request): 
+    data = await request.json()
+    token = data.get("accessToken")
     if not token:
         return {"error": "no active token found"}
 
@@ -97,8 +100,9 @@ async def get_top_genres():
 
 # SEND QUICK STATS TO FRONTEND
 @app.post("/api/quick-stats")
-async def get_quick_stats(): 
-    token = user_tokens.get("active")
+async def get_quick_stats(request: Request): 
+    data = await request.json()
+    token = data.get("accessToken")
     if not token:
         return {"error": "no active token found"}
 
@@ -109,8 +113,9 @@ async def get_quick_stats():
 
 # SEND SONG RECOMMENDATIONS TO FRONTEND
 @app.post("/api/recommendations")
-async def get_song_recommendations(): 
-    token = user_tokens.get("active")
+async def get_song_recommendations(request: Request): 
+    data = await request.json()
+    token = data.get("accessToken")
     if not token:
         return {"error": "no active token found"}
 

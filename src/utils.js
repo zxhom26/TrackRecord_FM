@@ -46,7 +46,7 @@ export async function fetchTopTracks(token) {
       {
         method: "POST", // backend expects POST
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ "accessToken": token }),
       }
     );
 
@@ -69,7 +69,7 @@ export async function fetchTopArtists(token) {
       {
         method: "POST", // backend uses POST
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token })
+        body: JSON.stringify({ "accessToken": token })
       }
     );
 
