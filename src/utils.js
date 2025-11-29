@@ -2,11 +2,8 @@
 export async function callBackend() {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    console.log("Backend URL:", backendUrl);
 
-    const res = await fetch(`${backendUrl}/api/data`, {
-      method: "GET",
-    });
+    const res = await fetch(`${backendUrl}/api/data`, { method: "GET" });
 
     if (!res.ok) {
       throw new Error(`Backend responded with status ${res.status}`);
@@ -19,16 +16,14 @@ export async function callBackend() {
   }
 }
 
-// ---  Backend token sender ---
+// --- Send token to backend ---
 export async function sendTokenToBackend(token) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     const res = await fetch(`${backendUrl}/api/token`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accessToken: token }),
     });
 
@@ -43,41 +38,36 @@ export async function sendTokenToBackend(token) {
   }
 }
 
-// --- Fetching Top Tracks ---
+// --- Fetch Top Tracks ---
 export async function fetchTopTracks(token) {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-tracks`,
       {
-        method: "POST",
+        method: "POST", // backend expects POST
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: token,
-        }),
+        body: JSON.stringify({ token }),
       }
     );
 
     if (!response.ok) {
-      throw new Error(`Spotify request failed: ${response.status}`);
+      throw new Error(`Top tracks request failed: ${response.status}`);
     }
-    return await response.json();
+
+    return await response.json(); // { top_tracks: [...] }
   } catch (err) {
     console.error("fetchTopTracks error:", err);
     return { error: err.message };
   }
 }
 
-// --- Fetching Top Artists (for genre-based mood) ---
+// --- Fetch Top Artists (NEW RESPONSE SHAPE) ---
 export async function fetchTopArtists(token) {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-artists`,
       {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: token,
-        }),
+        method: "GET", // backend uses GET — NO BODY
       }
     );
 
@@ -85,18 +75,17 @@ export async function fetchTopArtists(token) {
       throw new Error(`Top artists request failed: ${response.status}`);
     }
 
-    return await response.json();
+    return await response.json(); // { top_artists: [...] }
   } catch (err) {
     console.error("fetchTopArtists error:", err);
     return { error: err.message };
   }
 }
 
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────
 //   Composite Mood Classifier (Top 3 Moods)
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────
 
-// 1️⃣ Base map: genre keyword → mood label
 const GENRE_TO_MOOD_MAP = [
   { key: "rap", mood: "🔥 Bold & Confident" },
   { key: "hip hop", mood: "🔥 Bold & Confident" },
@@ -123,17 +112,15 @@ const GENRE_TO_MOOD_MAP = [
   { key: "classical", mood: "🌙 Calm & Peaceful" },
 ];
 
-// 2️⃣ Compute top moods from genres
 export function getTopMoodsFromGenres(genres) {
   if (!genres || genres.length === 0) {
     return ["Unknown Mood"];
   }
 
-  const lowerGenres = genres.map((g) => g.toLowerCase());
+  const lower = genres.map((g) => g.toLowerCase());
   const moodScores = {};
 
-  // Assign mood points based on genre matches
-  for (const g of lowerGenres) {
+  for (const g of lower) {
     for (const entry of GENRE_TO_MOOD_MAP) {
       if (g.includes(entry.key)) {
         moodScores[entry.mood] = (moodScores[entry.mood] || 0) + 1;
@@ -141,16 +128,12 @@ export function getTopMoodsFromGenres(genres) {
     }
   }
 
-  // If no moods matched
   if (Object.keys(moodScores).length === 0) {
     return ["🎧 Balanced Vibes"];
   }
 
-  // Sort by frequency (descending)
-  const sorted = Object.entries(moodScores)
-    .sort((a, b) => b[1] - a[1]) // sort by score
-    .map((pair) => pair[0]); // return mood labels only
-
-  // Return the TOP 3 moods
-  return sorted.slice(0, 3);
+  return Object.entries(moodScores)
+    .sort((a, b) => b[1] - a[1])
+    .map((pair) => pair[0])
+    .slice(0, 3);
 }
