@@ -77,7 +77,7 @@ export default function LoginPage() {
 
       {/* ================== OVERLAY TEXT ================== */}
             {/* ================== OVERLAY TEXT (RIGHT-ALIGNED) ================== */}
-      <div className="absolute bottom-24 right-16 z-20 text-right max-w-xl">
+      <div className="absolute top-1/2 right-16 -translate-y-1/2 z-20 text-right max-w-xl">
 
         <h1 className="text-5xl md:text-6xl font-bold leading-tight">
           Meet Your <br />
@@ -86,7 +86,7 @@ export default function LoginPage() {
           </span>
         </h1>
 
-        <p className="text-lg mt-4 text-white/80">
+        <p className="text-lg mt-4 text-white/90 font-semibold">
           Explore your listening patterns, discover your mood profile,  
           and dive into the sound that makes you—you.
         </p>
