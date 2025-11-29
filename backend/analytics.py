@@ -5,6 +5,7 @@ import requests
 from itertools import chain
 from spotify_api import SpotifyAPI, SpotifyAPIProxy
 import asyncio
+import httpx
 
 class ProcessData:
     def __init__(self):
