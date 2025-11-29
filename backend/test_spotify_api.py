@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 import time
 import requests
 from spotify_api import SpotifyAPI, SpotifyAPIProxy
+import httpx
 
 
 class TestSpotifyAPI(unittest.TestCase):
