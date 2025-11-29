@@ -1,102 +1,138 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 import time
-import requests
-from spotify_api import SpotifyAPI, SpotifyAPIProxy
 import httpx
+import copy
+
+from spotify_api import SpotifyAPIProxy, SpotifyAPI, APIInterface
+
+class MockAPI(APIInterface):
+    """Mock implementation for APIInterface."""
+    def __init__(self, token="TEST_TOKEN"):
+        self.token = token
+        self.fetch_api = AsyncMock()
+
+    def get_token(self):
+        return self.token
 
 
-class TestSpotifyAPI(unittest.TestCase):
+# ───────────────────────────────────────────────
+#              TEST: SpotifyAPIProxy
+# ───────────────────────────────────────────────
+class TestSpotifyAPIProxy(unittest.IsolatedAsyncioTestCase):
+
     def setUp(self):
-        self.api = SpotifyAPI()
+        """Runs before each test."""
+        self.mock_api = MockAPI()
+        self.proxy = SpotifyAPIProxy(api=self.mock_api)
 
-    @patch('spotify_api.requests.request')
-    def test_fetch_api(self, mock_request):
-        mock_response = MagicMock() # magic mock creates a fake object
-        mock_response.json.return_value = {'music': {'track1', 'track2'}}
+        # Common mock response object used by several tests
+        self.mock_response = MagicMock()
+        self.mock_response.status_code = 200
+        self.mock_response.headers = {"ETag": "ABC123"}
+        self.mock_response.json.return_value = {"result": 1}
+
+    async def test_fetch_api_stores_cache(self):
+        """Test that proxy caches new responses using ETag."""
+        self.mock_api.fetch_api.return_value = self.mock_response
+
+        result = await self.proxy.fetch_api("me")
+
+        self.assertEqual(result, {"result": 1})
+        url = "https://api.spotify.com/v1/me"
+        self.assertIn(url, self.proxy.cache)
+        self.assertEqual(self.proxy.cache[url]["ETag"], "ABC123")
+
+    async def test_fetch_api_uses_cache_on_304(self):
+        """Test that cached data is returned on a 304."""
+        cached_url = "https://api.spotify.com/v1/me"
+        self.proxy.cache[cached_url] = {
+            "ETag": "ABC123",
+            "data": {"cached": True},
+            "timestamp": time.time(),
+        }
+
+        mock_304 = MagicMock()
+        mock_304.status_code = 304
+        mock_304.headers = {}
+
+        self.mock_api.fetch_api.return_value = mock_304
+
+        result = await self.proxy.fetch_api("me")
+        self.assertEqual(result, {"cached": True})
+
+    async def test_fetch_api_handles_missing_token(self):
+        """Test that proxy returns {} if no token exists."""
+        proxy = SpotifyAPIProxy(api=MockAPI(token=None))  # simulate missing token
+        result = await proxy.fetch_api("me")
+        self.assertEqual(result, {})
+
+    async def test_fetch_api_recaches_on_new_response(self):
+        """Test recaching when API returns new data."""
+        cached_url = "https://api.spotify.com/v1/me"
+        self.proxy.cache[cached_url] = {
+            "ETag": "OLD",
+            "data": {"old": True},
+            "timestamp": time.time(),
+        }
+
+        new_resp = MagicMock()
+        new_resp.status_code = 200
+        new_resp.headers = {"ETag": "NEW123"}
+        new_resp.json.return_value = {"updated": True}
+
+        self.mock_api.fetch_api.return_value = new_resp
+
+        result = await self.proxy.fetch_api("me")
+
+        self.assertEqual(result, {"updated": True})
+        self.assertEqual(self.proxy.cache[cached_url]["ETag"], "NEW123")
+
+
+# ───────────────────────────────────────────────
+#                    TEST: SpotifyAPI
+# ───────────────────────────────────────────────
+class TestSpotifyAPI(unittest.IsolatedAsyncioTestCase):
+
+    def setUp(self):
+        """Setup token and default API object."""
+        self.api = SpotifyAPI(access_token="TEST_TOKEN")
+
+    @patch("httpx.AsyncClient")
+    async def test_fetch_api_success(self, mock_client_cls):
+        """Test successful HTTP request."""
+        mock_client = AsyncMock()
+        mock_client_cls.return_value.__aenter__.return_value = mock_client
+
+        mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.raise_for_status = MagicMock()
 
-        # Mock request is what patches the real request
-        mock_request.return_value = mock_response # attaches mock object to the patch
+        mock_client.request.return_value = mock_response
 
-        # Test standard API call --> returns Response object
-        standard_call = self.api.fetch_api('fake_url', 'fake_header')
-        self.assertEqual(standard_call.json(), {'music': {'track1', 'track2'}})
+        result = await self.api.fetch_api("me")
+        self.assertEqual(result, mock_response)
 
-        # Test API call failure catch --> returns None if status code != (200,300)
-        mock_response.status_code = 404
-        status_check = self.api.fetch_api('fake_endpoint', 'fake_header')
-        self.assertIsNone(status_check)
+    @patch("httpx.AsyncClient")
+    async def test_fetch_api_failure(self, mock_client_cls):
+        """Test returning None when Spotify returns an error code."""
+        mock_client = AsyncMock()
+        mock_client_cls.return_value.__aenter__.return_value = mock_client
 
-        # Test cached conditional response --> returns Response object
-        mock_response.status_code = 304
-        conditional_call = self.api.fetch_api('fake_endpoint', 'fake_header')
-        self.assertEqual(conditional_call.status_code, 304)
+        failure_resp = MagicMock()
+        failure_resp.status_code = 401
+        failure_resp.text = "Unauthorized"
+
+        mock_client.request.return_value = failure_resp
+
+        result = await self.api.fetch_api("me")
+        self.assertIsNone(result)
+
+    async def test_fetch_api_missing_token(self):
+        """Test behavior when access token is missing."""
+        api = SpotifyAPI(access_token=None)
+        result = await api.fetch_api("me")
+        self.assertIsNone(result)
 
 
-class TestSpotifyAPIProxy(unittest.TestCase):
-    def setUp(self):
-        self.api = SpotifyAPI()
-        self.proxy = SpotifyAPIProxy(self.api, 'fake_token')
-    
-    @patch('spotify_api.requests.request')
-    def test_fetch_api(self, mock_request):
-        # Populate the cache and check its stored properly
-        first_response = MagicMock()
-        first_response.status_code = 200
-        first_response.json.return_value = {"data": "fresh"}
-        first_response.headers = {"ETag": "12345"}
-        mock_request.return_value = first_response
-
-        result1 = self.proxy.fetch_api("fake")  # first call
-        self.assertEqual(result1, {"data": "fresh"})
-        cache = self.proxy.get_cache()
-        self.assertIn("https://api.spotify.com/v1/fake", cache)
-        self.assertEqual(cache["https://api.spotify.com/v1/fake"]["ETag"], "12345")
-
-        # Check cached result
-        cached_response = MagicMock()
-        cached_response.status_code = 304
-        cached_response.json.return_value = {"data": "stale"}  # should be ignored
-        cached_response.headers = {}
-        mock_request.return_value = cached_response
-
-        result2 = self.proxy.fetch_api("fake")
-        # should return cached "fresh" data, not new
-        self.assertEqual(result2, {"data": "fresh"})
-
-        # API call failed
-        fail_response = MagicMock()
-        fail_response.status_code = 500
-        fail_response.json.return_value = {"error": "server"}
-        fail_response.headers = {}
-        mock_request.return_value = fail_response
-
-        result3 = self.proxy.fetch_api("fake")
-        self.assertEqual(result3, {})  # proxy returns {} on failure
-
-    @patch("spotify_api.requests.request")
-    def test_get_cache(self, mock_request):
-        # Populate the cache and check its stored properly
-        first_response = MagicMock()
-        first_response.status_code = 200
-        first_response.json.return_value = {"data": "fresh"}
-        mock_request.return_value = first_response
-
-        track1 = self.proxy.fetch_api("track1")
-
-        second_response = MagicMock()
-        second_response.status_code = 200
-        second_response.json.return_value = {"data": "fresh"}
-        mock_request.return_value = second_response
-
-        track2 = self.proxy.fetch_api("track2")
-
-        self.assertIn("https://api.spotify.com/v1/track1", self.proxy.get_cache())
-        self.assertIn("https://api.spotify.com/v1/track2", self.proxy.get_cache())
-
-        
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
