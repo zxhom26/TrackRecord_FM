@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 // Mood → Icon map
-const MOOD_ICON_MAP: Record<string, JSX.Element> = {
+const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
   "🔥 Bold & Confident": <Flame size={42} className="text-red-400" />,
   "💙 Smooth & Chill": <Cloud size={42} className="text-blue-400" />,
   "🎉 Upbeat & Fun": <PartyPopper size={42} className="text-purple-400" />,
@@ -27,6 +27,7 @@ const MOOD_ICON_MAP: Record<string, JSX.Element> = {
   "💃 Vibrant & Rhythmic": <PartyPopper size={42} className="text-pink-400" />,
   "🌙 Calm & Peaceful": <Cloud size={42} className="text-sky-300" />,
 };
+
 
 interface SpotifyArtist {
   name: string;
