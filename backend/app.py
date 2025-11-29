@@ -71,7 +71,7 @@ async def get_top_artists():
 
     return {"top_artists": top_artists}
 
-# SEND RECENTLY PLAYED TO FRONTEND
+# SEND RECENTLY PLAYED TO FRONTEND (DOES NOT SUPPORT PAGINATION)
 @app.get("/api/recently-played")
 async def get_recently_played(): 
     token = user_tokens.get("active")
