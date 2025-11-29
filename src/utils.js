@@ -1,156 +1,183 @@
-// ---  Call backend helper ---
-export async function callBackend() {
-  try {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    console.log("Backend URL:", backendUrl);
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from spotify_api import SpotifyAPI, SpotifyAPIProxy
+from analytics import UserAnalytics
 
-    const res = await fetch(`${backendUrl}/api/data`, {
-      method: "GET",
-    });
+# Temporary token storage (for development)
+user_tokens = {}
 
-    if (!res.ok) {
-      throw new Error(`Backend responded with status ${res.status}`);
-    }
+# FastAPI app setup
+app = FastAPI()
 
-    return await res.json();
-  } catch (err) {
-    console.error("Error calling backend:", err);
-    return { error: err.message };
-  }
-}
+# CORS setup to enable requests from frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://trackrecord-fm-ui.onrender.com",
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
-// ---  Backend token sender ---
-export async function sendTokenToBackend(token) {
-  try {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+# Basic root endpoint
+@app.get("/")
+def root():
+    return {"message": "TrackRecord.fm backend API is live!"}
 
-    const res = await fetch(`${backendUrl}/api/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ accessToken: token }),
-    });
+# Testing endpoint
+@app.get("/api/test") 
+def get_data():
+    return {"message": "Hello from FastAPI backend!"}
 
-    if (!res.ok) {
-      throw new Error(`Backend responded with status ${res.status}`);
-    }
+# RECEIVE FRESH TOKEN FROM FRONTEND
+@app.post("/api/token")
+async def receive_token(request: Request):
+    data = await request.json()
+    token = data.get("accessToken")
 
-    return await res.json();
-  } catch (err) {
-    console.error("Error sending token to backend:", err);
-    return { error: err.message };
-  }
-}
+    print("\n--- /api/token RECEIVED ---")
+    print("Token:", token)
 
-// --- Fetching Top Tracks ---
-export async function fetchTopTracks(token) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/spotify`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: token,
-        }),
-      }
-    );
+    if not token:
+        return {"error": "token not found"}
 
-    if (!response.ok) {
-      throw new Error(`Spotify request failed: ${response.status}`);
-    }
-    return await response.json();
-  } catch (err) {
-    console.error("fetchTopTracks error:", err);
-    return { error: err.message };
-  }
-}
+    user_tokens["active"] = token
+    print("Stored token successfully.")
+    return {"message": "token stored successfully"}
 
-// --- Fetching Top Artists (for genre-based mood) ---
-export async function fetchTopArtists(token) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-artists`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: token,
-        }),
-      }
-    );
+# SEND TOP TRACKS TO FRONTEND
+@app.post("/api/top-tracks")
+async def get_top_tracks(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
 
-    if (!response.ok) {
-      throw new Error(`Top artists request failed: ${response.status}`);
-    }
+    analytics = UserAnalytics(access_token=token)
+    top_tracks = await analytics.getTopTracks(n=20)
 
-    return await response.json();
-  } catch (err) {
-    console.error("fetchTopArtists error:", err);
-    return { error: err.message };
-  }
-}
+    return {"top_tracks": top_tracks}
 
-// ─────────────────────────────────────────────
-//   Composite Mood Classifier (Top 3 Moods)
-// ─────────────────────────────────────────────
+# SEND TOP ARTISTS TO FRONTEND
+@app.get("/api/top-artists")
+async def get_top_artists(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
 
-// 1️⃣ Base map: genre keyword → mood label
-const GENRE_TO_MOOD_MAP = [
-  { key: "rap", mood: "🔥 Bold & Confident" },
-  { key: "hip hop", mood: "🔥 Bold & Confident" },
-  { key: "trap", mood: "🔥 Bold & Confident" },
+    analytics = UserAnalytics(access_token=token)
+    top_artists = await analytics.getTopArtists(n=20)
 
-  { key: "pop", mood: "🎉 Upbeat & Fun" },
+    return {"top_artists": top_artists}
 
-  { key: "r&b", mood: "💙 Smooth & Chill" },
-  { key: "dark r&b", mood: "💙 Smooth & Chill" },
-  { key: "trap soul", mood: "💙 Smooth & Chill" },
+# SEND RECENTLY PLAYED TO FRONTEND
+@app.get("/api/recently-played")
+async def get_recently_played(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
 
-  { key: "indie", mood: "🌿 Mellow & Indie" },
+    analytics = UserAnalytics(access_token=token)
+    recently_played = await analytics.getRecentlyPlayed(n=50)
 
-  { key: "edm", mood: "⚡ High Energy" },
-  { key: "dance", mood: "⚡ High Energy" },
+    return {"recently_played": recently_played}
 
-  { key: "rock", mood: "🤘 Intense & Driven" },
+# SEND TOP GENRES TO FRONTEND
+@app.get("/api/top-genres")
+async def get_top_genres(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
 
-  { key: "lofi", mood: "📚 Chill Study Vibes" },
-  { key: "lo-fi", mood: "📚 Chill Study Vibes" },
+    analytics = UserAnalytics(access_token=token)
+    top_genres = await analytics.getTopGenres(n=50)
 
-  { key: "latin", mood: "💃 Vibrant & Rhythmic" },
+    return {"top_genres": top_genres}
 
-  { key: "classical", mood: "🌙 Calm & Peaceful" },
-];
+# SEND QUICK STATS TO FRONTEND
+@app.get("/api/quick-stats")
+async def get_quick_stats(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
 
-// 2️⃣ Compute top moods from genres
-export function getTopMoodsFromGenres(genres) {
-  if (!genres || genres.length === 0) {
-    return ["Unknown Mood"];
-  }
+    analytics = UserAnalytics(access_token=token)
+    quick_stats = await analytics.getQuickStats()
 
-  const lowerGenres = genres.map((g) => g.toLowerCase());
-  const moodScores = {};
+    return {"quick_stats": quick_stats}
 
-  // Assign mood points based on genre matches
-  for (const g of lowerGenres) {
-    for (const entry of GENRE_TO_MOOD_MAP) {
-      if (g.includes(entry.key)) {
-        moodScores[entry.mood] = (moodScores[entry.mood] || 0) + 1;
-      }
-    }
-  }
+# SEND SONG RECOMMENDATIONS TO FRONTEND
+@app.get("/api/recommendations")
+async def get_song_recommendations(): 
+    token = user_tokens.get("active")
+    if not token:
+        return {"error": "no active token found"}
 
-  // If no moods matched
-  if (Object.keys(moodScores).length === 0) {
-    return ["🎧 Balanced Vibes"];
-  }
+    analytics = UserAnalytics(access_token=token)
+    recommendations = await analytics.getSongRecommendations(n=20)
 
-  // Sort by frequency (descending)
-  const sorted = Object.entries(moodScores)
-    .sort((a, b) => b[1] - a[1]) // sort by score
-    .map((pair) => pair[0]); // return mood labels only
+    return {"recommendations": recommendations}
 
-  // Return the TOP 3 moods
-  return sorted.slice(0, 3);
-}
+
+# ------------- DEPRECATED ---------------
+# MAIN SPOTIFY CALL
+@app.post("/api/spotify")
+async def call_spotify(request: Request):
+    data = await request.json()
+
+    print("\n--- /api/spotify CALLED ---")
+    print("Request body:", data)
+
+    token = data.get("token")
+    if not token:
+        print("❌ No token received!")
+        return {"error": "token not found"}
+
+    print("🎵 Token received in /api/spotify:", token[:25] + "...")
+
+    # create API wrapper with token
+    api = SpotifyAPI(access_token=token)
+    proxy = SpotifyAPIProxy(api)
+
+    print("📡 Calling Spotify: GET me/top/tracks")
+
+    # make spotify call
+    response = proxy.fetch_api(endpoint="me/top/tracks")
+
+    print("📦 Spotify API returned:", response)
+    print("--- END /api/spotify ---\n")
+
+    return {"spotify_data": response}
+
+# NEW: Fetch user's top artists (for mood via genres)
+@app.post("/api/top-artists")
+async def get_top_artists(request: Request):
+    data = await request.json()
+
+    print("\n--- /api/top-artists CALLED ---")
+    print("Request body:", data)
+
+    token = data.get("token")
+    if not token:
+        print("❌ No token received in /api/top-artists!")
+        return {"error": "token not found"}
+
+    print("🎵 Token received in /api/top-artists:", token[:25] + "...")
+
+    # create API wrapper with token
+    api = SpotifyAPI(access_token=token)
+    proxy = SpotifyAPIProxy(api)
+
+    # We use Spotify's "Get User's Top Artists" endpoint
+    # Spotify default is medium_term; we can make it explicit & set limit.
+    endpoint = "me/top/artists?limit=20&time_range=medium_term"
+    print(f"📡 Calling Spotify: GET {endpoint}")
+
+    response = proxy.fetch_api(endpoint=endpoint)
+
+    print("📦 Spotify top artists returned:", response)
+    print("--- END /api/top-artists ---\n")
+
+    # Keep return structure consistent with /api/spotify
+    return {"spotify_data": response}
