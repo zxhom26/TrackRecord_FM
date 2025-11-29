@@ -1,397 +1,115 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Home, MessagesSquare, Trophy, Settings, User, ListMusic } from "lucide-react";
-import { sendTokenToBackend } from "../utils";
-
-// ───────────────────── TYPES ─────────────────────
-interface SpotifyArtist {
-  name: string;
-}
-
-interface SpotifyTrack {
-  name: string;
-  artists: SpotifyArtist[];
-  external_urls: { spotify: string };
-}
-
-interface SpotifyResponse {
-  spotify_data?: {
-    items: SpotifyTrack[];
-  };
-}
-
-// ───────────────────── COMPONENT ─────────────────────
+import { BarChart3, PieChart, Brain, UserCircle2 } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   const { data: session } = useSession();
-  const router = useRouter();
-
-  // send token to backend
-  useEffect(() => {
-    if (session?.accessToken) {
-      sendTokenToBackend(session.accessToken);
-    }
-  }, [session?.accessToken]);
-
-  const displayName =
-    session?.user?.email || session?.user?.name || "Spotify User";
-
-  const handleGoToTopTracks = () => {
-    router.push("/top-tracks");
-  };
+  const username =
+    session?.user?.name ||
+    session?.user?.email?.split("@")[0] ||
+    "User";
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        fontFamily: "Inter, sans-serif",
-        background: "linear-gradient(135deg,#e8defa,#d0bcf5)",
-        color: "#2b225a",
-      }}
-    >
-      {/* ================= LEFT SIDEBAR ================= */}
-      <aside
-        style={{
-          width: "95px",
-          padding: "16px 10px 24px 10px",
-          background: "#1a1233",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "40px",
-        }}
-      >
-        {/* ----- WAVEFORM TOP LEFT ----- */}
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "0px",
-            marginBottom: "10px",
-          }}
-        >
-          <svg
-            width="120"
-            height="180"
-            viewBox="0 0 400 200"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            {/* Play circle */}
-            <circle cx="60" cy="80" r="40" fill="url(#grad)" />
-            <polygon points="50,60 50,100 80,80" fill="white" />
-
-            {/* Left bars */}
-            <rect x="130" y="50" width="20" height="80" rx="10" fill="url(#grad)" />
-            <rect x="170" y="60" width="20" height="60" rx="10" fill="url(#grad)" />
-
-            {/* Center tall bars */}
-            <rect x="210" y="30" width="20" height="120" rx="10" fill="url(#grad)" />
-            <rect x="250" y="45" width="20" height="90" rx="10" fill="url(#grad)" />
-            <rect x="290" y="35" width="20" height="110" rx="10" fill="url(#grad)" />
-
-            {/* Right decreasing bars */}
-            <rect x="330" y="55" width="20" height="70" rx="10" fill="url(#grad)" />
-            <rect x="370" y="70" width="20" height="40" rx="10" fill="url(#grad)" />
-
+    <div className="min-h-screen w-full bg-[#1b1b1b] text-white">
+      {/* ---------------- TOP NAV ---------------- */}
+      <header className="w-full flex items-center justify-between px-10 py-6 bg-[#242424] border-b border-white/10 shadow-lg">
+        {/* LEFT: LOGO */}
+        <div className="flex items-center gap-3">
+          {/* Your logo SVG reused for consistency */}
+          <svg width="55" height="35" viewBox="0 0 200 100">
             <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+              <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#a160ff" />
                 <stop offset="100%" stopColor="#ff985c" />
               </linearGradient>
             </defs>
+
+            <circle cx="28" cy="50" r="12" fill="url(#logoGradient)" />
+            <rect x="60" y="30" width="10" height="40" fill="url(#logoGradient)" rx="3" />
+            <rect x="80" y="20" width="10" height="60" fill="url(#logoGradient)" rx="3" />
+            <rect x="100" y="10" width="10" height="80" fill="url(#logoGradient)" rx="3" />
+            <rect x="120" y="25" width="10" height="50" fill="url(#logoGradient)" rx="3" />
+            <rect x="140" y="35" width="10" height="30" fill="url(#logoGradient)" rx="3" />
           </svg>
+
+          <span className="text-xl font-semibold tracking-wide text-white/95">
+            TrackRecord FM
+          </span>
         </div>
 
-        {/* ---------------- ICON NAV ---------------- */}
-        <nav
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "28px",
-            marginTop: "8px",
-          }}
-        >
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: 14,
-              backgroundColor: "rgba(106, 86, 194, 0.15)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Home size={24} color="#dccbf2" />
-          </div>
-
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: 14,
-              backgroundColor: "rgba(106, 86, 194, 0.08)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <MessagesSquare size={24} color="#dccbf2" />
-          </div>
-
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: 14,
-              backgroundColor: "rgba(106, 86, 194, 0.08)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Trophy size={24} color="#dccbf2" />
-          </div>
-
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: 14,
-              backgroundColor: "rgba(106, 86, 194, 0.08)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Settings size={24} color="#dccbf2" />
-          </div>
-        </nav>
-      </aside>
-
-      {/* ================= MAIN CONTENT ================= */}
-      <main
-        style={{
-          flexGrow: 1,
-          padding: "30px 40px 40px 40px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "24px",
-        }}
-      >
-        {/* ------- TOP BAR ------- */}
-        <header
-          style={{
-            width: "100%",
-            height: "70px",
-            backgroundColor: "#1a1233",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 30px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          }}
-        >
-          <div style={{ width: 40 }} />
-
-          <div
-            style={{
-              fontSize: "1.6rem",
-              fontWeight: 700,
-              backgroundImage: "linear-gradient(135deg,#a160ff,#ff985c)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-              textAlign: "center",
-              flexGrow: 1,
-            }}
-          >
-            Welcome back, {displayName}!
-          </div>
-
-          <div
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: "50%",
-              backgroundColor: "#d9c9ff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <User size={22} color="#2b225a" />
-          </div>
-        </header>
-
-        {/* ------- TOP BUTTON ------- */}
-        <section style={{ textAlign: "center", marginTop: "10px" }}>
-          <h2
-            style={{
-              fontSize: "1.8rem",
-              fontWeight: 600,
-              marginBottom: "16px",
-            }}
-          >
-            Dive Back In to Your Favorites…
-          </h2>
-
-          <button
-            onClick={handleGoToTopTracks}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "12px 28px",
-              borderRadius: "999px",
-              border: "none",
-              cursor: "pointer",
-              fontWeight: 600,
-              fontSize: "0.95rem",
-              color: "#fff",
-              backgroundImage: "linear-gradient(135deg,#a160ff,#ff985c)",
-              boxShadow: "0 8px 18px rgba(0,0,0,0.18)",
-            }}
-          >
-            <ListMusic size={18} color="#ffffff" />
-            Load Top Tracks
+        {/* RIGHT: Spotify + Profile */}
+        <div className="flex items-center gap-6">
+          <button className="px-5 py-2.5 rounded-full bg-[#1DB954] hover:bg-[#16a34a] transition-all font-semibold text-white shadow-lg">
+            Start Listening on Spotify
           </button>
-        </section>
 
-        {/* ==================================================== */}
-        {/*              UPDATED 3-PANEL DASHBOARD               */}
-        {/* ==================================================== */}
+          <UserCircle2 className="w-10 h-10 text-white/80 hover:text-white transition-all" />
+        </div>
+      </header>
 
-        <section
-          style={{
-            marginTop: "24px",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "20px",
-          }}
-        >
-          {/* 1 — QUICK STATS */}
-          <div
-            style={{
-              borderRadius: "18px",
-              padding: "18px 20px",
-              background: "linear-gradient(135deg,#e8f5ff,#d2e5ff)",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: "1.1rem",
-                fontWeight: 600,
-                marginBottom: "10px",
-              }}
-            >
-              Quick Stats
-            </h3>
+      {/* ---------------- MAIN CONTENT ---------------- */}
+      <main className="px-14 pb-20 pt-14">
+        {/* WELCOME HEADER */}
+        <h1 className="text-6xl font-bold mb-12">
+          <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
+            Welcome Back,
+          </span>{" "}
+          {username}.
+        </h1>
 
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                fontSize: "0.92rem",
-                lineHeight: 1.5,
-                opacity: 0.85,
-              }}
-            >
-              <li>• Total Artists Analyzed: —</li>
-              <li>• Most Common Genre: —</li>
-              <li>• Average Popularity: —</li>
-            </ul>
-          </div>
+        {/* CARD GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {/* --------- QUICK STATS CARD --------- */}
+          <Link href="/quick-stats">
+            <div className="rounded-3xl p-8 bg-[#6a3ff815] backdrop-blur-md border border-white/10 shadow-xl hover:scale-[1.03] hover:border-white/20 transition-all cursor-pointer">
+              <div className="w-full flex justify-center mb-6">
+                <BarChart3 size={70} className="text-purple-300" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4 text-center text-white/90">
+                QuickStats
+              </h2>
+              <div className="text-white/70 text-xl space-y-2">
+                <p>1. Top Track</p>
+                <p>2. Top Artist</p>
+                <p>3. Top Genre</p>
+              </div>
+            </div>
+          </Link>
 
-          {/* 2 — ANALYTICS */}
-          <div
-            style={{
-              borderRadius: "18px",
-              padding: "18px 20px",
-              background: "linear-gradient(135deg,#f0e8ff,#d9caff)",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: "1.1rem",
-                fontWeight: 600,
-                marginBottom: "10px",
-              }}
-            >
-              Analytics
-            </h3>
+          {/* --------- ANALYTICS CARD --------- */}
+          <Link href="/analytics">
+            <div className="rounded-3xl p-8 bg-[#ff88d715] backdrop-blur-md border border-white/10 shadow-xl hover:scale-[1.03] hover:border-white/20 transition-all cursor-pointer">
+              <div className="w-full flex justify-center mb-6">
+                <PieChart size={70} className="text-pink-300" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4 text-center text-white/90">
+                View Your Analytics
+              </h2>
+              <p className="text-white/70 text-center text-lg">
+                Dive deeper into your musical patterns, trends, and listening habits.
+              </p>
+            </div>
+          </Link>
 
-            <p
-              style={{
-                fontSize: "0.9rem",
-                opacity: 0.8,
-                lineHeight: 1.4,
-              }}
-            >
-              Listening trends and patterns will appear here soon.
-            </p>
-          </div>
-
-          {/* 3 — MOOD PROFILE */}
-          <div
-            style={{
-              borderRadius: "18px",
-              padding: "18px 20px",
-              background: "linear-gradient(135deg,#fff2e5,#ffd7b8)",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <h3
-              style={{
-                fontSize: "1.1rem",
-                fontWeight: 600,
-                marginBottom: "10px",
-              }}
-            >
-              Mood Profile
-            </h3>
-
-            <p
-              style={{
-                fontSize: "0.9rem",
-                opacity: 0.8,
-                marginBottom: "14px",
-              }}
-            >
-              Discover your unique listening mood.
-            </p>
-
-            <div style={{ fontSize: "2rem", marginBottom: "16px" }}>🎧</div>
-
-            <button
-              onClick={() => router.push("/mood")}
-              style={{
-                marginTop: "auto",
-                padding: "10px 16px",
-                background: "linear-gradient(135deg,#a160ff,#ff985c)",
-                border: "none",
-                borderRadius: "10px",
-                color: "white",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-                boxShadow: "0 5px 12px rgba(0,0,0,0.15)",
-              }}
-            >
-              View Mood Profile
-            </button>
-          </div>
-        </section>
+          {/* --------- MOOD PROFILE CARD --------- */}
+          <Link href="/mood">
+            <div className="rounded-3xl p-8 bg-[#ff987515] backdrop-blur-md border border-white/10 shadow-xl hover:scale-[1.03] hover:border-white/20 transition-all cursor-pointer">
+              <div className="w-full flex justify-center mb-6">
+                <Brain size={70} className="text-orange-300" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4 text-center text-white/90">
+                View Your Mood Profile
+              </h2>
+              <p className="text-white/70 text-center text-lg">
+                Understand your musical identity through emotion-based analysis.
+              </p>
+            </div>
+          </Link>
+        </div>
       </main>
     </div>
   );
