@@ -32,7 +32,7 @@ export default function TopTracksPage() {
   async function loadTracks() {
     if (!session?.accessToken) return;
 
-    const result = await fetchTopTracks(session.accessToken);
+    const result = await fetchTopTracks(session.sessionId);
 
     console.log("🎧 Top Tracks Response:", result);
 

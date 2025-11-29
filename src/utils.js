@@ -44,7 +44,7 @@ export async function sendTokenToBackend(session) {
 }
 
 // --- Fetching Top Tracks ---
-export async function fetchTopTracks(token) {
+export async function fetchTopTracks(sessionId) { // MAY CAUSE ISSUES HERE ------------------
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-tracks`,
@@ -52,7 +52,7 @@ export async function fetchTopTracks(token) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: token,
+          sessionId: sessionId,
         }),
       }
     );
@@ -68,7 +68,7 @@ export async function fetchTopTracks(token) {
 }
 
 // --- Fetching Top Artists (for genre-based mood) ---
-export async function fetchTopArtists(token) {
+export async function fetchTopArtists(sessionId) {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-artists`,
@@ -76,7 +76,7 @@ export async function fetchTopArtists(token) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: token,
+          sessionId: sessionId,
         }),
       }
     );

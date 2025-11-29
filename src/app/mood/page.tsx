@@ -40,7 +40,7 @@ export default function MoodPage() {
 
     console.log("🎫 Access Token:", session.accessToken);
 
-    const response = await fetchTopArtists(session.accessToken);
+    const response = await fetchTopArtists(session.sessionId); // modified
     console.log("🔍 Top Artists JSON:", response);
 
     setResult(response);
