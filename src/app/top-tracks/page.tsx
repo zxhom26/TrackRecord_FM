@@ -11,20 +11,18 @@ interface SpotifyArtist {
 interface SpotifyTrack {
   name: string;
   artists: SpotifyArtist[];
-  external_urls: { spotify: string };
+  external_urls?: { spotify?: string };
 }
 
-interface SpotifyResponse {
-  spotify_data?: {
-    items: SpotifyTrack[];
-  };
+interface BackendTopTracksResponse {
+  top_tracks: SpotifyTrack[];
 }
 
 export default function TopTracksPage() {
   const { data: session } = useSession();
-  const [tracks, setTracks] = useState<SpotifyResponse | null>(null);
+  const [tracks, setTracks] = useState<BackendTopTracksResponse | null>(null);
 
-  // Send token to backend if available
+  // Send token to backend when available
   useEffect(() => {
     if (session?.accessToken) {
       sendTokenToBackend(session.accessToken);
@@ -35,6 +33,9 @@ export default function TopTracksPage() {
     if (!session?.accessToken) return;
 
     const result = await fetchTopTracks(session.accessToken);
+
+    console.log("🎧 Top Tracks Response:", result);
+
     setTracks(result);
   }
 
@@ -61,7 +62,8 @@ export default function TopTracksPage() {
           marginBottom: "10px",
         }}
       >
-        Your Top Tracks, <span style={{ color: "#6A56C2" }}>{username}</span>
+        Your Top Tracks,{" "}
+        <span style={{ color: "#6A56C2" }}>{username}</span>
       </h1>
 
       {/* Load Button */}
@@ -82,7 +84,7 @@ export default function TopTracksPage() {
       </button>
 
       {/* Track Cards */}
-      {tracks?.spotify_data?.items && (
+      {tracks?.top_tracks && (
         <div
           style={{
             display: "grid",
@@ -90,44 +92,61 @@ export default function TopTracksPage() {
             gap: "20px",
           }}
         >
-          {tracks.spotify_data.items.slice(0, 20).map((track, index) => (
-            <div
-              key={index}
-              style={{
-                background: "white",
-                borderRadius: "14px",
-                padding: "16px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                minHeight: "140px",
-              }}
-            >
-              <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>
-                {index + 1}. {track.name}
-              </div>
-              <div style={{ marginTop: "6px", color: "#555" }}>
-                {track.artists.map((a) => a.name).join(", ")}
-              </div>
-              <a
-                href={track.external_urls.spotify}
-                target="_blank"
-                rel="noopener noreferrer"
+          {tracks.top_tracks.slice(0, 20).map((track, index) => {
+            // SAFE URL EXTRACTION — prevents crashes
+            const spotifyUrl = track?.external_urls?.spotify ?? null;
+
+            return (
+              <div
+                key={index}
                 style={{
-                  marginTop: "12px",
-                  display: "inline-block",
-                  padding: "8px 12px",
-                  background: "#1DB954",
-                  color: "white",
-                  borderRadius: "20px",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                  fontSize: "0.85rem",
+                  background: "white",
+                  borderRadius: "14px",
+                  padding: "16px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  minHeight: "140px",
                 }}
               >
-                Open →
-              </a>
-            </div>
-          ))}
+                <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>
+                  {index + 1}. {track?.name ?? "Unknown Track"}
+                </div>
+
+                <div style={{ marginTop: "6px", color: "#555" }}>
+                  {(track?.artists ?? []).map((a) => a.name).join(", ") ||
+                    "Unknown Artist"}
+                </div>
+
+                {spotifyUrl && (
+                  <a
+                    href={spotifyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      marginTop: "12px",
+                      display: "inline-block",
+                      padding: "8px 12px",
+                      background: "#1DB954",
+                      color: "white",
+                      borderRadius: "20px",
+                      textDecoration: "none",
+                      fontWeight: 600,
+                      fontSize: "0.85rem",
+                    }}
+                  >
+                    Open →
+                  </a>
+                )}
+              </div>
+            );
+          })}
         </div>
+      )}
+
+      {/* If no tracks */}
+      {tracks?.top_tracks?.length === 0 && (
+        <p style={{ marginTop: "20px", fontSize: "1.1rem" }}>
+          No top tracks found for your account.
+        </p>
       )}
     </main>
   );
