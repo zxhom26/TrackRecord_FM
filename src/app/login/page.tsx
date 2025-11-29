@@ -76,20 +76,23 @@ export default function LoginPage() {
       </div>
 
       {/* ================== OVERLAY TEXT ================== */}
-      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-20 text-center px-6">
+            {/* ================== OVERLAY TEXT (RIGHT-ALIGNED) ================== */}
+      <div className="absolute bottom-24 right-16 z-20 text-right max-w-xl">
+
         <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-          Meet Your
-          <br />
+          Meet Your <br />
           <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
             Musical Identity.
           </span>
         </h1>
 
-        <p className="text-lg mt-4 text-white/80 max-w-xl mx-auto">
+        <p className="text-lg mt-4 text-white/80">
           Explore your listening patterns, discover your mood profile,  
           and dive into the sound that makes you—you.
         </p>
+
       </div>
+
 
     </div>
   );
