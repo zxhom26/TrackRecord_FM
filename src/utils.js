@@ -49,7 +49,7 @@ export async function fetchTopTracks(token) {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-tracks`,
       {
-        method: "GET",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token: token,
