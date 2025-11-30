@@ -1,23 +1,29 @@
 import unittest
-from unittest.mock import AsyncMock
-from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock
 import pandas as pd
 
 from analytics import UserAnalytics, ProcessData
+from spotify_api import SpotifyAPI, SpotifyAPIProxy
 
 
 # ----------------------------------------------------
 #      Mock Objects
 # ----------------------------------------------------
+class MockSpotifyAPI(SpotifyAPI):
+    """Fake SpotifyAPI that never calls the real API."""
+    def __init__(self, token="TEST_TOKEN"):
+        self.access_token = token
+        self.fetch_api = AsyncMock()
+
+
 class MockSpotifyAPIProxy:
-    """Mock proxy that returns dict data exactly as UserAnalytics expects."""
-    def __init__(self, responses=None):
-        # responses: dict of {endpoint: dict_data}
-        self.responses = responses or {}
+    """Mock proxy that returns predefined responses for endpoints."""
+    def __init__(self, responses):
+        self.responses = responses  # dict: {endpoint: data}
 
     async def fetch_api(self, endpoint, params=None):
-        # Return the raw dict
-        return self.responses.get(endpoint, {"items": []})
+        data = self.responses.get(endpoint, {"items": []})
+        return data
 
 
 # ----------------------------------------------------
@@ -34,7 +40,7 @@ class TestProcessData(unittest.TestCase):
 
     def test_flatten_valid(self):
         raw = [
-            {"name": "Tyler", "followers.total": 999, "genres": []}
+            {"name": "Tyler", "followers.total": 999, "genres": ["hip hop"]}
         ]
         df = self.process.flatten_data(raw)
         self.assertIn("name", df.columns)
@@ -50,13 +56,13 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
         """Create a UserAnalytics instance using a mocked proxy."""
         self.ua = UserAnalytics("TEST_TOKEN")
 
-        # Sample Spotify response for top artists
+        # Sample Spotify responses
         self.sample_top_artists = {
             "items": [
                 {
                     "id": "4V8LLVI7PbaPR0K2TGSxFF",
                     "name": "Tyler, The Creator",
-                    "genres": [],
+                    "genres": ["hip hop"],
                     "followers": {"total": 24739335},
                     "popularity": 87
                 },
@@ -70,12 +76,31 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
             ]
         }
 
-        # Sample responses for all endpoints needed
+        self.sample_top_tracks = {
+            "items": [
+                {"id": "track1", "name": "Song1"},
+                {"id": "track2", "name": "Song2"}
+            ]
+        }
+
+        self.sample_recently_played = {
+            "items": [
+                {"track": {"id": "track_recent", "name": "Recent Song"}, "played_at": "2024-05-20T10:00:00Z"}
+            ]
+        }
+
+        self.sample_recommendations = {
+            "tracks": [
+                {"id": "rec1", "name": "Recommended Song"}
+            ]
+        }
+
+        # Mock proxy with predefined responses
         self.ua.proxy = MockSpotifyAPIProxy({
             "me/top/artists": self.sample_top_artists,
-            "me/top/tracks": {"items": [{"id": "track1", "name": "Song1"}]},
-            "me/player/recently-played": {"items": [{"track": {"id": "track1"}, "played_at": "2024-01-01T00:00:00Z"}]},
-            "recommendations": {"tracks": [{"id": "rec1", "name": "Recommended Song"}]}
+            "me/top/tracks": self.sample_top_tracks,
+            "me/player/recently-played": self.sample_recently_played,
+            "recommendations": self.sample_recommendations
         })
 
     # ----------------------------------------------------
@@ -92,7 +117,7 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
     async def test_get_top_tracks(self):
         result = await self.ua.getTopTracks(n=1)
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["name"], "Song1")
+        self.assertEqual(result[0]["id"], "track1")
 
     # ----------------------------------------------------
     #   Recently Played
@@ -100,7 +125,7 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
     async def test_get_recently_played(self):
         result = await self.ua.getRecentlyPlayed(n=1)
         self.assertEqual(len(result), 1)
-        self.assertIn("track.id", result[0] or result[0].get("track"))
+        self.assertEqual(result[0]["track.id"], "track_recent")
 
     # ----------------------------------------------------
     #   Top Genres
@@ -108,6 +133,7 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
     async def test_get_top_genres(self):
         result = await self.ua.getTopGenres(n=2)
         genres = [g["genre"] for g in result]
+        self.assertIn("hip hop", genres)
         self.assertIn("dream pop", genres)
         self.assertIn("shoegaze", genres)
 
@@ -116,10 +142,9 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
     # ----------------------------------------------------
     async def test_get_quick_stats(self):
         result = await self.ua.getQuickStats()
-        stats = result[0]
-        self.assertEqual(stats["top_artist"], "Tyler, The Creator")
-        self.assertEqual(stats["top_track"], "Song1")
-        self.assertIsNotNone(stats["top_genre"])
+        self.assertEqual(result[0]["top_artist"], "Tyler, The Creator")
+        self.assertEqual(result[0]["top_track"], "Song1")
+        self.assertIsNotNone(result[0]["top_genre"])
 
     # ----------------------------------------------------
     #   Song Recommendations
