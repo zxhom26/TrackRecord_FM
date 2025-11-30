@@ -150,18 +150,14 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
     #   Song Recommendations
     # ----------------------------------------------------
     async def test_get_song_recommendations(self):
-        # Mock fetch_api to return proper IDs for top tracks/artists/genres
+        # Mock fetch_api to return proper IDs and genres
         self.ua.proxy = MockSpotifyAPIProxy({
             "me/top/tracks": {
                 "items": [{"id": "track1"}, {"id": "track2"}]
             },
             "me/top/artists": {
-                "items": [{"id": "artist1"}, {"id": "artist2"}]
-            },
-            "me/top/artists_with_genres": {  # used by getTopGenres internally
                 "items": [
-                    {"id": "artist1", "genres": ["pop", "rock"]},
-                    {"id": "artist2", "genres": ["dream pop"]}
+                    {"id": "artist1", "name": "Artist1", "genres": ["pop", "rock"]},
                 ]
             },
             "recommendations": {
@@ -170,8 +166,11 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
         })
 
         result = await self.ua.getSongRecommendations(n=1)
+
+        # Checks
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["id"], "rec1")
+
 
 
 
