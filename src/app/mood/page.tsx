@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import Sidebar from "../components/Sidebar";
-import Logo from "../components/logo"; // correct path & lowercase file
+import Logo from "../components/Logo"; // correct path & lowercase file
 
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
