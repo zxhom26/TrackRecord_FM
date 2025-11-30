@@ -2,37 +2,29 @@ import unittest
 from unittest.mock import AsyncMock, MagicMock
 import pandas as pd
 from analytics import UserAnalytics, ProcessData
-from spotify_api import APIInterface
+
 
 # ----------------------------------------------------
 #      Mock Objects
 # ----------------------------------------------------
-class MockSpotifyAPI(APIInterface):
-    """Mock implementation of APIInterface for testing."""
-    def __init__(self, token="TEST_TOKEN"):
-        self.token = token
+class MockSpotifyAPIProxy:
+    """Mock proxy that returns a proper HTTP-like response asynchronously."""
+    def __init__(self, responses):
+        """
+        responses: dict mapping endpoint -> response data
+        """
+        self.responses = responses
 
-    def get_token(self):
-        return self.token
+    async def fetch_api(self, endpoint, **kwargs):
+        """
+        Return a mock response object with .status_code, .headers, and .json().
+        """
+        data = self.responses.get(endpoint, {})
 
-    async def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None):
-        """Return default empty structure to prevent KeyErrors."""
-        return {"items": []}
-
-
-class MockSpotifyAPIProxy(MockSpotifyAPI):
-    """Mock proxy that simulates API responses for UserAnalytics."""
-    def __init__(self, responses=None):
-        super().__init__(token="TEST_TOKEN")
-        self.responses = responses or {}
-
-    async def fetch_api(self, endpoint, headers=None, method="GET", data=None, params=None):
-        """Return a mock response based on endpoint."""
-        resp_data = self.responses.get(endpoint, {"items": []})
         mock_resp = MagicMock()
         mock_resp.status_code = 200
         mock_resp.headers = {"ETag": "TEST"}
-        mock_resp.json.return_value = resp_data
+        mock_resp.json.return_value = data
         return mock_resp
 
 
@@ -49,7 +41,9 @@ class TestProcessData(unittest.TestCase):
         self.assertTrue(df.empty)
 
     def test_flatten_valid(self):
-        raw = [{"name": "Tyler", "followers.total": 999, "genres": []}]
+        raw = [
+            {"name": "Tyler", "followers.total": 999, "genres": []}
+        ]
         df = self.process.flatten_data(raw)
         self.assertIn("name", df.columns)
         self.assertEqual(df.iloc[0]["name"], "Tyler")
@@ -61,7 +55,7 @@ class TestProcessData(unittest.TestCase):
 class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
-        # Example Spotify response for top artists
+        """Create a UserAnalytics instance using a mocked proxy."""
         self.sample_top_artists = {
             "items": [
                 {
@@ -81,14 +75,35 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
             ]
         }
 
-        # Create UserAnalytics instance with mock proxy
-        self.ua = UserAnalytics("TEST_TOKEN")
-        self.ua.proxy = MockSpotifyAPIProxy(responses={
+        self.sample_top_tracks = {
+            "items": [
+                {"id": "track123", "name": "Some Song", "popularity": 55}
+            ]
+        }
+
+        self.sample_recently_played = {
+            "items": [
+                {"track.id": "abc", "played_at": "2024-05-20T10:00:00Z"}
+            ]
+        }
+
+        self.sample_recommendations = {
+            "tracks": [
+                {"id": "rec1", "name": "Recommended Song"}
+            ]
+        }
+
+        # Prepare mock responses mapping endpoints to fake data
+        responses = {
             "me/top/artists": self.sample_top_artists,
-            "me/top/tracks": {"items": [{"id": "t1", "name": "Song1"}]},
-            "recommendations": {"tracks": [{"id": "rec1", "name": "Recommended Song"}]}
-        })
-        self.mock_api = self.ua.proxy  # for easy access
+            "me/top/tracks": self.sample_top_tracks,
+            "me/player/recently-played": self.sample_recently_played,
+            "recommendations": self.sample_recommendations
+        }
+
+        # Instantiate UserAnalytics and replace proxy with mock
+        self.ua = UserAnalytics("TEST_TOKEN")
+        self.ua.proxy = MockSpotifyAPIProxy(responses)
 
     # ----------------------------------------------------
     #   Top Artists
@@ -104,15 +119,12 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
     async def test_get_top_tracks(self):
         result = await self.ua.getTopTracks(n=1)
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["id"], "t1")
+        self.assertEqual(result[0]["id"], "track123")
 
     # ----------------------------------------------------
     #   Recently Played
     # ----------------------------------------------------
     async def test_get_recently_played(self):
-        self.ua.proxy.responses["me/player/recently-played"] = {
-            "items": [{"track.id": "abc", "played_at": "2024-05-20T10:00:00Z"}]
-        }
         result = await self.ua.getRecentlyPlayed(n=1)
         self.assertEqual(len(result), 1)
 
@@ -130,10 +142,9 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
     # ----------------------------------------------------
     async def test_get_quick_stats(self):
         result = await self.ua.getQuickStats()
-        stats = result[0]
-        self.assertEqual(stats["top_artist"], "Tyler, The Creator")
-        self.assertEqual(stats["top_track"], "Song1")
-        self.assertIsNotNone(stats["top_genre"])
+        self.assertEqual(result[0]["top_artist"], "Tyler, The Creator")
+        self.assertEqual(result[0]["top_track"], "Some Song")
+        self.assertIsNotNone(result[0]["top_genre"])
 
     # ----------------------------------------------------
     #   Song Recommendations
