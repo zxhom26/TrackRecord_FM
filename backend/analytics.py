@@ -28,15 +28,6 @@ class UserAnalytics:
         self.proxy = SpotifyAPIProxy(self.api)
         self.process = ProcessData()
         pass
-    
-    # ---------------- TOP ITEMS ----------------
-    # def getTopTracks(self, n=20):
-    #     data = self.proxy.fetch_api("me/top/tracks", params={"limit": n})
-    #     tracks = data.get("items", [])
-    #     # Flatten tracks data into Spark DataFrame
-    #     rdd = self.spark.parallelize([json.dumps(track) for track in tracks]) # Convert each track dict → JSON string
-    #     df = spark.read.json(rdd)
-    #     return [json.loads(row) for row in df.toJSON().collect()]
 
     # ---------------- HELPER FUNCTIONS -------------------
     async def getTopTracks(self, n=20):
@@ -60,42 +51,6 @@ class UserAnalytics:
         df = self.process.flatten_data(plays)
         
         return df.to_dict(orient='records') 
-
-    # more_data = True
-#     all_items = []
-#     # Breaking up week call into chunks to handle item limits
-#     while more_data:
-#         # Fetch data
-#         data, records = self.getRecentlyPlayed(n=n, after=after, before=before)
-#         all_items.append(records) # list of lists
-#         more_data = data.get("next")
-    
-#     if len(all_items) <= 0 or aggBy is None:
-#         print("No aggBy column selected, you must specify how to group records for minute aggregation OR failed api call.")
-#         return []
-#     else:
-#         # Combine all dictionary records into single DataFrame
-#         df_all = list(chain.from_iterable(all_items)) # flatten list of lists
-#         df_all = pd.DataFrame(df_all)
-
-#         # Calculate minutes listened by day of the week
-#         df_all['hour'] = pd.to_datetime(df_all['played_at']).dt.hour # "played_at": "2025-11-26T22:00:45.165Z"
-#         df_all['day'] = pd.to_datetime(df_all['played_at']).dt.date # "played_at": "2025-11-26T22:00:45.165Z"
-#         df_all['minutes_listened'] = (df_all['track.duration_ms'] / 60000).round(2)
-
-#         if aggBy == 'artist':
-#             df_all[aggBy] = df_all['track.' + aggBy]
-#             df_final = df_all.groupby(aggBy).agg({'minutes_listened': 'sum'}).reset_index()
-#         elif aggBy == 'day':
-#             df_final = df_all.groupby('hour').agg({'minutes_listened': 'sum'}).reset_index()
-#         else: # week and month default to day
-#             df_final = df_all.groupby('day').agg({'minutes_listened': 'sum'}).reset_index()
-
-#         return df_final.to_dict(orient='records')
-#         # ex. aggBy == day:[{day: '2025-11-20', minutes_listened: 42.0}, ...]
-#         # ex. aggBy == artist:[{artist: 'Doechii', minutes_listened: 69.0}, ...]
-
-        # [{day: '2025-11-20', minutes_listened: 34.5}, ...]
     
     # ---------------- DIRECT TO FRONTEND ----------------
     async def getTopGenres(self, n=50):
@@ -151,57 +106,7 @@ class UserAnalytics:
             print(f"No seeds found. Error getting track, artist, and genre ids: {e}")
             return []
 
-# ---------- Run standalone ----------
-if __name__ == "__main__":
-    pass
 
 
 
 
-
-# def getMinutesListened(self, n=50, interval='day', aggBy=None):
-#     # timestamps in milliseconds
-#     before = int(datetime.now().timestamp() * 1000)
-#     match interval:
-#         case 'day':
-#             after = int((datetime.now() - timedelta(days=1)).timestamp() * 1000)
-#         case 'week':
-#             after = int((datetime.now() - timedelta(days=7)).timestamp() * 1000)
-#         case 'month':
-#             after = int((datetime.now() - timedelta(days=30)).timestamp() * 1000)
-#         case _: # default to day if invalid
-#             after = int((datetime.now() - timedelta(days=1)).timestamp() * 1000)
-
-#     more_data = True
-#     all_items = []
-#     # Breaking up week call into chunks to handle item limits
-#     while more_data:
-#         # Fetch data
-#         data, records = self.getRecentlyPlayed(n=n, after=after, before=before)
-#         all_items.append(records) # list of lists
-#         more_data = data.get("next")
-    
-#     if len(all_items) <= 0 or aggBy is None:
-#         print("No aggBy column selected, you must specify how to group records for minute aggregation OR failed api call.")
-#         return []
-#     else:
-#         # Combine all dictionary records into single DataFrame
-#         df_all = list(chain.from_iterable(all_items)) # flatten list of lists
-#         df_all = pd.DataFrame(df_all)
-
-#         # Calculate minutes listened by day of the week
-#         df_all['hour'] = pd.to_datetime(df_all['played_at']).dt.hour # "played_at": "2025-11-26T22:00:45.165Z"
-#         df_all['day'] = pd.to_datetime(df_all['played_at']).dt.date # "played_at": "2025-11-26T22:00:45.165Z"
-#         df_all['minutes_listened'] = (df_all['track.duration_ms'] / 60000).round(2)
-
-#         if aggBy == 'artist':
-#             df_all[aggBy] = df_all['track.' + aggBy]
-#             df_final = df_all.groupby(aggBy).agg({'minutes_listened': 'sum'}).reset_index()
-#         elif aggBy == 'day':
-#             df_final = df_all.groupby('hour').agg({'minutes_listened': 'sum'}).reset_index()
-#         else: # week and month default to day
-#             df_final = df_all.groupby('day').agg({'minutes_listened': 'sum'}).reset_index()
-
-#         return df_final.to_dict(orient='records')
-#         # ex. aggBy == day:[{day: '2025-11-20', minutes_listened: 42.0}, ...]
-#         # ex. aggBy == artist:[{artist: 'Doechii', minutes_listened: 69.0}, ...]
