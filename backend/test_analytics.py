@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from datetime import datetime
 import pandas as pd
 
-from user_analytics import UserAnalytics, ProcessData
+from analytics import UserAnalytics, ProcessData
 from spotify_api import SpotifyAPI, SpotifyAPIProxy
 
 
