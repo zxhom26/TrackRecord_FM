@@ -2,45 +2,46 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { BarChart3, PieChart, Brain } from "lucide-react";
-import Logo from "./components/Logo";
+import Link from "next/link";
 import { getQuickStats } from "../utils";
 
-// -------------------- TYPES --------------------
-interface QuickStatsItem {
-  top_artist: string | null;
-  top_track: string | null;
-  top_genre: string | null;
-}
+// NEW — import your logo component
+import Logo from "../components/Logo";
 
-interface QuickStatsResponse {
-  quick_stats: QuickStatsItem[];
+interface QuickStats {
+  topTrack: string;
+  topArtist: string;
+  topGenre: string;
 }
 
 export default function HomePage() {
   const { data: session } = useSession();
 
-  const [quickStats, setQuickStats] = useState<QuickStatsItem | null>(null);
-  const [loadingQuickStats, setLoadingQuickStats] = useState(false);
+  const [quickStats, setQuickStats] = useState<QuickStats>({
+    topTrack: "Loading…",
+    topArtist: "Loading…",
+    topGenre: "Loading…",
+  });
 
-  // -------------------- LOAD QUICKSTATS --------------------
+  const [loadingQuickStats, setLoadingQuickStats] = useState(true);
+
+  // Fetch QuickStats on load
   useEffect(() => {
-    if (!session?.accessToken) return;
+    const token = session?.accessToken;
+    if (!token) return;
 
     async function loadStats() {
-      setLoadingQuickStats(true);
+      try {
+        setLoadingQuickStats(true);
 
-      const stats: QuickStatsResponse = await getQuickStats(
-        session.accessToken
-      );
-
-      // stats.quick_stats is an array of length 1 from backend
-      if (stats?.quick_stats?.length > 0) {
-        setQuickStats(stats.quick_stats[0]);
+        const stats = await getQuickStats(token);
+        setQuickStats(stats);
+      } catch (err) {
+        console.error("QuickStats error:", err);
+      } finally {
+        setLoadingQuickStats(false);
       }
-
-      setLoadingQuickStats(false);
     }
 
     loadStats();
@@ -51,6 +52,7 @@ export default function HomePage() {
 
       {/* ====================== TOP BAR ====================== */}
       <div className="flex items-center justify-between py-6">
+
         {/* LOGO */}
         <div className="flex items-center gap-3">
           <Logo width={55} height={35} />
@@ -94,7 +96,7 @@ export default function HomePage() {
       {/* ====================== 3 FEATURE CARDS ====================== */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
 
-        {/* ----------- QUICK STATS CARD ----------- */}
+        {/* =============== QUICK STATS CARD =============== */}
         <div
           className="
             rounded-3xl p-10
@@ -102,38 +104,29 @@ export default function HomePage() {
             border border-white/10 shadow-xl
             hover:scale-[1.03] hover:border-white/20
             transition-all cursor-default
-
-            flex flex-col justify-between items-center
-            min-h-[260px]
+            flex flex-col gap-6 items-center text-center
+            min-h-[280px]
           "
         >
-          <BarChart3 size={42} className="text-purple-400 mb-4" />
-
+          <BarChart3 size={42} className="text-purple-400" />
           <h2 className="text-2xl font-semibold">QuickStats</h2>
 
-          <ul className="mt-4 text-white/80 leading-relaxed text-center">
-            <li>
-              <span className="font-semibold text-white">Top Track:</span>{" "}
-              {loadingQuickStats
-                ? "Loading..."
-                : quickStats?.top_track || "N/A"}
-            </li>
-            <li>
-              <span className="font-semibold text-white">Top Artist:</span>{" "}
-              {loadingQuickStats
-                ? "Loading..."
-                : quickStats?.top_artist || "N/A"}
-            </li>
-            <li>
-              <span className="font-semibold text-white">Top Genre:</span>{" "}
-              {loadingQuickStats
-                ? "Loading..."
-                : quickStats?.top_genre || "N/A"}
-            </li>
-          </ul>
+          {loadingQuickStats ? (
+            <ul className="mt-2 text-white/50 animate-pulse">
+              <li>Loading top track…</li>
+              <li>Loading top artist…</li>
+              <li>Loading top genre…</li>
+            </ul>
+          ) : (
+            <ul className="mt-3 text-white/80 leading-relaxed text-center">
+              <li>🎵 <b>Top Track:</b> {quickStats.topTrack}</li>
+              <li>👤 <b>Top Artist:</b> {quickStats.topArtist}</li>
+              <li>🎧 <b>Top Genre:</b> {quickStats.topGenre}</li>
+            </ul>
+          )}
         </div>
 
-        {/* ----------- ANALYTICS (REDIRECT) ----------- */}
+        {/* ANALYTICS */}
         <Link
           href="/analytics"
           className="
@@ -141,25 +134,18 @@ export default function HomePage() {
             bg-[#ff88d715] backdrop-blur-md
             border border-white/10 shadow-xl
             hover:scale-[1.03] hover:border-white/20
-            transition-all
-
-            flex flex-col justify-between items-center
-            min-h-[260px]
+            transition-all flex flex-col gap-6 items-center text-center
+            min-h-[280px]
           "
         >
-          <PieChart size={42} className="text-pink-300 mb-4" />
-
-          <h2 className="text-2xl font-semibold text-center">
-            View Your Analytics
-          </h2>
-
-          <p className="text-white/80 text-center mt-3">
-            Dive deeper into your musical patterns, trends, and listening
-            habits.
+          <PieChart size={42} className="text-pink-300" />
+          <h2 className="text-2xl font-semibold">View Your Analytics</h2>
+          <p className="text-white/80">
+            Dive deeper into your musical patterns and listening habits.
           </p>
         </Link>
 
-        {/* ----------- MOOD PROFILE (REDIRECT) ----------- */}
+        {/* MOOD */}
         <Link
           href="/mood"
           className="
@@ -167,22 +153,17 @@ export default function HomePage() {
             bg-[#ff987515] backdrop-blur-md
             border border-white/10 shadow-xl
             hover:scale-[1.03] hover:border-white/20
-            transition-all
-
-            flex flex-col justify-between items-center
-            min-h-[260px]
+            transition-all flex flex-col gap-6 items-center text-center
+            min-h-[280px]
           "
         >
-          <Brain size={42} className="text-orange-300 mb-4" />
-
-          <h2 className="text-2xl font-semibold text-center">
-            View Your Mood Profile
-          </h2>
-
-          <p className="text-white/80 text-center mt-3">
+          <Brain size={42} className="text-orange-300" />
+          <h2 className="text-2xl font-semibold">View Your Mood Profile</h2>
+          <p className="text-white/80">
             Understand your musical identity through emotion-based analysis.
           </p>
         </Link>
+
       </div>
     </main>
   );
