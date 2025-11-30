@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import Sidebar from "../components/Sidebar";
-import Logo from "../components/Logo";
+import Logo from "../components/logo"; // correct path & lowercase file
 
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
@@ -14,19 +14,25 @@ import {
   Flame,
   Cloud,
   PartyPopper,
+  Leaf,
+  Zap,
+  BookOpen,
+  Sun,
+  Moon,
+  BrainCircuit,
 } from "lucide-react";
 
-// Mood → Icon map
+// Mood → Icon map (unchanged)
 const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
-  "🔥 Bold & Confident": <Flame size={42} className="text-red-400" />,
-  "💙 Smooth & Chill": <Cloud size={42} className="text-blue-400" />,
-  "🎉 Upbeat & Fun": <PartyPopper size={42} className="text-purple-400" />,
-  "🌿 Mellow & Indie": <Cloud size={42} className="text-green-400" />,
-  "⚡ High Energy": <Flame size={42} className="text-yellow-300" />,
-  "🤘 Intense & Driven": <Flame size={42} className="text-orange-400" />,
-  "📚 Chill Study Vibes": <Cloud size={42} className="text-indigo-300" />,
-  "💃 Vibrant & Rhythmic": <PartyPopper size={42} className="text-pink-400" />,
-  "🌙 Calm & Peaceful": <Cloud size={42} className="text-sky-300" />,
+  "Bold & Confident": <Flame size={42} className="text-red-400" />,
+  "Smooth & Chill": <Cloud size={42} className="text-blue-400" />,
+  "Upbeat & Fun": <PartyPopper size={42} className="text-purple-400" />,
+  "Mellow & Indie": <Leaf size={42} className="text-green-400" />,
+  "High Energy": <Zap size={42} className="text-yellow-300" />,
+  "Intense & Driven": <BrainCircuit size={42} className="text-orange-400" />,
+  "Chill Study Vibes": <BookOpen size={42} className="text-indigo-300" />,
+  "Vibrant & Rhythmic": <Sun size={42} className="text-pink-400" />,
+  "Calm & Peaceful": <Moon size={42} className="text-sky-300" />,
 };
 
 interface SpotifyArtist {
@@ -58,10 +64,18 @@ export default function MoodPage() {
   };
 
   return (
-    <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white">
+    <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white relative">
 
-      {/* Sidebar */}
-      <Sidebar active="mood" />
+      {/* SIDEBAR + LOGO OVERLAY */}
+      <div className="relative">
+        {/* Sidebar */}
+        <Sidebar active="mood" />
+
+        {/* OVERLAY LOGO */}
+        <div className="absolute top-6 left-6 z-50">
+          <Logo width={50} height={32} />
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="flex-1 p-12">
