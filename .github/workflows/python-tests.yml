@@ -2,9 +2,9 @@ name: Python Tests
 
 on:
   push:
-    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render, TRF-38-Create-framework-for-basic-music-analytics ]
+    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render, TRF-38-Create-framework-for-basic-music-analytics, TRF-56-Add-support-for-multiple-user-sessions-in-backend ]
   pull_request:
-    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render, TRF-38-Create-framework-for-basic-music-analytics ]
+    branches: [ main, master, TRF-34-Create-frontend-domain-on-Render, TRF-38-Create-framework-for-basic-music-analytics, TRF-56-Add-support-for-multiple-user-sessions-in-backend ]
 
 jobs:
   run-tests:
