@@ -143,28 +143,48 @@ export function getTopMoodsFromGenres(genres) {
 // --- Fetch QuickStats ---
 export async function getQuickStats(token) {
   try {
-    const backend = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/quick-stats`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: token }),
+      }
+    );
 
-    const res = await fetch(`${backend}/api/quick-stats`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accessToken: token })
-    });
-
-    if (!res.ok) {
-      throw new Error(`QuickStats request failed: ${res.status}`);
+    if (!response.ok) {
+      throw new Error(`QuickStats failed: ${response.status}`);
     }
 
-    const data = await res.json();
+    const json = await response.json();
+
+    // The backend returns quick_stats as a list with ONE object:
+    // { quick_stats: [ { top_artist, top_track, top_genre } ] }
+    const arr = json.quick_stats;
+
+    if (!arr || !Array.isArray(arr) || arr.length === 0) {
+      return {
+        topTrack: "N/A",
+        topArtist: "N/A",
+        topGenre: "N/A",
+      };
+    }
+
+    const stats = arr[0]; // extract the first object
 
     return {
-      topTrack: data?.quick_stats?.top_track || "N/A",
-      topArtist: data?.quick_stats?.top_artist || "N/A",
-      topGenre: data?.quick_stats?.top_genre || "N/A",
+      topTrack: stats.top_track || "N/A",
+      topArtist: stats.top_artist || "N/A",
+      topGenre: stats.top_genre || "N/A",
     };
   } catch (err) {
     console.error("QuickStats error:", err);
-    return { topTrack: "N/A", topArtist: "N/A", topGenre: "N/A" };
+    return {
+      topTrack: "N/A",
+      topArtist: "N/A",
+      topGenre: "N/A",
+    };
   }
 }
+
 
