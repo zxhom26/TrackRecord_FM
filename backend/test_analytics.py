@@ -23,6 +23,7 @@ class MockSpotifyAPIProxy(SpotifyAPIProxy):
         self.api = MockSpotifyAPI()
         self.cache = {}
         self.base_url = "https://api.spotify.com/v1"
+        self.access_token = "TEST"
 
 
 # ----------------------------------------------------
