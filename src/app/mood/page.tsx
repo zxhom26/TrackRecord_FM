@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
 import {
@@ -28,7 +29,6 @@ const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
   "🌙 Calm & Peaceful": <Cloud size={42} className="text-sky-300" />,
 };
 
-
 interface SpotifyArtist {
   name: string;
   genres: string[];
@@ -36,6 +36,7 @@ interface SpotifyArtist {
 
 export default function MoodPage() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [moods, setMoods] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,16 +48,22 @@ export default function MoodPage() {
     setMoods([]);
 
     const response = await fetchTopArtists(session.accessToken);
-
     const items: SpotifyArtist[] = response?.top_artists ?? [];
 
     const allGenres = items.flatMap((artist: SpotifyArtist) => artist.genres);
-
     const topMoods = getTopMoodsFromGenres(allGenres);
-    setMoods(topMoods);
 
+    setMoods(topMoods);
     setLoading(false);
   };
+
+  // Redirect handlers
+  const goProfile = () => router.push("/profile");
+  const goHome = () => router.push("/");
+  const goAnalytics = () => router.push("/analytics");
+  const goMood = () => router.push("/mood");
+  const goSpotify = () =>
+    window.open("https://open.spotify.com", "_blank");
 
   return (
     <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white">
@@ -96,12 +103,43 @@ export default function MoodPage() {
           </svg>
         </div>
 
-        {/* Sidebar Icons */}
+        {/* Sidebar Icons (with redirects) */}
         <div className="flex flex-col items-center gap-8 text-white/70">
-          <User size={28} className="hover:text-white cursor-pointer" />
-          <Home size={28} className="hover:text-white cursor-pointer" />
-          <BarChart3 size={28} className="hover:text-white cursor-pointer" />
-          <Music size={28} className="hover:text-white cursor-pointer" />
+
+          {/* PROFILE */}
+          <User
+            size={28}
+            className="hover:text-white cursor-pointer"
+            onClick={goProfile}
+          />
+
+          {/* HOME */}
+          <Home
+            size={28}
+            className="hover:text-white cursor-pointer"
+            onClick={goHome}
+          />
+
+          {/* ANALYTICS */}
+          <BarChart3
+            size={28}
+            className="hover:text-white cursor-pointer"
+            onClick={goAnalytics}
+          />
+
+          {/* SPOTIFY */}
+          <Music
+            size={28}
+            className="hover:text-white cursor-pointer"
+            onClick={goSpotify}
+          />
+
+          {/* MOOD (current page) */}
+          <Flame
+            size={28}
+            className="hover:text-white cursor-pointer mt-4"
+            onClick={goMood}
+          />
         </div>
       </aside>
 
