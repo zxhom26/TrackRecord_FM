@@ -25,13 +25,21 @@ export default function HomePage() {
 
   // Fetch QuickStats on load
   useEffect(() => {
-    if (!session?.accessToken) return;
+    const token = session?.accessToken;
+    if (!token) return;
 
     async function loadStats() {
-      setLoadingQuickStats(true);
-      const stats = await getQuickStats(session.accessToken);
-      setQuickStats(stats);
-      setLoadingQuickStats(false);
+      try {
+        setLoadingQuickStats(true);
+
+        // FIXED null issue: session?.accessToken
+        const stats = await getQuickStats(token);
+        setQuickStats(stats);
+      } catch (err) {
+        console.error("QuickStats error:", err);
+      } finally {
+        setLoadingQuickStats(false);
+      }
     }
 
     loadStats();
@@ -131,7 +139,7 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* =============== ANALYTICS CARD (Link) =============== */}
+        {/* ANALYTICS */}
         <Link
           href="/analytics"
           className="
@@ -150,7 +158,7 @@ export default function HomePage() {
           </p>
         </Link>
 
-        {/* =============== MOOD CARD (Link) =============== */}
+        {/* MOOD */}
         <Link
           href="/mood"
           className="
@@ -168,6 +176,7 @@ export default function HomePage() {
             Understand your musical identity through emotion-based analysis.
           </p>
         </Link>
+
       </div>
     </main>
   );
