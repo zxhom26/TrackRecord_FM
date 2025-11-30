@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import AuthButton from "../components/AuthButton";
 import Image from "next/image";
+import Logo from "../components/Logo";
 
 export default function LoginPage() {
   const { data: session } = useSession();
@@ -35,33 +36,9 @@ export default function LoginPage() {
       {/* ================== TOP BAR ================== */}
       <div className="w-full flex items-center justify-between px-8 pt-6 relative z-20">
 
-        {/* LOGO */}
+        {/* LOGO COMPONENT */}
         <div className="flex items-center gap-3">
-          <svg
-            width="120"
-            height="40"
-            viewBox="0 0 400 200"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="60" cy="80" r="40" fill="url(#grad)" />
-            <polygon points="50,60 50,100 80,80" fill="white" />
-
-            <rect x="130" y="50" width="20" height="80" rx="10" fill="url(#grad)" />
-            <rect x="170" y="60" width="20" height="60" rx="10" fill="url(#grad)" />
-            <rect x="210" y="30" width="20" height="120" rx="10" fill="url(#grad)" />
-            <rect x="250" y="45" width="20" height="90" rx="10" fill="url(#grad)" />
-            <rect x="290" y="35" width="20" height="110" rx="10" fill="url(#grad)" />
-            <rect x="330" y="55" width="20" height="70" rx="10" fill="url(#grad)" />
-            <rect x="370" y="70" width="20" height="40" rx="10" fill="url(#grad)" />
-
-            <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#a160ff" />
-                <stop offset="100%" stopColor="#ff985c" />
-              </linearGradient>
-            </defs>
-          </svg>
-
+          <Logo width={120} height={40} />
           <span className="text-xl font-semibold tracking-wide text-white/95">
             TrackRecord FM
           </span>
@@ -94,7 +71,7 @@ export default function LoginPage() {
 
         <p className="text-lg mt-4 text-white/90 font-semibold">
           Explore your listening patterns, discover your mood profile,
-          and dive into the sound that makes you—you.
+          and dive into the sound that makes you, YOU.
         </p>
 
       </div>
