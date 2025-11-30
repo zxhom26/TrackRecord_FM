@@ -67,6 +67,7 @@ export const authOptions = {
           accessToken: account.access_token,
           refreshToken: account.refresh_token,
           expiresAt: Date.now() + account.expires_in * 1000,
+          userId: account.providerAccountId, // ← ADD THIS LINE
         };
       }
 
@@ -84,6 +85,7 @@ export const authOptions = {
       session.refreshToken = token.refreshToken;
       session.expiresAt = token.expiresAt;
       session.error = token.error;
+      session.user.id = token.userId; // ← ADDED THIS LINE -- TRYING NAME IMPLEMENTATION
       return session;
     },
   },
