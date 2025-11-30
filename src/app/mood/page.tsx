@@ -2,32 +2,38 @@
 
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+import Sidebar from "../components/Sidebar";
+import Logo from "../components/Logo"; // correct path & lowercase file
+
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
 import {
-  Home,
-  User,
-  BarChart3,
-  Music,
   RefreshCw,
   Flame,
   Cloud,
   PartyPopper,
+  Leaf,
+  Zap,
+  BookOpen,
+  Sun,
+  Moon,
+  BrainCircuit,
 } from "lucide-react";
 
-// Mood → Icon map
+// Mood → Icon map (unchanged)
 const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
-  "🔥 Bold & Confident": <Flame size={42} className="text-red-400" />,
-  "💙 Smooth & Chill": <Cloud size={42} className="text-blue-400" />,
-  "🎉 Upbeat & Fun": <PartyPopper size={42} className="text-purple-400" />,
-  "🌿 Mellow & Indie": <Cloud size={42} className="text-green-400" />,
-  "⚡ High Energy": <Flame size={42} className="text-yellow-300" />,
-  "🤘 Intense & Driven": <Flame size={42} className="text-orange-400" />,
-  "📚 Chill Study Vibes": <Cloud size={42} className="text-indigo-300" />,
-  "💃 Vibrant & Rhythmic": <PartyPopper size={42} className="text-pink-400" />,
-  "🌙 Calm & Peaceful": <Cloud size={42} className="text-sky-300" />,
+  "Bold & Confident": <Flame size={42} className="text-red-400" />,
+  "Smooth & Chill": <Cloud size={42} className="text-blue-400" />,
+  "Upbeat & Fun": <PartyPopper size={42} className="text-purple-400" />,
+  "Mellow & Indie": <Leaf size={42} className="text-green-400" />,
+  "High Energy": <Zap size={42} className="text-yellow-300" />,
+  "Intense & Driven": <BrainCircuit size={42} className="text-orange-400" />,
+  "Chill Study Vibes": <BookOpen size={42} className="text-indigo-300" />,
+  "Vibrant & Rhythmic": <Sun size={42} className="text-pink-400" />,
+  "Calm & Peaceful": <Moon size={42} className="text-sky-300" />,
 };
-
 
 interface SpotifyArtist {
   name: string;
@@ -36,6 +42,7 @@ interface SpotifyArtist {
 
 export default function MoodPage() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [moods, setMoods] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,68 +54,33 @@ export default function MoodPage() {
     setMoods([]);
 
     const response = await fetchTopArtists(session.accessToken);
-
     const items: SpotifyArtist[] = response?.top_artists ?? [];
 
-    const allGenres = items.flatMap((artist: SpotifyArtist) => artist.genres);
-
+    const allGenres = items.flatMap(a => a.genres || []);
     const topMoods = getTopMoodsFromGenres(allGenres);
-    setMoods(topMoods);
 
+    setMoods(topMoods);
     setLoading(false);
   };
 
   return (
-    <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white">
+    <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white relative">
 
-      {/* ================== SIDEBAR ================== */}
-      <aside
-        className="
-          w-[150px]
-          bg-[#141414]
-          flex flex-col
-          items-center
-          py-10
-          gap-10
-          shadow-xl
-        "
-      >
-        {/* Logo */}
-        <div>
-          <svg width="80" height="60" viewBox="0 0 400 200">
-            {/* Play circle */}
-            <circle cx="60" cy="80" r="40" fill="url(#grad)" />
-            <polygon points="50,60 50,100 80,80" fill="white" />
+      {/* SIDEBAR + LOGO OVERLAY */}
+      <div className="relative">
+        {/* Sidebar */}
+        <Sidebar active="mood" />
 
-            {/* Waveform bars */}
-            <rect x="130" y="50" width="20" height="80" rx="10" fill="url(#grad)" />
-            <rect x="170" y="60" width="20" height="60" rx="10" fill="url(#grad)" />
-            <rect x="210" y="30" width="20" height="120" rx="10" fill="url(#grad)" />
-            <rect x="250" y="45" width="20" height="90" rx="10" fill="url(#grad)" />
-            <rect x="290" y="35" width="20" height="110" rx="10" fill="url(#grad)" />
-
-            <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#a160ff" />
-                <stop offset="100%" stopColor="#ff985c" />
-              </linearGradient>
-            </defs>
-          </svg>
+        {/* OVERLAY LOGO */}
+        <div className="absolute top-6 left-6 z-50">
+          <Logo width={50} height={32} />
         </div>
+      </div>
 
-        {/* Sidebar Icons */}
-        <div className="flex flex-col items-center gap-8 text-white/70">
-          <User size={28} className="hover:text-white cursor-pointer" />
-          <Home size={28} className="hover:text-white cursor-pointer" />
-          <BarChart3 size={28} className="hover:text-white cursor-pointer" />
-          <Music size={28} className="hover:text-white cursor-pointer" />
-        </div>
-      </aside>
-
-      {/* ================== MAIN CONTENT ================== */}
+      {/* Main Content */}
       <main className="flex-1 p-12">
 
-        {/* Page Title */}
+        {/* Header Title */}
         <h1 className="text-4xl font-bold">
           <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
             Mood Profile
@@ -131,7 +103,7 @@ export default function MoodPage() {
           {loading ? "Refreshing..." : "Refresh Mood Profile"}
         </button>
 
-        {/* ================== MOOD CARDS ================== */}
+        {/* Mood Cards */}
         <div className="mt-10 flex flex-col gap-6 max-w-3xl">
           {moods.map((mood, idx) => (
             <div
@@ -147,7 +119,7 @@ export default function MoodPage() {
                 {MOOD_ICON_MAP[mood] ?? <Flame size={42} />}
               </div>
 
-              {/* Mood Text */}
+              {/* Text */}
               <div>
                 <h2 className="text-2xl font-bold">{mood}</h2>
                 <p className="text-white/70 mt-1">

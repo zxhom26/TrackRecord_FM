@@ -6,6 +6,9 @@ import { BarChart3, PieChart, Brain } from "lucide-react";
 import Link from "next/link";
 import { getQuickStats } from "../utils";
 
+// NEW — import your logo component
+import Logo from "./components/Logo";
+
 interface QuickStats {
   topTrack: string;
   topArtist: string;
@@ -32,7 +35,6 @@ export default function HomePage() {
       try {
         setLoadingQuickStats(true);
 
-        // FIXED null issue: session?.accessToken
         const stats = await getQuickStats(token);
         setQuickStats(stats);
       } catch (err) {
@@ -53,22 +55,7 @@ export default function HomePage() {
 
         {/* LOGO */}
         <div className="flex items-center gap-3">
-          <svg width="55" height="35" viewBox="0 0 200 100">
-            <defs>
-              <linearGradient id="logoGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#a160ff" />
-                <stop offset="100%" stopColor="#ff985c" />
-              </linearGradient>
-            </defs>
-
-            <circle cx="28" cy="50" r="12" fill="url(#logoGradient)" />
-            <rect x="60" y="30" width="10" height="40" rx="3" fill="url(#logoGradient)" />
-            <rect x="80" y="20" width="10" height="60" rx="3" fill="url(#logoGradient)" />
-            <rect x="100" y="10" width="10" height="80" rx="3" fill="url(#logoGradient)" />
-            <rect x="120" y="25" width="10" height="50" rx="3" fill="url(#logoGradient)" />
-            <rect x="140" y="35" width="10" height="30" rx="3" fill="url(#logoGradient)" />
-          </svg>
-
+          <Logo width={55} height={35} />
           <span className="text-xl font-semibold tracking-wide text-white/95">
             TrackRecord FM
           </span>
