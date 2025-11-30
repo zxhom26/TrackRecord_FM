@@ -1,18 +1,56 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { BarChart3, PieChart, Brain } from "lucide-react";
 import Link from "next/link";
+import { getQuickStats } from "../utils";
+
+interface QuickStats {
+  topTrack: string;
+  topArtist: string;
+  topGenre: string;
+}
 
 export default function HomePage() {
-  // we no longer use username here — just keeping session in case you use it later
   const { data: session } = useSession();
+
+  const [quickStats, setQuickStats] = useState<QuickStats>({
+    topTrack: "Loading…",
+    topArtist: "Loading…",
+    topGenre: "Loading…",
+  });
+
+  const [loadingQuickStats, setLoadingQuickStats] = useState(true);
+
+  // Fetch QuickStats on load
+  useEffect(() => {
+    const token = session?.accessToken;
+    if (!token) return;
+
+    async function loadStats() {
+      try {
+        setLoadingQuickStats(true);
+
+        // FIXED null issue: session?.accessToken
+        const stats = await getQuickStats(token);
+        setQuickStats(stats);
+      } catch (err) {
+        console.error("QuickStats error:", err);
+      } finally {
+        setLoadingQuickStats(false);
+      }
+    }
+
+    loadStats();
+  }, [session?.accessToken]);
 
   return (
     <main className="min-h-screen bg-[#1b1b1b] text-white px-10 pb-32">
 
       {/* ====================== TOP BAR ====================== */}
       <div className="flex items-center justify-between py-6">
+
         {/* LOGO */}
         <div className="flex items-center gap-3">
           <svg width="55" height="35" viewBox="0 0 200 100">
@@ -23,15 +61,12 @@ export default function HomePage() {
               </linearGradient>
             </defs>
 
-            {/* circular eye */}
             <circle cx="28" cy="50" r="12" fill="url(#logoGradient)" />
-
-            {/* waveform bars */}
-            <rect x="60" y="30" width="10" height="40" fill="url(#logoGradient)" rx="3" />
-            <rect x="80" y="20" width="10" height="60" fill="url(#logoGradient)" rx="3" />
-            <rect x="100" y="10" width="10" height="80" fill="url(#logoGradient)" rx="3" />
-            <rect x="120" y="25" width="10" height="50" fill="url(#logoGradient)" rx="3" />
-            <rect x="140" y="35" width="10" height="30" fill="url(#logoGradient)" rx="3" />
+            <rect x="60" y="30" width="10" height="40" rx="3" fill="url(#logoGradient)" />
+            <rect x="80" y="20" width="10" height="60" rx="3" fill="url(#logoGradient)" />
+            <rect x="100" y="10" width="10" height="80" rx="3" fill="url(#logoGradient)" />
+            <rect x="120" y="25" width="10" height="50" rx="3" fill="url(#logoGradient)" />
+            <rect x="140" y="35" width="10" height="30" rx="3" fill="url(#logoGradient)" />
           </svg>
 
           <span className="text-xl font-semibold tracking-wide text-white/95">
@@ -74,7 +109,7 @@ export default function HomePage() {
       {/* ====================== 3 FEATURE CARDS ====================== */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
 
-        {/* ----------- QUICK STATS CARD (NO REDIRECT) ----------- */}
+        {/* =============== QUICK STATS CARD =============== */}
         <div
           className="
             rounded-3xl p-10
@@ -82,23 +117,29 @@ export default function HomePage() {
             border border-white/10 shadow-xl
             hover:scale-[1.03] hover:border-white/20
             transition-all cursor-default
-
-            flex flex-col justify-between items-center
-            min-h-[260px]
+            flex flex-col gap-6 items-center text-center
+            min-h-[280px]
           "
         >
-          <BarChart3 size={42} className="text-purple-400 mb-4" />
-
+          <BarChart3 size={42} className="text-purple-400" />
           <h2 className="text-2xl font-semibold">QuickStats</h2>
 
-          <ul className="mt-4 text-white/80 leading-relaxed text-center">
-            <li>1. Top Track</li>
-            <li>2. Top Artist</li>
-            <li>3. Top Genre</li>
-          </ul>
+          {loadingQuickStats ? (
+            <ul className="mt-2 text-white/50 animate-pulse">
+              <li>Loading top track…</li>
+              <li>Loading top artist…</li>
+              <li>Loading top genre…</li>
+            </ul>
+          ) : (
+            <ul className="mt-3 text-white/80 leading-relaxed text-center">
+              <li>🎵 <b>Top Track:</b> {quickStats.topTrack}</li>
+              <li>👤 <b>Top Artist:</b> {quickStats.topArtist}</li>
+              <li>🎧 <b>Top Genre:</b> {quickStats.topGenre}</li>
+            </ul>
+          )}
         </div>
 
-        {/* ----------- ANALYTICS (REDIRECT) ----------- */}
+        {/* ANALYTICS */}
         <Link
           href="/analytics"
           className="
@@ -106,22 +147,18 @@ export default function HomePage() {
             bg-[#ff88d715] backdrop-blur-md
             border border-white/10 shadow-xl
             hover:scale-[1.03] hover:border-white/20
-            transition-all
-
-            flex flex-col justify-between items-center
-            min-h-[260px]
+            transition-all flex flex-col gap-6 items-center text-center
+            min-h-[280px]
           "
         >
-          <PieChart size={42} className="text-pink-300 mb-4" />
-
-          <h2 className="text-2xl font-semibold text-center">View Your Analytics</h2>
-
-          <p className="text-white/80 text-center mt-3">
-            Dive deeper into your musical patterns, trends, and listening habits.
+          <PieChart size={42} className="text-pink-300" />
+          <h2 className="text-2xl font-semibold">View Your Analytics</h2>
+          <p className="text-white/80">
+            Dive deeper into your musical patterns and listening habits.
           </p>
         </Link>
 
-        {/* ----------- MOOD PROFILE (REDIRECT) ----------- */}
+        {/* MOOD */}
         <Link
           href="/mood"
           className="
@@ -129,20 +166,17 @@ export default function HomePage() {
             bg-[#ff987515] backdrop-blur-md
             border border-white/10 shadow-xl
             hover:scale-[1.03] hover:border-white/20
-            transition-all
-
-            flex flex-col justify-between items-center
-            min-h-[260px]
+            transition-all flex flex-col gap-6 items-center text-center
+            min-h-[280px]
           "
         >
-          <Brain size={42} className="text-orange-300 mb-4" />
-
-          <h2 className="text-2xl font-semibold text-center">View Your Mood Profile</h2>
-
-          <p className="text-white/80 text-center mt-3">
+          <Brain size={42} className="text-orange-300" />
+          <h2 className="text-2xl font-semibold">View Your Mood Profile</h2>
+          <p className="text-white/80">
             Understand your musical identity through emotion-based analysis.
           </p>
         </Link>
+
       </div>
     </main>
   );
