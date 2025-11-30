@@ -139,3 +139,32 @@ export function getTopMoodsFromGenres(genres) {
     .map((pair) => pair[0])
     .slice(0, 3);
 }
+
+// --- Fetch QuickStats ---
+export async function getQuickStats(token) {
+  try {
+    const backend = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+    const res = await fetch(`${backend}/api/quick-stats`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken: token })
+    });
+
+    if (!res.ok) {
+      throw new Error(`QuickStats request failed: ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    return {
+      topTrack: data?.quick_stats?.top_track || "N/A",
+      topArtist: data?.quick_stats?.top_artist || "N/A",
+      topGenre: data?.quick_stats?.top_genre || "N/A",
+    };
+  } catch (err) {
+    console.error("QuickStats error:", err);
+    return { topTrack: "N/A", topArtist: "N/A", topGenre: "N/A" };
+  }
+}
+
