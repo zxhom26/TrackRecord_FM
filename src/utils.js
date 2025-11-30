@@ -89,29 +89,29 @@ export async function fetchTopArtists(token) {
 // ─────────────────────────────────────────
 
 const GENRE_TO_MOOD_MAP = [
-  { key: "rap", mood: "🔥 Bold & Confident" },
-  { key: "hip hop", mood: "🔥 Bold & Confident" },
-  { key: "trap", mood: "🔥 Bold & Confident" },
+  { key: "rap", mood: "Bold & Confident" },
+  { key: "hip hop", mood: "Bold & Confident" },
+  { key: "trap", mood: "Bold & Confident" },
 
-  { key: "pop", mood: "🎉 Upbeat & Fun" },
+  { key: "pop", mood: "Upbeat & Fun" },
 
-  { key: "r&b", mood: "💙 Smooth & Chill" },
-  { key: "dark r&b", mood: "💙 Smooth & Chill" },
-  { key: "trap soul", mood: "💙 Smooth & Chill" },
+  { key: "r&b", mood: "Smooth & Chill" },
+  { key: "dark r&b", mood: "Smooth & Chill" },
+  { key: "trap soul", mood: "Smooth & Chill" },
 
-  { key: "indie", mood: "🌿 Mellow & Indie" },
+  { key: "indie", mood: "Mellow & Indie" },
 
-  { key: "edm", mood: "⚡ High Energy" },
-  { key: "dance", mood: "⚡ High Energy" },
+  { key: "edm", mood: "High Energy" },
+  { key: "dance", mood: "High Energy" },
 
-  { key: "rock", mood: "🤘 Intense & Driven" },
+  { key: "rock", mood: "Intense & Driven" },
 
-  { key: "lofi", mood: "📚 Chill Study Vibes" },
-  { key: "lo-fi", mood: "📚 Chill Study Vibes" },
+  { key: "lofi", mood: "Chill Study Vibes" },
+  { key: "lo-fi", mood: "Chill Study Vibes" },
 
-  { key: "latin", mood: "💃 Vibrant & Rhythmic" },
+  { key: "latin", mood: "Vibrant & Rhythmic" },
 
-  { key: "classical", mood: "🌙 Calm & Peaceful" },
+  { key: "classical", mood: "Calm & Peaceful" },
 ];
 
 export function getTopMoodsFromGenres(genres) {
