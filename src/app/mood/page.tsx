@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
 import {
   Home,
-  User,
   BarChart3,
   Music,
   RefreshCw,
@@ -14,7 +14,6 @@ import {
   Cloud,
   PartyPopper,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 // Mood → Icon map
 const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
@@ -41,7 +40,20 @@ export default function MoodPage() {
   const [moods, setMoods] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Refresh mood profile
+  // --------- SIDE NAV HANDLERS ---------
+  const goHome = () => {
+    router.push("/");
+  };
+
+  const goAnalytics = () => {
+    router.push("/analytics");
+  };
+
+  const goSpotifyDashboard = () => {
+    window.open("https://open.spotify.com", "_blank", "noopener,noreferrer");
+  };
+
+  // --------- MAIN REFRESH HANDLER ---------
   const handleRefresh = async () => {
     if (!session?.accessToken) return;
 
@@ -50,37 +62,19 @@ export default function MoodPage() {
 
     const response = await fetchTopArtists(session.accessToken);
 
+    // Using the analytics-based backend: { top_artists: [...] }
     const items: SpotifyArtist[] = response?.top_artists ?? [];
 
-    const allGenres = items.flatMap((artist) => artist.genres || []);
+    const allGenres = items.flatMap((artist: SpotifyArtist) => artist.genres || []);
+
     const topMoods = getTopMoodsFromGenres(allGenres);
-
     setMoods(topMoods);
+
     setLoading(false);
-  };
-
-  // ----------- REDIRECT FUNCTIONS -----------
-  const goHome = () => router.push("/");
-
-  const goAnalytics = () => router.push("/analytics");
-
-  const goSpotifyDashboard = () =>
-    window.open("https://open.spotify.com", "_blank");
-
-  const goSpotifyProfile = () => {
-    const spotifyId = session?.user?.id;
-
-    if (!spotifyId) {
-      alert("Spotify profile unavailable — try re-logging in.");
-      return;
-    }
-
-    window.open(`https://open.spotify.com/user/${spotifyId}`, "_blank");
   };
 
   return (
     <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white">
-
       {/* ================== SIDEBAR ================== */}
       <aside
         className="
@@ -96,9 +90,11 @@ export default function MoodPage() {
         {/* Logo */}
         <div>
           <svg width="80" height="60" viewBox="0 0 400 200">
+            {/* Play circle */}
             <circle cx="60" cy="80" r="40" fill="url(#grad)" />
             <polygon points="50,60 50,100 80,80" fill="white" />
 
+            {/* Waveform bars */}
             <rect x="130" y="50" width="20" height="80" rx="10" fill="url(#grad)" />
             <rect x="170" y="60" width="20" height="60" rx="10" fill="url(#grad)" />
             <rect x="210" y="30" width="20" height="120" rx="10" fill="url(#grad)" />
@@ -116,41 +112,40 @@ export default function MoodPage() {
 
         {/* Sidebar Icons */}
         <div className="flex flex-col items-center gap-8 text-white/70">
-          <User
-            size={28}
-            className="hover:text-white cursor-pointer"
-            onClick={goSpotifyProfile}
-          />
-
-          <Home
-            size={28}
-            className="hover:text-white cursor-pointer"
+          {/* HOME */}
+          <button
             onClick={goHome}
-          />
+            className="hover:text-white cursor-pointer transition"
+          >
+            <Home size={28} />
+          </button>
 
-          <BarChart3
-            size={28}
-            className="hover:text-white cursor-pointer"
+          {/* ANALYTICS (bar chart) */}
+          <button
             onClick={goAnalytics}
-          />
+            className="hover:text-white cursor-pointer transition"
+          >
+            <BarChart3 size={28} />
+          </button>
 
-          <Music
-            size={28}
-            className="hover:text-white cursor-pointer"
+          {/* SPOTIFY DASHBOARD */}
+          <button
             onClick={goSpotifyDashboard}
-          />
+            className="hover:text-white cursor-pointer transition"
+          >
+            <Music size={28} />
+          </button>
         </div>
       </aside>
 
       {/* ================== MAIN CONTENT ================== */}
       <main className="flex-1 p-12">
-
         {/* Page Title */}
         <h1 className="text-4xl font-bold">
           <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
             Mood Profile
           </span>{" "}
-          on {new Date().toLocaleDateString()}:
+          On {new Date().toLocaleDateString()}:
         </h1>
 
         {/* Refresh Button */}
@@ -194,7 +189,6 @@ export default function MoodPage() {
             </div>
           ))}
         </div>
-
       </main>
     </div>
   );
