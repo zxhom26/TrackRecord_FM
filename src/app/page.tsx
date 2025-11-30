@@ -7,7 +7,7 @@ import Link from "next/link";
 import { getQuickStats } from "../utils";
 
 // NEW — import your logo component
-import Logo from "../components/Logo";
+import Logo from "./components/Logo";
 
 interface QuickStats {
   topTrack: string;
