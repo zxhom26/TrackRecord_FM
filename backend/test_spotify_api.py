@@ -11,6 +11,9 @@ class MockAPI(APIInterface):
     def __init__(self, token="TEST_TOKEN"):
         self.token = token
         self.fetch_api = AsyncMock()
+    
+    async def fetch_api(self, *args, **kwargs):
+        return await self.fetch_api(*args, **kwargs)
 
     def get_token(self):
         return self.token
