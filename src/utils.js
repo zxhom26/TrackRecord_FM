@@ -84,6 +84,75 @@ export async function fetchTopArtists(token) {
   }
 }
 
+// --- Fetch Recently Played (matches getRecentlyPlayed in backend) ---
+export async function fetchRecentlyPlayed(token) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recently-played`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: token }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Recently played failed: ${response.status}`);
+    }
+
+    return await response.json(); // { recently_played: [...] }
+  } catch (err) {
+    console.error("fetchRecentlyPlayed error:", err);
+    return { error: err.message };
+  }
+}
+
+// --- Fetch Top Genres ---
+export async function fetchTopGenres(token) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-genres`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: token }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Top genres failed: ${response.status}`);
+    }
+
+    return await response.json(); // { top_genres: [...] }
+  } catch (err) {
+    console.error("fetchTopGenres error:", err);
+    return { error: err.message };
+  }
+}
+
+// --- Fetch Recommendations ---
+export async function fetchRecommendations(token) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recommendations`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: token }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Recommendations failed: ${response.status}`);
+    }
+
+    return await response.json(); // { recommendations: [...] }
+  } catch (err) {
+    console.error("fetchRecommendations error:", err);
+    return { error: err.message };
+  }
+}
+
 // ─────────────────────────────────────────
 //   Composite Mood Classifier (Top 3 Moods)
 // ─────────────────────────────────────────
