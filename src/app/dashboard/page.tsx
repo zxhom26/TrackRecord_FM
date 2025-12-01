@@ -28,7 +28,7 @@ import {
 } from "recharts";
 
 /* ----------------------------------------
-   TYPES
+   TYPES — STRICT (NO `any`)
 -----------------------------------------*/
 interface SpotifyArtist {
   name: string;
@@ -39,6 +39,7 @@ interface RecentlyPlayedItem {
   "track.duration_ms"?: number;
   "track.name"?: string;
   "track.artists"?: SpotifyArtist[];
+  "track.genres"?: string[];
   [key: string]: unknown;
 }
 
@@ -52,7 +53,7 @@ interface RecommendationItem {
 
 interface LineDataPoint {
   date: string;
-  minutes: number; // <-- now represents TRACK COUNT
+  minutes: number;
 }
 
 interface BarDataPoint {
@@ -64,12 +65,12 @@ interface PieDataPoint {
   genre: string;
   count: number;
   percentage: number;
-  [key: string]: string | number;   // <-- REQUIRED FOR RECHARTS
+  [key: string]: string | number;
 }
 
 
 /* ----------------------------------------
-   THEME COLORS
+   THEME COLORS — BLACK DIAMOND
 -----------------------------------------*/
 const BD_COLORS = [
   "#A78BFA",
@@ -110,9 +111,8 @@ function SimpleCard({
     </div>
   );
 }
-
 /* ----------------------------------------
-   GENRE DETAIL SECTION (SAFE + ACCURATE)
+   GENRE DETAIL SECTION
 -----------------------------------------*/
 function GenreDetailSection({
   genre,
@@ -126,11 +126,20 @@ function GenreDetailSection({
   const artistCount: Record<string, number> = {};
 
   recentlyPlayed.forEach((item: RecentlyPlayedItem) => {
-    const artists = item["track.artists"] ?? [];
-    artists.forEach((artist: SpotifyArtist) => {
-      const name = artist.name;
-      artistCount[name] = (artistCount[name] || 0) + 1;
-    });
+    const genres = item["track.genres"];
+    if (!Array.isArray(genres)) return;
+
+    const match = genres.some((g) =>
+      g.toLowerCase().includes(genre.toLowerCase())
+    );
+
+    if (match) {
+      const artists = item["track.artists"] ?? [];
+      artists.forEach((a) => {
+        const name = a.name;
+        artistCount[name] = (artistCount[name] || 0) + 1;
+      });
+    }
   });
 
   const topArtists = Object.entries(artistCount)
@@ -141,13 +150,8 @@ function GenreDetailSection({
   return (
     <div className="mt-4 p-4 rounded-2xl bg-[#151622] border border-white/10 shadow-lg">
       <h3 className="text-xl font-semibold text-white mb-2">
-        Top Artists While Listening to {genre}
+        Top Artists in {genre}
       </h3>
-
-      <p className="text-white/40 text-xs mb-2">
-        *Spotify does not return genre per track. This shows your most-played
-        artists during sessions associated with {genre}.
-      </p>
 
       {topArtists.length === 0 ? (
         <p className="text-white/50">No artists found.</p>
@@ -159,7 +163,7 @@ function GenreDetailSection({
               className="flex justify-between text-white/80 border-b border-white/10 pb-1"
             >
               <span>{a.artist}</span>
-              <span className="text-white/50">{a.count} plays</span>
+              <span className="text-white/50">{a.count} tracks</span>
             </li>
           ))}
         </ul>
@@ -168,67 +172,62 @@ function GenreDetailSection({
   );
 }
 
-
 /* ----------------------------------------
-   HEATMAP (AM/PM LABELS)
+   HEATMAP (24 hours)
 -----------------------------------------*/
 function HeatmapRenderer({ data }: { data: number[] }) {
   const maxVal = Math.max(...data);
 
   return (
     <div>
-      {/* FIRST ROW */}
+      {/* 2-row layout */}
       <div className="grid grid-cols-12 gap-1">
         {data.slice(0, 12).map((val, hour) => {
           const intensity = maxVal === 0 ? 0 : val / maxVal;
           const idx = Math.min(5, Math.floor(intensity * 5));
+
           return (
             <div
               key={hour}
-              title={`${hourLabel(hour)} — ${val} mins`}
-              className="h-8 rounded-md"
+              title={`${hour}:00 — ${val} minutes`}
+              className="h-8 rounded-md transition-all duration-150"
               style={{
                 backgroundColor: HEATMAP_COLORS[idx],
+                border: "1px solid rgba(255,255,255,0.08)",
               }}
             />
           );
         })}
       </div>
 
-      {/* SECOND ROW */}
       <div className="grid grid-cols-12 gap-1 mt-1">
-        {data.slice(12).map((val, i) => {
-          const hour = i + 12;
+        {data.slice(12).map((val, idx) => {
+          const hour = idx + 12;
           const intensity = maxVal === 0 ? 0 : val / maxVal;
-          const idx = Math.min(5, Math.floor(intensity * 5));
+          const i = Math.min(5, Math.floor(intensity * 5));
+
           return (
             <div
               key={hour}
-              title={`${hourLabel(hour)} — ${val} mins`}
-              className="h-8 rounded-md"
+              title={`${hour}:00 — ${val} minutes`}
+              className="h-8 rounded-md transition-all duration-150"
               style={{
-                backgroundColor: HEATMAP_COLORS[idx],
+                backgroundColor: HEATMAP_COLORS[i],
+                border: "1px solid rgba(255,255,255,0.08)",
               }}
             />
           );
         })}
       </div>
 
-      {/* LABELS */}
+      {/* Label row */}
       <div className="flex justify-between mt-2 text-white/50 text-xs">
         {Array.from({ length: 24 }).map((_, i) => (
-          <span key={i}>{hourLabel(i)}</span>
+          <span key={i}>{i}</span>
         ))}
       </div>
     </div>
   );
-}
-
-function hourLabel(h: number): string {
-  if (h === 0) return "12 AM";
-  if (h < 12) return `${h} AM`;
-  if (h === 12) return "12 PM";
-  return `${h - 12} PM`;
 }
 
 /* ----------------------------------------
@@ -261,7 +260,7 @@ function TopArtistsBar({
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={artistsToShow} layout="vertical">
           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-          <XAxis type="number" stroke="#ffffff90" />
+          <XAxis stroke="#ffffff90" type="number" />
           <YAxis
             type="category"
             dataKey="artist"
@@ -269,34 +268,29 @@ function TopArtistsBar({
             stroke="#ffffff90"
           />
           <Tooltip
-            formatter={(v) => [`${v} plays`, "Play Count"]}
             contentStyle={{
               backgroundColor: "#1b1c29",
               border: "1px solid rgba(255,255,255,0.1)",
               color: "white",
+              borderRadius: "8px",
             }}
           />
           <Bar dataKey="count" fill="url(#artistGradient)" radius={[8, 8, 8, 8]} />
 
           <defs>
-            <linearGradient id="artistGradient" x1="0" x2="1">
+            <linearGradient id="artistGradient" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0%" stopColor="#A78BFA" />
               <stop offset="100%" stopColor="#E879F9" />
             </linearGradient>
           </defs>
         </BarChart>
       </ResponsiveContainer>
-
-      <p className="text-white/40 text-xs mt-2">
-        *Count = number of times this artist appeared in your recent listening
-        history.
-      </p>
     </div>
   );
 }
 
 /* ----------------------------------------
-   DONUT CHART — GENRES (%)
+   DONUT CHART – GENRES
 -----------------------------------------*/
 function DonutChart({
   pieData,
@@ -315,47 +309,44 @@ function DonutChart({
 
       <ResponsiveContainer width="100%" height={350}>
         <PieChart>
-       <Tooltip
-  formatter={(value, name, item) => {
-    const p = item as unknown as { payload?: PieDataPoint };
-    const pct = p?.payload?.percentage ?? 0;
-    return [`${pct}%`, "Genre"];
-  }}
-  contentStyle={{
-    backgroundColor: "#1b1c29",
-    border: "1px solid rgba(255,255,255,0.1)",
-    color: "white",
-  }}
-/>
+          <Tooltip
+            formatter={(value: number, name: string) => [
+              `${value} tracks`,
+              name,
+            ]}
+            contentStyle={{
+              backgroundColor: "#1b1c29",
+              border: "1px solid rgba(255,255,255,0.1)",
+              color: "white",
+              borderRadius: "8px",
+            }}
+          />
 
+          <Legend wrapperStyle={{ color: "white" }} />
 
-
-
-<Pie
-  data={pieData}
-  dataKey="percentage"
-  nameKey="genre"
-  cx="50%"
-  cy="50%"
-  outerRadius={120}
-  innerRadius={60}
-  oonClick={(entry) => {
-  const e = entry as unknown as PieDataPoint;
-  setExpandedGenre(expandedGenre === e.genre ? null : e.genre);
-}}
-
-
->
-  {pieData.map((entry, i) => (
-    <Cell
-      key={i}
-      fill={BD_COLORS[i % BD_COLORS.length]}
-      stroke="#11121c"
-      strokeWidth={3}
-    />
-  ))}
-</Pie>
-
+          <Pie
+            data={pieData}
+            dataKey="count"
+            nameKey="genre"
+            cx="50%"
+            cy="50%"
+            outerRadius={120}
+            innerRadius={60}
+            onClick={(entry) =>
+              setExpandedGenre(
+                expandedGenre === entry.genre ? null : entry.genre
+              )
+            }
+          >
+            {pieData.map((entry, i) => (
+              <Cell
+                key={i}
+                fill={BD_COLORS[i % BD_COLORS.length]}
+                stroke="#0d0f18"
+                strokeWidth={2}
+              />
+            ))}
+          </Pie>
         </PieChart>
       </ResponsiveContainer>
 
@@ -368,26 +359,21 @@ function DonutChart({
     </div>
   );
 }
-
 /* ----------------------------------------
    MAIN DASHBOARD
 -----------------------------------------*/
 export default function DashboardPage() {
   const { data: session, status } = useSession();
 
-  const [recentlyPlayed, setRecentlyPlayed] =
-    useState<RecentlyPlayedItem[]>([]);
+  const [recentlyPlayed, setRecentlyPlayed] = useState<RecentlyPlayedItem[]>([]);
   const [topGenres, setTopGenres] = useState<GenreItem[]>([]);
-  const [recommendations, setRecommendations] =
-    useState<RecommendationItem[]>([]);
+  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const [lineData, setLineData] = useState<LineDataPoint[]>([]);
   const [artistBarData, setArtistBarData] = useState<BarDataPoint[]>([]);
   const [pieData, setPieData] = useState<PieDataPoint[]>([]);
-  const [heatmapData, setHeatmapData] = useState<number[]>(
-    new Array(24).fill(0)
-  );
+  const [heatmapData, setHeatmapData] = useState<number[]>(new Array(24).fill(0));
 
   const [expandedGenre, setExpandedGenre] = useState<string | null>(null);
   const [showAllArtists, setShowAllArtists] = useState<boolean>(false);
@@ -399,7 +385,7 @@ export default function DashboardPage() {
   });
 
   /* ----------------------------------------
-     FETCH & PROCESS DATA
+     FETCH DATA
   -----------------------------------------*/
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -423,32 +409,33 @@ export default function DashboardPage() {
         setTopGenres(genres);
         setRecommendations(recs);
 
-        /* ---------- DAILY TRACK COUNT ---------- */
-        const trackTotals: Record<string, number> = {};
+        /* ---------- LINE CHART ---------- */
+        const totals: Record<string, number> = {};
         recently.forEach((item: RecentlyPlayedItem) => {
           const date = item.played_at?.slice(0, 10);
+          const ms = item["track.duration_ms"] ?? 0;
           if (!date) return;
-                    trackTotals[date] = (trackTotals[date] || 0) + 1;
+          totals[date] = (totals[date] || 0) + ms;
         });
 
+
         setLineData(
-          Object.entries(trackTotals)
-            .map(([d, count]) => ({
+          Object.entries(totals)
+            .map(([d, ms]) => ({
               date: d,
-              minutes: count, // now "minutes" = track count — CLEAR & SAFE
+              minutes: Math.round(ms / 60000),
             }))
             .sort((a, b) => a.date.localeCompare(b.date))
         );
 
-        /* ---------- TOP ARTISTS ---------- */
+        /* ---------- BAR CHART ---------- */
         const artistCounts: Record<string, number> = {};
         recently.forEach((item: RecentlyPlayedItem) => {
-  const artists = (item["track.artists"] ?? []) as SpotifyArtist[];
-
-  artists.forEach((a: SpotifyArtist) => {
-    artistCounts[a.name] = (artistCounts[a.name] || 0) + 1;
-  });
-});
+          const artists = item["track.artists"] ?? [];
+          artists.forEach((a) => {
+            artistCounts[a.name] = (artistCounts[a.name] || 0) + 1;
+          });
+        });
 
 
         setArtistBarData(
@@ -457,46 +444,43 @@ export default function DashboardPage() {
             .sort((a, b) => b.count - a.count)
         );
 
-        /* ---------- PIE CHART (GENRE %) ---------- */
-        const genreCounts: Record<string, number> = {};
-        genres.forEach((g: GenreItem) => {
-          const name = g.genre ?? "Unknown";
-          genreCounts[name] = (genreCounts[name] || 0) + 1;
-        });
-
-        const sorted = Object.entries(genreCounts).sort(
-          (a, b) => b[1] - a[1]
-        );
-        const total = sorted.reduce((a, [, c]) => a + c, 0);
-
-        const top5 = sorted.slice(0, 5);
-        const others = sorted.slice(5).reduce((acc, [, v]) => acc + v, 0);
-
-        setPieData([
-          ...top5.map(([g, c]) => ({
-            genre: g,
-            count: c,
-            percentage: Number(((c / total) * 100).toFixed(1)),
-          })),
-          {
-            genre: "Other",
-            count: others,
-            percentage: Number(((others / total) * 100).toFixed(1)),
-          },
-        ]);
-
-        /* ---------- HEATMAP (MINS PER HOUR) ---------- */
-        const hourBins = new Array(24).fill(0);
-
-recently.forEach((item: RecentlyPlayedItem) => {
-  const t = item.played_at;
-  const ms = item["track.duration_ms"] ?? 0;
-
-  if (!t) return;
-
-  const h = new Date(t).getHours();
-  hourBins[h] += Math.round(ms / 60000);
+        /* ---------- PIE CHART ---------- */
+      /* ---------- PIE CHART ---------- */
+const genreCounts: Record<string, number> = {};
+genres.forEach((g: GenreItem) => {
+  const name = g.genre ?? "Unknown";
+  genreCounts[name] = (genreCounts[name] || 0) + 1;
 });
+
+const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+const total = sorted.reduce((a, [, c]) => a + c, 0);
+
+const top5 = sorted.slice(0, 5);
+const others = sorted.slice(5).reduce((acc, [, v]) => acc + v, 0);
+
+setPieData([
+  ...top5.map(([g, c]) => ({
+    genre: g,
+    count: c,
+    percentage: Number(((c / total) * 100).toFixed(1)),
+  })),
+  {
+    genre: "Other",
+    count: others,
+    percentage: Number(((others / total) * 100).toFixed(1)),
+  },
+]);
+
+
+        /* ---------- HEATMAP ---------- */
+        const hourBins = new Array(24).fill(0);
+        recently.forEach((item: RecentlyPlayedItem) => {
+          const t = item.played_at;
+          const ms = item["track.duration_ms"] ?? 0;
+          if (!t) return;
+          const h = new Date(t).getHours();
+          hourBins[h] += Math.round(ms / 60000);
+        });
 
 
         setHeatmapData(hourBins);
@@ -509,7 +493,7 @@ recently.forEach((item: RecentlyPlayedItem) => {
   }, [status, session]);
 
   /* ----------------------------------------
-     RENDER UI
+     RENDER
   -----------------------------------------*/
   return (
     <div className="flex min-h-screen bg-[#0d0f18] text-white">
@@ -519,7 +503,7 @@ recently.forEach((item: RecentlyPlayedItem) => {
         <Sidebar />
       </div>
 
-      {/* MAIN PANEL */}
+      {/* MAIN */}
       <main className="flex-1 px-10 py-10">
         <h1 className="text-5xl font-extrabold mb-2 tracking-tight">
           <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-300 text-transparent bg-clip-text">
@@ -559,11 +543,11 @@ recently.forEach((item: RecentlyPlayedItem) => {
           </SimpleCard>
         </div>
 
-        {/* CHART GRID */}
+        {/* CHARTS */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* LINE CHART */}
           <div className="bg-[#11121c] p-6 rounded-3xl shadow-xl border border-white/10">
-            <h2 className="text-2xl font-bold mb-4">Tracks Played per Day</h2>
+            <h2 className="text-2xl font-bold mb-4">Daily Listening Trend</h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={lineData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
@@ -571,21 +555,22 @@ recently.forEach((item: RecentlyPlayedItem) => {
                 <YAxis
                   stroke="#ffffff90"
                   label={{
-                    value: "Track Count",
+                    value: "Minutes",
                     angle: -90,
                     position: "insideLeft",
                     fill: "#ffffff90",
                   }}
                 />
                 <Tooltip
-                  formatter={(v) => [`${v} tracks`, "Track Count"]}
                   contentStyle={{
                     backgroundColor: "#1b1c29",
                     border: "1px solid rgba(255,255,255,0.1)",
                     color: "white",
+                    borderRadius: "8px",
                   }}
                 />
                 <Legend wrapperStyle={{ color: "white" }} />
+
                 <Line
                   type="monotone"
                   dataKey="minutes"
@@ -605,7 +590,7 @@ recently.forEach((item: RecentlyPlayedItem) => {
             setShowAll={setShowAllArtists}
           />
 
-          {/* GENRE DONUT */}
+          {/* GENRES */}
           <DonutChart
             pieData={pieData}
             expandedGenre={expandedGenre}
@@ -615,7 +600,7 @@ recently.forEach((item: RecentlyPlayedItem) => {
 
           {/* HEATMAP */}
           <div className="bg-[#11121c] p-6 rounded-3xl shadow-xl border border-white/10 col-span-1 md:col-span-2">
-            <h2 className="text-2xl font-bold mb-4">Listening by Hour</h2>
+            <h2 className="text-2xl font-bold mb-4">Listening Activity by Hour</h2>
             <HeatmapRenderer data={heatmapData} />
           </div>
         </div>
@@ -623,5 +608,3 @@ recently.forEach((item: RecentlyPlayedItem) => {
     </div>
   );
 }
-
-
