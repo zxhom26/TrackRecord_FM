@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import Sidebar from "../components/Sidebar";
-import Logo from "../components/Logo"; // correct path & lowercase file
+import Logo from "../components/Logo";
 
 import { fetchTopArtists, getTopMoodsFromGenres } from "../../utils";
 
@@ -22,7 +22,9 @@ import {
   BrainCircuit,
 } from "lucide-react";
 
-// Mood → Icon map (unchanged)
+/* ============================================================
+   MOOD → ICON
+   ============================================================ */
 const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
   "Bold & Confident": <Flame size={42} className="text-red-400" />,
   "Smooth & Chill": <Cloud size={42} className="text-blue-400" />,
@@ -33,6 +35,30 @@ const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
   "Chill Study Vibes": <BookOpen size={42} className="text-indigo-300" />,
   "Vibrant & Rhythmic": <Sun size={42} className="text-pink-400" />,
   "Calm & Peaceful": <Moon size={42} className="text-sky-300" />,
+};
+
+/* ============================================================
+   MOOD → FUN FACT SUBTEXT
+   ============================================================ */
+const MOOD_FACT_MAP: Record<string, string> = {
+  "Bold & Confident":
+    "You gravitate toward empowering beats. Your playlists scream main-character energy.",
+  "Smooth & Chill":
+    "You love mellow tracks that keep things calm, cozy, and effortlessly cool.",
+  "Upbeat & Fun":
+    "You naturally bring good vibes. Your music taste is basically a serotonin booster.",
+  "Mellow & Indie":
+    "You enjoy thoughtful, earthy sounds. The kind of music that makes life feel cinematic.",
+  "High Energy":
+    "You're fueled by adrenaline. Your playlists match your go-go-go personality.",
+  "Intense & Driven":
+    "You love tracks with emotional depth and power; your music is your motivation.",
+  "Chill Study Vibes":
+    "You thrive in focus mode: your playlist is a productivity cheat code.",
+  "Vibrant & Rhythmic":
+    "You have rhythm in your soul. Your music taste is warm, colorful, and full of movement.",
+  "Calm & Peaceful":
+    "You appreciate serenity. Your playlists feel like a deep breath and a soft reset.",
 };
 
 interface SpotifyArtist {
@@ -56,7 +82,7 @@ export default function MoodPage() {
     const response = await fetchTopArtists(session.accessToken);
     const items: SpotifyArtist[] = response?.top_artists ?? [];
 
-    const allGenres = items.flatMap(a => a.genres || []);
+    const allGenres = items.flatMap((a) => a.genres || []);
     const topMoods = getTopMoodsFromGenres(allGenres);
 
     setMoods(topMoods);
@@ -65,22 +91,19 @@ export default function MoodPage() {
 
   return (
     <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white relative">
-
       {/* SIDEBAR + LOGO OVERLAY */}
       <div className="relative">
-        {/* Sidebar */}
         <Sidebar active="mood" />
 
-        {/* OVERLAY LOGO */}
         <div className="absolute top-6 left-6 z-50">
           <Logo width={50} height={32} />
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 p-12">
 
-        {/* Header Title */}
+        {/* Title */}
         <h1 className="text-4xl font-bold">
           <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
             Mood Profile
@@ -103,7 +126,7 @@ export default function MoodPage() {
           {loading ? "Refreshing..." : "Refresh Mood Profile"}
         </button>
 
-        {/* Mood Cards */}
+        {/* MOOD CARDS */}
         <div className="mt-10 flex flex-col gap-6 max-w-3xl">
           {moods.map((mood, idx) => (
             <div
@@ -119,11 +142,12 @@ export default function MoodPage() {
                 {MOOD_ICON_MAP[mood] ?? <Flame size={42} />}
               </div>
 
-              {/* Text */}
+              {/* Text: Mood + Fun Fact */}
               <div>
                 <h2 className="text-2xl font-bold">{mood}</h2>
                 <p className="text-white/70 mt-1">
-                  Fun facts & lifestyle insights about this mood coming soon.
+                  {MOOD_FACT_MAP[mood] ??
+                    "This mood says something uniquely you — more insights soon!"}
                 </p>
               </div>
             </div>
