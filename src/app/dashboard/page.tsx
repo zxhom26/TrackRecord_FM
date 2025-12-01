@@ -30,9 +30,13 @@ import {
 /* ----------------------------------------
    TYPES — STRICT (NO `any`)
 -----------------------------------------*/
+
+// Spotify artist object
 interface SpotifyArtist {
   name: string;
 }
+
+// Shape of a recently played track returned by backend
 
 interface RecentlyPlayedItem {
   played_at?: string;
@@ -43,24 +47,29 @@ interface RecentlyPlayedItem {
   [key: string]: unknown;
 }
 
+// Genre object from backend
 interface GenreItem {
   genre: string | null;
 }
 
+// Genre object from backend
 interface RecommendationItem {
   name: string;
 }
 
+// Data structure for the line chart (daily minutes)
 interface LineDataPoint {
   date: string;
   minutes: number;
 }
 
+// Data structure for the top artists bar chart
 interface BarDataPoint {
   artist: string;
   count: number;
 }
 
+// Pie chart structure
 interface PieDataPoint {
   genre: string;
   count: number;
@@ -121,14 +130,17 @@ function GenreDetailSection({
   genre: string;
   recentlyPlayed: RecentlyPlayedItem[];
 }) {
+    // Don't show anything if clicking "Other" or empty
   if (!genre || genre === "Other") return null;
 
+   // Count artists for the selected genre
   const artistCount: Record<string, number> = {};
 
  recentlyPlayed.forEach((item: RecentlyPlayedItem) => {
   const genres = item["track.genres"];
   if (!Array.isArray(genres)) return;
 
+  // Does the track match the clicked donut slice?
   const match = genres.some((g) =>
     g.toLowerCase().includes(genre.toLowerCase())
   );
@@ -142,7 +154,7 @@ function GenreDetailSection({
   }
 });
 
-
+  // Convert dictionary → sorted list
   const topArtists = Object.entries(artistCount)
     .map(([artist, count]) => ({ artist, count }))
     .sort((a, b) => b.count - a.count)
@@ -505,19 +517,25 @@ setPieData([
   },
 ]);
 
+      /* ---------- HEATMAP ---------- */
+const hourBins = new Array(24).fill(0);
 
-        /* ---------- HEATMAP ---------- */
-        const hourBins = new Array(24).fill(0);
-        recently.forEach((item: RecentlyPlayedItem) => {
-          const t = item.played_at;
-          const ms = item["track.duration_ms"] ?? 0;
-          if (!t) return;
-          const h = new Date(t).getHours();
-          hourBins[h] += Math.round(ms / 60000);
-        });
+recently.forEach((item: RecentlyPlayedItem) => {
+  const t = item.played_at;
+  const ms = item["track.duration_ms"] ?? 0;
+  if (!t) return;
 
+  // Convert Spotify UTC → CST/CDT correctly
+  const localTime = new Date(
+    new Date(t).toLocaleString("en-US", { timeZone: "America/Chicago" })
+  );
 
-        setHeatmapData(hourBins);
+  const h = localTime.getHours();
+  hourBins[h] += Math.round(ms / 60000);
+});
+
+setHeatmapData(hourBins);
+
       } finally {
         setLoading(false);
       }
