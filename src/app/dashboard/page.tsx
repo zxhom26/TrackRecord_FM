@@ -125,9 +125,9 @@ function GenreDetailSection({
 
   const artistCount: Record<string, number> = {};
 
-  recentlyPlayed.forEach((item) => {
+  recentlyPlayed.forEach((item: RecentlyPlayedItem) => {
     const artists = item["track.artists"] ?? [];
-    artists.forEach((artist) => {
+    artists.forEach((artist: SpotifyArtist) => {
       const name = artist.name;
       artistCount[name] = (artistCount[name] || 0) + 1;
     });
@@ -145,8 +145,8 @@ function GenreDetailSection({
       </h3>
 
       <p className="text-white/40 text-xs mb-2">
-        *Spotify does not return genre per track. This list reflects the artists
-        you played most during sessions containing {genre}.
+        *Spotify does not return genre per track. This shows your most-played
+        artists during sessions associated with {genre}.
       </p>
 
       {topArtists.length === 0 ? (
@@ -167,6 +167,7 @@ function GenreDetailSection({
     </div>
   );
 }
+
 
 /* ----------------------------------------
    HEATMAP (AM/PM LABELS)
@@ -421,7 +422,7 @@ export default function DashboardPage() {
 
         /* ---------- DAILY TRACK COUNT ---------- */
         const trackTotals: Record<string, number> = {};
-        recently.forEach((item) => {
+        recently.forEach((item: RecentlyPlayedItem) => {
           const date = item.played_at?.slice(0, 10);
           if (!date) return;
                     trackTotals[date] = (trackTotals[date] || 0) + 1;
