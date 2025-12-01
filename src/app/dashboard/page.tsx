@@ -338,12 +338,17 @@ function DonutChart({
             contentStyle={{
               backgroundColor: "#1b1c29",
               border: "1px solid rgba(255,255,255,0.1)",
-              color: "white",
               borderRadius: "8px",
             }}
+             itemStyle={{ color: "white" }}
+            labelStyle={{ color: "white" }}
           />
 
-          <Legend wrapperStyle={{ color: "white" }} />
+          <Legend
+  wrapperStyle={{ color: "white" }}
+  style={{ color: "white" }}
+/>
+
 
           <Pie
             data={pieData}
