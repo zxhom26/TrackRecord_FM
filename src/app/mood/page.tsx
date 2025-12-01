@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
 import Sidebar from "../components/Sidebar";
 import Logo from "../components/Logo";
@@ -23,6 +22,18 @@ import {
 } from "lucide-react";
 
 /* -------------------------------------------------------------
+   TYPES
+------------------------------------------------------------- */
+interface SpotifyArtist {
+  name: string;
+  genres: string[];
+}
+
+interface TopArtistsResponse {
+  top_artists?: SpotifyArtist[];
+}
+
+/* -------------------------------------------------------------
    ICONS FOR EACH MOOD
 ------------------------------------------------------------- */
 const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
@@ -38,26 +49,26 @@ const MOOD_ICON_MAP: Record<string, React.ReactNode> = {
 };
 
 /* -------------------------------------------------------------
-   FUN FACT FOR EACH MOOD
+   FUN FACTS FOR EACH MOOD
 ------------------------------------------------------------- */
 const MOOD_FACT_MAP: Record<string, string> = {
   "Bold & Confident": "You gravitate toward empowering music that boosts confidence.",
   "Smooth & Chill": "Your listening style leans toward calm, soulful comfort.",
   "Upbeat & Fun": "You’re energized by bright, joyful, fun music.",
-  "Mellow & Indie": "You enjoy low-key expressive music and creative atmospheres.",
-  "High Energy": "You tend to choose fast-paced tracks that elevate your mood.",
-  "Intense & Driven": "You prefer emotionally powerful or focused tracks.",
-  "Chill Study Vibes": "You gravitate toward concentration-boosting lofi sounds.",
-  "Vibrant & Rhythmic": "You enjoy lively rhythms and uplifting atmospheres.",
+  "Mellow & Indie": "You enjoy expressive music and creative atmospheres.",
+  "High Energy": "You choose fast-paced tracks that elevate your mood.",
+  "Intense & Driven": "You like emotionally powerful or focused tracks.",
+  "Chill Study Vibes": "You gravitate toward concentration-boosting lofi tracks.",
+  "Vibrant & Rhythmic": "You enjoy lively rhythms and dynamic beats.",
   "Calm & Peaceful": "You prefer serene, relaxing soundscapes.",
 };
 
 /* -------------------------------------------------------------
-   ACTIVITIES FOR EACH MOOD (3 per mood)
+   ACTIVITIES FOR EACH MOOD
 ------------------------------------------------------------- */
 const MOOD_ACTIVITIES_MAP: Record<string, string[]> = {
   "Bold & Confident": [
-    "Hit the gym or take a powerful walk",
+    "Hit the gym or take a power walk",
     "Start a task you've been avoiding",
     "Make a bold choice you've been considering",
   ],
@@ -67,66 +78,71 @@ const MOOD_ACTIVITIES_MAP: Record<string, string[]> = {
     "Journal or reflect on your day",
   ],
   "Upbeat & Fun": [
-    "Listen to your happy playlist and dance",
+    "Dance to your playlist",
     "Make spontaneous plans with a friend",
-    "Try a creative activity like drawing or baking",
+    "Try a fun creative activity",
   ],
   "Mellow & Indie": [
-    "Go for a quiet walk with headphones",
-    "Read or explore a cozy café",
-    "Work on a personal creative project",
+    "Go for a quiet walk",
+    "Read at a cozy café",
+    "Work on a personal project",
   ],
   "High Energy": [
-    "Do a short HIIT or cardio burst",
-    "Clean your space with loud music",
-    "Start an ambitious mini-goal",
+    "Do a short cardio burst",
+    "Clean with loud music",
+    "Start a high-energy goal",
   ],
   "Intense & Driven": [
-    "Focus deeply on your top task",
-    "Write out goals for the week",
-    "Channel feelings into productivity",
+    "Focus on your top task",
+    "Write weekly goals",
+    "Use intensity as motivation",
   ],
   "Chill Study Vibes": [
-    "Do a focused study/work session",
+    "Have a focused study session",
     "Reorganize your workspace",
-    "Listen to lofi while reviewing notes",
+    "Review notes with lofi",
   ],
   "Vibrant & Rhythmic": [
-    "Spend time outdoors in the sun",
-    "Cook something flavorful with music",
+    "Go outside and enjoy the sun",
+    "Cook something flavorful",
     "Meet up with someone upbeat",
   ],
   "Calm & Peaceful": [
-    "Try gentle yoga or stretching",
+    "Do gentle stretching",
     "Meditate for 5 minutes",
-    "Set up a peaceful cozy environment",
+    "Set up a cozy environment",
   ],
 };
 
 export default function MoodPage() {
   const { data: session } = useSession();
-  const router = useRouter();
 
   const [moods, setMoods] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
+  /* -------------------------------------------------------------
+     REFRESH MOODS
+  ------------------------------------------------------------- */
   const handleRefresh = async () => {
-    if (!session || !(session as any).accessToken) return;
+    const token = (session as unknown as { accessToken?: string })?.accessToken;
+    if (!token) return;
 
     setLoading(true);
     setMoods([]);
 
-    const response: any = await fetchTopArtists((session as any).accessToken);
-    const items = response?.top_artists ?? [];
+    const response = (await fetchTopArtists(token)) as TopArtistsResponse;
 
-    const allGenres = items.flatMap((a: any) => a.genres || []);
+    const items = response.top_artists ?? [];
+    const allGenres = items.flatMap((artist) => artist.genres || []);
     const topMoods = getTopMoodsFromGenres(allGenres);
 
     setMoods(topMoods);
     setLoading(false);
   };
 
-  // Group activities by mood
+  /* -------------------------------------------------------------
+     GROUP ACTIVITIES BY MOOD
+  ------------------------------------------------------------- */
   const activityGroups = moods.map((m) => ({
     mood: m,
     activities: MOOD_ACTIVITIES_MAP[m] ?? [],
@@ -134,8 +150,7 @@ export default function MoodPage() {
 
   return (
     <div className="w-full min-h-screen flex bg-[#1b1b1b] text-white relative">
-
-      {/* SIDEBAR + OVERLAY LOGO */}
+      {/* SIDEBAR + LOGO */}
       <div className="relative">
         <Sidebar active="mood" />
         <div className="absolute top-6 left-6 z-50">
@@ -145,8 +160,6 @@ export default function MoodPage() {
 
       {/* MAIN CONTENT */}
       <main className="flex-1 p-12">
-
-        {/* TITLE */}
         <h1 className="text-4xl font-bold">
           <span className="bg-gradient-to-r from-[#a160ff] to-[#ff985c] bg-clip-text text-transparent">
             Mood Profile
@@ -154,24 +167,18 @@ export default function MoodPage() {
           On {new Date().toLocaleDateString()}:
         </h1>
 
-        {/* REFRESH BUTTON */}
+        {/* Refresh Button */}
         <button
           onClick={handleRefresh}
           disabled={loading}
-          className="
-            flex items-center gap-2
-            mt-6 px-5 py-3 rounded-full
-            bg-white/10 hover:bg-white/20
-            transition-all shadow
-          "
+          className="flex items-center gap-2 mt-6 px-5 py-3 rounded-full bg-white/10 hover:bg-white/20 transition-all shadow"
         >
           <RefreshCw size={20} />
           {loading ? "Refreshing..." : "Refresh Mood Profile"}
         </button>
 
-        {/* MAIN 70/30 LAYOUT */}
+        {/* 70/30 GRID */}
         <div className="mt-10 grid grid-cols-1 lg:grid-cols-[70%_30%] gap-10">
-
           {/* LEFT — MOOD CARDS */}
           <div className="flex flex-col gap-6">
             {moods.map((mood, idx) => (
@@ -191,7 +198,7 @@ export default function MoodPage() {
             ))}
           </div>
 
-          {/* RIGHT — RECOMMENDED ACTIVITIES */}
+          {/* RIGHT — ACTIVITIES PANEL */}
           <div
             className="
               rounded-2xl p-8
@@ -209,10 +216,7 @@ export default function MoodPage() {
             <div className="flex flex-col gap-6">
               {activityGroups.map((group, index) => (
                 <div key={index}>
-                  <p className="text-lg font-semibold mb-2">
-                    {group.mood}
-                  </p>
-
+                  <p className="text-lg font-semibold mb-2">{group.mood}</p>
                   <ol className="list-decimal list-inside text-white/80 text-sm space-y-1">
                     {group.activities.map((act, i) => (
                       <li key={i}>{act}</li>
@@ -222,7 +226,6 @@ export default function MoodPage() {
               ))}
             </div>
           </div>
-
         </div>
       </main>
     </div>
