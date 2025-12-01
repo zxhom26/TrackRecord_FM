@@ -31,7 +31,8 @@ export default function DashboardPage() {
   const [genres, setGenres] = useState([]);
 
   // Backend API URL
-  const BASE_URL = "https://trackrecord-fm-api.onrender.com/api";
+  const BASE_URL = "https://trackrecord-fm.onrender.com/api";
+
 
   // ------------------------------
   // SEND TOKEN TO BACKEND
