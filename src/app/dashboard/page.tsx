@@ -1,133 +1,199 @@
-
 "use client";
 
-/**
- * TRF-62 — BACKEND ANALYTICS FETCHER (DEBUG PAGE ONLY)
- * ----------------------------------------------------
- * ✔ Sends Spotify access token → backend POST /api/token
- * ✔ Fetches ALL analytics endpoints (POST) with same token
- * ✔ Stores ONLY correct response fields from backend
- * ✔ Recently Played endpoint corrected: /recently-played
- */
-
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { useSession } from "next-auth/react";
-import { sendTokenToBackend } from "../../utils.js";
+import Sidebar from "../components/Sidebar";
+import Logo from "../components/Logo";
+
+import {
+  fetchRecentlyPlayed,
+  fetchTopGenres,
+  fetchRecommendations,
+} from "../../utils";
+
+// -----------------------
+// TYPES
+// -----------------------
+interface RecentlyPlayedItem {
+  // We don't know all keys, but we know we can index by string
+  [key: string]: unknown;
+}
+
+interface GenreItem {
+  genre?: string | null;
+}
+
+interface RecommendationItem {
+  name?: string;
+}
+
+interface CardProps {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+}
+
+// -----------------------
+// CARD COMPONENT (SAFE)
+// -----------------------
+function SimpleCard(props: CardProps) {
+  return (
+    <div
+      className="
+        rounded-3xl p-10
+        bg-[#ffffff0a] backdrop-blur-md
+        border border-white/10 shadow-xl
+        min-h-[260px]
+      "
+    >
+      <h2 className="text-2xl font-semibold text-white">{props.title}</h2>
+      <p className="text-white/60 -mt-2">{props.subtitle}</p>
+      <div className="mt-3 text-white/80">{props.children}</div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
-  // --------------------------------------------------
-  // STATE FOR ANALYTICS
-  // --------------------------------------------------
-  const [topTracks, setTopTracks] = useState([]);
-  const [topArtists, setTopArtists] = useState([]);
-  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
-  const [genres, setGenres] = useState([]);
-  const [quickStats, setQuickStats] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
+  // -----------------------
+  // STATE (STRICT TYPED)
+  // -----------------------
+  const [recentlyPlayed, setRecentlyPlayed] = useState<RecentlyPlayedItem[]>([]);
+  const [topGenres, setTopGenres] = useState<GenreItem[]>([]);
+  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Backend URL — this MUST point to Render backend
-  const BASE_URL = "https://trackrecord-fm-api.onrender.com/api";
+  // -----------------------
+  // DATE FORMAT
+  // -----------------------
+  const formattedDate = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
-  // --------------------------------------------------
-  // 1) SEND TOKEN TO BACKEND
-  // --------------------------------------------------
+  // -----------------------
+  // DATA LOADING (TS-SAFE)
+  // -----------------------
   useEffect(() => {
-    if (!session?.accessToken) return;
+    if (status !== "authenticated") return;
 
-    console.log("Sending access token to backend…");
-    sendTokenToBackend(session.accessToken);
-  }, [session?.accessToken]);
+    const token = session?.accessToken;
+    if (!token) return;
 
-  // --------------------------------------------------
-  // 2) FETCH ALL ANALYTICS IN PARALLEL
-  // --------------------------------------------------
-  async function loadAnalytics() {
-    if (!session?.accessToken) return;
+    async function load() {
+      setLoading(true);
+      try {
+        const [rp, tg, rc] = await Promise.all([
+          fetchRecentlyPlayed(token),
+          fetchTopGenres(token),
+          fetchRecommendations(token),
+        ]);
 
-    try {
-      console.log("📡 Fetching analytics…");
-
-      const tokenBody = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken: session.accessToken }),
-      };
-
-      // PARALLEL requests
-      const [
-        tracksRes,
-        artistsRes,
-        recentRes,
-        genresRes,
-        quickRes,
-        recsRes,
-      ] = await Promise.all([
-        fetch(`${BASE_URL}/top-tracks`, tokenBody),
-        fetch(`${BASE_URL}/top-artists`, tokenBody),
-        fetch(`${BASE_URL}/recently-played`, tokenBody),   // ✔ MATCHES backend
-        fetch(`${BASE_URL}/top-genres`, tokenBody),
-        fetch(`${BASE_URL}/quick-stats`, tokenBody),
-        fetch(`${BASE_URL}/recommendations`, tokenBody),
-      ]);
-
-      // Convert to JSON
-      const tracksData = await tracksRes.json();
-      const artistsData = await artistsRes.json();
-      const recentData = await recentRes.json();
-      const genresData = await genresRes.json();
-      const quickData = await quickRes.json();
-      const recsData = await recsRes.json();
-
-      // --------------------------------------------------
-      // SAVE RESPONSE FIELDS (MATCHES BACKEND EXACTLY)
-      // --------------------------------------------------
-      setTopTracks(tracksData.top_tracks || []);
-      setTopArtists(artistsData.top_artists || []);
-      setRecentlyPlayed(recentData.recently_played || []);
-      setGenres(genresData.top_genres || []);
-      setQuickStats(quickData.quick_stats?.[0] || null);
-      setRecommendations(recsData.recommendations || []);
-
-      console.log("✅ Analytics loaded successfully!");
-      console.log({
-        tracksData,
-        artistsData,
-        recentData,
-        genresData,
-        quickData,
-        recsData,
-      });
-    } catch (err) {
-      console.error("❌ Error loading analytics:", err);
+        setRecentlyPlayed((rp?.recently_played as RecentlyPlayedItem[]) ?? []);
+        setTopGenres((tg?.top_genres as GenreItem[]) ?? []);
+        setRecommendations((rc?.recommendations as RecommendationItem[]) ?? []);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
 
-  // --------------------------------------------------
-  // 3) RUN ON PAGE LOAD
-  // --------------------------------------------------
-  useEffect(() => {
-    if (session?.accessToken) loadAnalytics();
-  }, [session?.accessToken]);
+    load();
+  }, [status, session]);
 
-  // --------------------------------------------------
-  // TRF-58 UI: DEBUG ONLY
-  // --------------------------------------------------
+  // -----------------------
+  // UI
+  // -----------------------
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold">Analytics Loader (TRF-62)</h1>
+    <div className="flex min-h-screen bg-[#0d0f18] text-white">
 
-      <p className="text-gray-500 mt-2">
-        This page fetches analytics successfully.  
-        Charts/UI will be built in <strong>TRF-63</strong>.
-      </p>
-
-      <div className="mt-6">
-        <p className="text-gray-600">
-          Open your browser console to see all analytics data.
-        </p>
+      {/* Sidebar */}
+      <div className="w-20 md:w-24 bg-[#0b0d14] border-r border-white/10 flex flex-col items-center py-6 gap-10">
+        <Logo className="w-10 h-auto opacity-90" />
+        <Sidebar />
       </div>
+
+      {/* Main Content */}
+      <main className="flex-1 px-10 py-10">
+
+        <h1 className="text-5xl font-extrabold mb-2">
+          <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-300 text-transparent bg-clip-text">
+            Your Analytics
+          </span>{" "}
+          <span className="text-white">On {formattedDate}:</span>
+        </h1>
+
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
+
+          {/* Recently Played */}
+          <SimpleCard
+            title="Recently Played"
+            subtitle="A quick peek at what you’ve been listening to."
+          >
+            {loading ? (
+              <p className="text-white/50">Loading…</p>
+            ) : recentlyPlayed.length === 0 ? (
+              <p className="text-white/50">No recently played data available.</p>
+            ) : (
+              <ul className="space-y-1">
+                {recentlyPlayed.slice(0, 5).map((item, index) => {
+                  let trackName = "Unknown Track";
+
+                  const flattenedName = item["track.name"];
+                  if (typeof flattenedName === "string") {
+                    trackName = flattenedName;
+                  } else if (typeof item["name"] === "string") {
+                    trackName = item["name"] as string;
+                  }
+
+                  return <li key={index}>{trackName}</li>;
+                })}
+              </ul>
+            )}
+          </SimpleCard>
+
+          {/* Top Genres */}
+          <SimpleCard
+            title="Top Genres"
+            subtitle="Genres detected from your top artists."
+          >
+            {loading ? (
+              <p className="text-white/50">Loading…</p>
+            ) : topGenres.length === 0 ? (
+              <p className="text-white/50">No genre data available.</p>
+            ) : (
+              <ul className="space-y-1">
+                {topGenres.slice(0, 5).map((g, index) => (
+                  <li key={index}>{g.genre ?? "Unknown Genre"}</li>
+                ))}
+              </ul>
+            )}
+          </SimpleCard>
+
+          {/* Recommendations */}
+          <SimpleCard
+            title="Recommendations"
+            subtitle="Tracks suggested just for you."
+          >
+            {loading ? (
+              <p className="text-white/50">Loading…</p>
+            ) : recommendations.length === 0 ? (
+              <p className="text-white/50">
+                No recommendations available right now.
+              </p>
+            ) : (
+              <ul className="space-y-1">
+                {recommendations.slice(0, 5).map((track, index) => (
+                  <li key={index}>{track.name ?? "Unknown Track"}</li>
+                ))}
+              </ul>
+            )}
+          </SimpleCard>
+
+        </div>
+      </main>
     </div>
   );
 }
