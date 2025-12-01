@@ -336,23 +336,19 @@ function DonutChart({
   outerRadius={120}
   innerRadius={60}
   onClick={(entry: PieDataPoint) =>
-    setExpandedGenre(
-      expandedGenre === entry.genre ? null : entry.genre
-    )
+    setExpandedGenre(expandedGenre === entry.genre ? null : entry.genre)
   }
 >
+  {pieData.map((entry, i) => (
+    <Cell
+      key={i}
+      fill={BD_COLORS[i % BD_COLORS.length]}
+      stroke="#11121c"
+      strokeWidth={3}
+    />
+  ))}
+</Pie>
 
-
-          >
-            {pieData.map((entry, i) => (
-              <Cell
-                key={i}
-                fill={BD_COLORS[i % BD_COLORS.length]}
-                stroke="#11121c"
-                strokeWidth={3}
-              />
-            ))}
-          </Pie>
         </PieChart>
       </ResponsiveContainer>
 
