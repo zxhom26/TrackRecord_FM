@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import Sidebar from "../components/sidebar";
+import Logo from "../components/Logo";
 
 import {
   fetchRecentlyPlayed,
@@ -9,76 +11,36 @@ import {
   fetchRecommendations,
 } from "../../utils";
 
-import Sidebar from "../components/Sidebar";
-import Logo from "../components/Logo";
+export default function DashboardPage() {
+  const { data: session, status } = useSession();
 
-// -------------------- TYPES --------------------
+  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
+  const [topGenres, setTopGenres] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
 
-interface PlayedTrack {
-  [key: string]: unknown;
-}
+  const [loading, setLoading] = useState(true);
 
-interface GenreItem {
-  genre?: string | null;
-  [key: string]: unknown;
-}
-
-interface RecommendationItem {
-  id?: string | number;
-  name?: string | null;
-  artists?: { name?: string | null }[];
-  [key: string]: unknown;
-}
-
-// -------------------- HELPERS --------------------
-
-function getFormattedDate() {
-  return new Date().toLocaleDateString("en-US", {
+  // --------------------------
+  //   FORMAT DATE LIKE MOOD
+  // --------------------------
+  const formattedDate = new Date().toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
-}
 
-// Try to pull a reasonable label from a generic object
-function getSafeStringField(
-  obj: { [key: string]: unknown },
-  keys: string[],
-  fallback: string
-): string {
-  for (const key of keys) {
-    const value = obj[key];
-    if (typeof value === "string" && value.trim().length > 0) {
-      return value;
-    }
-  }
-  return fallback;
-}
-
-// -------------------- PAGE --------------------
-
-export default function DashboardPage() {
-  const { data: session, status } = useSession();
-
-  const [recentlyPlayed, setRecentlyPlayed] = useState<PlayedTrack[]>([]);
-  const [genres, setGenres] = useState<GenreItem[]>([]);
-  const [recs, setRecs] = useState<RecommendationItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const formattedDate = getFormattedDate();
-
+  // --------------------------
+  //   LOAD DATA SAFELY
+  // --------------------------
   useEffect(() => {
+    if (status !== "authenticated") return;
+    if (!session?.accessToken) return;
+
     async function load() {
       try {
         setLoading(true);
 
-        const token = session?.accessToken;
-        if (!token) {
-          setRecentlyPlayed([]);
-          setGenres([]);
-          setRecs([]);
-          return;
-        }
+        const token = session.accessToken;
 
         const [rp, tg, rc] = await Promise.all([
           fetchRecentlyPlayed(token),
@@ -86,226 +48,113 @@ export default function DashboardPage() {
           fetchRecommendations(token),
         ]);
 
-        const rpArray = Array.isArray(rp?.recently_played)
-          ? (rp.recently_played as PlayedTrack[])
-          : [];
-        const tgArray = Array.isArray(tg?.top_genres)
-          ? (tg.top_genres as GenreItem[])
-          : [];
-        const rcArray = Array.isArray(rc?.recommendations)
-          ? (rc.recommendations as RecommendationItem[])
-          : [];
-
-        setRecentlyPlayed(rpArray);
-        setGenres(tgArray);
-        setRecs(rcArray);
-      } catch {
-        // On any error, just clear data; we don’t want the UI to crash
-        setRecentlyPlayed([]);
-        setGenres([]);
-        setRecs([]);
+        setRecentlyPlayed(rp?.recently_played ?? []);
+        setTopGenres(tg?.top_genres ?? []);
+        setRecommendations(rc?.recommendations ?? []);
       } finally {
         setLoading(false);
       }
     }
 
     load();
-  }, [session?.accessToken]);
+  }, [status, session]);
 
-  if (status === "loading") {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#050816] text-white">
-        Loading…
-      </div>
-    );
-  }
-
-  if (!session?.accessToken) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#050816] text-white">
-        Please log in with Spotify to view your analytics.
-      </div>
-    );
-  }
+  // --------------------------
+  //   CARD COMPONENT
+  // --------------------------
+  const Card = ({ title, subtitle, children }) => (
+    <div
+      className="
+        rounded-3xl p-10
+        bg-[#ffffff0a] backdrop-blur-md
+        border border-white/10 shadow-xl
+        transition-all flex flex-col gap-4
+        min-h-[260px]
+      "
+    >
+      <h2 className="text-2xl font-semibold text-white">{title}</h2>
+      <p className="text-white/60 -mt-2">{subtitle}</p>
+      <div className="mt-3 text-white/80">{children}</div>
+    </div>
+  );
 
   return (
-    <div className="flex min-h-screen bg-[#050816] text-white">
-      {/* SIDEBAR + LOGO COLUMN */}
-      <div className="relative flex-shrink-0">
-        <div className="absolute top-4 left-4 z-20">
-          <Logo />
-        </div>
-        <div className="h-full">
-          <Sidebar />
-        </div>
+    <div className="flex min-h-screen bg-[#0d0f18] text-white">
+
+      {/* ---------------- SIDEBAR ---------------- */}
+      <div className="w-20 md:w-24 bg-[#0b0d14] border-r border-white/10 flex flex-col items-center py-6 gap-10">
+        <Logo className="w-10 h-auto opacity-90" />
+        <Sidebar />
       </div>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 px-10 py-8">
-        {/* Title + Date (date text white) */}
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-          <span className="bg-gradient-to-r from-purple-400 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+      {/* ---------------- MAIN CONTENT ---------------- */}
+      <main className="flex-1 px-10 py-10">
+
+        {/* HEADER — matches Mood page */}
+        <h1 className="text-5xl font-extrabold mb-2">
+          <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-300 text-transparent bg-clip-text">
             Your Analytics
-          </span>
+          </span>{" "}
+          <span className="text-white">On {formattedDate}:</span>
         </h1>
-        <p className="text-lg text-white mb-8">On {formattedDate}</p>
 
-        {loading && (
-          <p className="mb-4 text-sm text-white/70">
-            Checking your Spotify data…
-          </p>
-        )}
+        {/* GUI GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
 
-        {/* ====================== 3 FEATURE CARDS ====================== */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-4">
-          {/* =============== RECENTLY PLAYED CARD =============== */}
-          <div
-            className="
-              rounded-3xl p-10
-              bg-[#6a3ff815] backdrop-blur-md
-              border border-white/10 shadow-xl
-              hover:scale-[1.03] hover:border-white/20
-              transition-all cursor-default
-              flex flex-col gap-4
-              min-h-[280px]
-            "
+          {/* Recently Played */}
+          <Card
+            title="Recently Played"
+            subtitle="A quick peek at what you've been listening to lately."
           >
-            <h2 className="text-2xl font-semibold">Recently Played</h2>
-            <p className="text-white/80 text-sm">
-              A quick peek at what you&apos;ve been listening to lately.
-            </p>
-
-            {recentlyPlayed.length === 0 ? (
-              <p className="mt-4 text-sm text-white/60">
-                No recently played data available yet.
-              </p>
+            {loading ? (
+              <p className="text-white/50 animate-pulse">Loading…</p>
+            ) : recentlyPlayed.length === 0 ? (
+              <p className="text-white/50">No recently played data available yet.</p>
             ) : (
-              <div className="mt-4 text-sm text-white/85 w-full">
-                <p className="mb-2 text-white/70">
-                  Total items: {recentlyPlayed.length}
-                </p>
-                <ul className="space-y-2">
-                  {recentlyPlayed.slice(0, 5).map((item, idx) => {
-                    const label = getSafeStringField(
-                      item,
-                      [
-                        "track.name",
-                        "song_name",
-                        "name",
-                      ],
-                      "Unknown track"
-                    );
-
-                    return (
-                      <li
-                        key={idx}
-                        className="px-3 py-2 rounded-full bg-white/5 border border-white/10"
-                      >
-                        {label}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              <ul className="space-y-1">
+                {recentlyPlayed.slice(0, 5).map((item, i) => (
+                  <li key={i}>{item?.track?.name ?? item?.name ?? "Unknown Track"}</li>
+                ))}
+              </ul>
             )}
-          </div>
+          </Card>
 
-          {/* =============== TOP GENRES CARD =============== */}
-          <div
-            className="
-              rounded-3xl p-10
-              bg-[#ff88d715] backdrop-blur-md
-              border border-white/10 shadow-xl
-              hover:scale-[1.03] hover:border-white/20
-              transition-all cursor-default
-              flex flex-col gap-4
-              min-h-[280px]
-            "
+          {/* Genres */}
+          <Card
+            title="Top Genres"
+            subtitle="Genres detected directly from your top artists."
           >
-            <h2 className="text-2xl font-semibold">Top Genres</h2>
-            <p className="text-white/80 text-sm">
-              Genres detected directly from your top artists.
-            </p>
-
-            {genres.length === 0 ? (
-              <p className="mt-4 text-sm text-white/60">
-                No genre data available.
-              </p>
+            {loading ? (
+              <p className="text-white/50 animate-pulse">Loading…</p>
+            ) : topGenres.length === 0 ? (
+              <p className="text-white/50">No genre data available.</p>
             ) : (
-              <div className="mt-4 text-sm text-white/85 w-full">
-                <p className="mb-2 text-white/70">
-                  Total items: {genres.length}
-                </p>
-                <ul className="space-y-2">
-                  {genres.slice(0, 6).map((g, idx) => (
-                    <li
-                      key={idx}
-                      className="px-3 py-2 rounded-full bg-white/5 border border-white/10"
-                    >
-                      {g.genre ?? "(unknown genre)"}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="space-y-1">
+                {topGenres.slice(0, 5).map((g, i) => (
+                  <li key={i}>{g.genre ?? "Unknown Genre"}</li>
+                ))}
+              </ul>
             )}
-          </div>
+          </Card>
 
-          {/* =============== RECOMMENDATIONS CARD =============== */}
-          <div
-            className="
-              rounded-3xl p-10
-              bg-[#ff987515] backdrop-blur-md
-              border border-white/10 shadow-xl
-              hover:scale-[1.03] hover:border-white/20
-              transition-all cursor-default
-              flex flex-col gap-4
-              min-h-[280px]
-            "
+          {/* Recommendations */}
+          <Card
+            title="Recommendations"
+            subtitle="Tracks your backend is suggesting right now."
           >
-            <h2 className="text-2xl font-semibold">Recommendations</h2>
-            <p className="text-white/80 text-sm">
-              Tracks your backend is suggesting right now.
-            </p>
-
-            {recs.length === 0 ? (
-              <p className="mt-4 text-sm text-white/60">
-                No recommendations available yet.
-              </p>
+            {loading ? (
+              <p className="text-white/50 animate-pulse">Loading…</p>
+            ) : recommendations.length === 0 ? (
+              <p className="text-white/50">No recommendations available yet.</p>
             ) : (
-              <div className="mt-4 text-sm text-white/85 w-full">
-                <p className="mb-2 text-white/70">
-                  Total items: {recs.length}
-                </p>
-                <ul className="space-y-2">
-                  {recs.slice(0, 5).map((r, idx) => {
-                    const name =
-                      typeof r.name === "string" && r.name.trim().length > 0
-                        ? r.name
-                        : "Unknown track";
-
-                    const artist =
-                      Array.isArray(r.artists) &&
-                      r.artists[0] &&
-                      typeof r.artists[0].name === "string"
-                        ? r.artists[0].name
-                        : "Unknown artist";
-
-                    return (
-                      <li
-                        key={r.id ?? idx}
-                        className="px-3 py-2 rounded-full bg-white/5 border border-white/10 flex flex-col"
-                      >
-                        <span className="font-semibold">{name}</span>
-                        <span className="text-xs text-white/70">
-                          {artist}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              <ul className="space-y-1">
+                {recommendations.slice(0, 5).map((track, i) => (
+                  <li key={i}>{track?.name ?? "Unknown Track"}</li>
+                ))}
+              </ul>
             )}
-          </div>
+          </Card>
+
         </div>
       </main>
     </div>
