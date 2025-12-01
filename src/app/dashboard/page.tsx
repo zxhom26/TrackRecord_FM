@@ -17,11 +17,10 @@ export default function DashboardPage() {
   const [recentlyPlayed, setRecentlyPlayed] = useState([]);
   const [topGenres, setTopGenres] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
-
   const [loading, setLoading] = useState(true);
 
   // --------------------------
-  //   FORMAT DATE LIKE MOOD
+  // DATE FORMAT (matches Mood)
   // --------------------------
   const formattedDate = new Date().toLocaleDateString("en-US", {
     month: "long",
@@ -30,17 +29,17 @@ export default function DashboardPage() {
   });
 
   // --------------------------
-  //   LOAD DATA SAFELY
+  // SAFE DATA LOADING
   // --------------------------
   useEffect(() => {
     if (status !== "authenticated") return;
-    if (!session?.accessToken) return;
+
+    const token = session?.accessToken;
+    if (!token) return;
 
     async function load() {
       try {
         setLoading(true);
-
-        const token = session.accessToken;
 
         const [rp, tg, rc] = await Promise.all([
           fetchRecentlyPlayed(token),
@@ -60,7 +59,7 @@ export default function DashboardPage() {
   }, [status, session]);
 
   // --------------------------
-  //   CARD COMPONENT
+  // CARD COMPONENT
   // --------------------------
   const Card = ({ title, subtitle, children }) => (
     <div
@@ -90,7 +89,7 @@ export default function DashboardPage() {
       {/* ---------------- MAIN CONTENT ---------------- */}
       <main className="flex-1 px-10 py-10">
 
-        {/* HEADER — matches Mood page */}
+        {/* HEADER */}
         <h1 className="text-5xl font-extrabold mb-2">
           <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-300 text-transparent bg-clip-text">
             Your Analytics
@@ -119,7 +118,7 @@ export default function DashboardPage() {
             )}
           </Card>
 
-          {/* Genres */}
+          {/* Top Genres */}
           <Card
             title="Top Genres"
             subtitle="Genres detected directly from your top artists."
