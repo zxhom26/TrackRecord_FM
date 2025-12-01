@@ -7,7 +7,6 @@
  * ✓ Loads ALL analytics endpoints in parallel
  * ✓ Handles errors correctly
  * ✓ Populates charts with stable, correct data
- * ✓ Uses NEXT_PUBLIC_BACKEND_URL (Render URL)
  * ✓ Fully commented + production-ready
  */
 
@@ -20,6 +19,11 @@ import { sendTokenToBackend } from "../../utils.js";
 import BarChartArtists from "./charts/BarChartArtists";
 import LineChartMinutes from "./charts/LineChartMinutes";
 import PieGenreChart from "./charts/PieGenreChart";
+
+// -------------------------------------
+// BACKEND URL (HARDCODED + CORRECT)
+// -------------------------------------
+const BASE_URL = "https://trackrecord-fm.onrender.com/api";
 
 // ---------------------------
 // Types for clean data access
@@ -52,15 +56,6 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   // ---------------------------
-  // BACKEND BASE URL VIA ENV
-  // ---------------------------
-  const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-  if (!BASE_URL) {
-    console.error("❌ ERROR: NEXT_PUBLIC_BACKEND_URL is missing.");
-  }
-
-  // ---------------------------
   // SEND TOKEN TO BACKEND
   // ---------------------------
   useEffect(() => {
@@ -87,12 +82,11 @@ export default function DashboardPage() {
 
       // Run all API requests in parallel for speed
       const [artistsRes, genresRes, quickRes] = await Promise.all([
-        fetch(`${BASE_URL}/api/top-artists`, requestBody),
-        fetch(`${BASE_URL}/api/top-genres`, requestBody),
-        fetch(`${BASE_URL}/api/quick-stats`, requestBody),
+        fetch(`${BASE_URL}/top-artists`, requestBody),
+        fetch(`${BASE_URL}/top-genres`, requestBody),
+        fetch(`${BASE_URL}/quick-stats`, requestBody),
       ]);
 
-      // Parse JSON
       const artistsData = await artistsRes.json();
       const genresData = await genresRes.json();
       const quickData = await quickRes.json();
@@ -118,7 +112,7 @@ export default function DashboardPage() {
     setLoading(false);
   }
 
-  // Load analytics after token arrives
+  // Load analytics when token arrives
   useEffect(() => {
     if (session?.accessToken) loadAnalytics();
   }, [session?.accessToken]);
