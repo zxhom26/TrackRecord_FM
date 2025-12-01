@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import Sidebar from "../components/sidebar";
+import Sidebar from "../components/Sidebar";
 import Logo from "../components/Logo";
 
 import {
