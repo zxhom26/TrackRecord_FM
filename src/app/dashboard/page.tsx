@@ -9,7 +9,7 @@ import {
   fetchRecommendations,
 } from "../../utils";
 
-import Sidebar from "../components/sidebar";
+import Sidebar from "../components/Sidebar";
 import Logo from "../components/Logo";
 
 // -------------------- TYPES --------------------
