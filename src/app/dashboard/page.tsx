@@ -8,9 +8,9 @@ import {
   fetchRecentlyPlayed,
   fetchTopGenres,
   fetchRecommendations,
-} from "../../utils"; // <-- CORRECT PATH
+} from "../../utils"; // correct path
 
-import Sidebar from "../components/Sidebar"; // <-- CORRECT PATH
+import Sidebar from "../components/Sidebar"; // correct path
 
 // Recharts
 import {
@@ -39,7 +39,7 @@ interface PlayedTrack {
     };
     artists?: { name: string }[];
   };
-  [key: string]: unknown; // allows flattened Spotify keys
+  [key: string]: unknown;
 }
 
 interface GenreItem {
@@ -261,16 +261,17 @@ export default function DashboardPage() {
   const formattedDate = getFormattedDate();
 
   useEffect(() => {
-    if (!session?.accessToken) return;
-
     async function load() {
       try {
         setLoading(true);
 
+        const token = session?.accessToken;
+        if (!token) return;
+
         const [rp, tg, rc] = await Promise.all([
-          fetchRecentlyPlayed(session.accessToken),
-          fetchTopGenres(session.accessToken),
-          fetchRecommendations(session.accessToken),
+          fetchRecentlyPlayed(token),
+          fetchTopGenres(token),
+          fetchRecommendations(token),
         ]);
 
         setRecentlyPlayed(rp.recently_played ?? []);
@@ -317,7 +318,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {/* Panel 1 */}
-          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-purple-500/40 via-purple-400/20 to-indigo-500/30 p-5">
+          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-purple-500/40 via-purple-400/20 to-indigo-500/30 p-5 shadow-lg">
             <h2 className="mb-2 text-lg font-semibold">Listening Activity</h2>
             <p className="mb-4 text-xs text-zinc-300">
               Songs you&apos;ve played recently.
@@ -328,7 +329,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Panel 2 */}
-          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-pink-500/40 via-rose-400/20 to-purple-500/30 p-5">
+          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-pink-500/40 via-rose-400/20 to-purple-500/30 p-5 shadow-lg">
             <h2 className="mb-2 text-lg font-semibold">Top Genres</h2>
             <p className="mb-4 text-xs text-zinc-300">
               Based on your top artists.
@@ -339,7 +340,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Panel 3 */}
-          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-rose-400/50 via-rose-300/30 to-amber-300/40 p-5">
+          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-rose-400/50 via-rose-300/30 to-amber-300/40 p-5 shadow-lg">
             <RecommendationsCard recs={recommendations} />
           </div>
         </div>
