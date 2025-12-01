@@ -371,12 +371,7 @@ function DonutChart({
         </PieChart>
       </ResponsiveContainer>
 
-      {expandedGenre && (
-        <GenreDetailSection
-          genre={expandedGenre}
-          recentlyPlayed={recentlyPlayed}
-        />
-      )}
+   
     </div>
   );
 }
@@ -534,7 +529,7 @@ setPieData([
         </h1>
 
         {/* SUMMARY CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           <SimpleCard title="Recently Played" subtitle="Your latest listening">
             {loading ? (
               <p>Loading...</p>
@@ -555,13 +550,7 @@ setPieData([
             </ul>
           </SimpleCard>
 
-          <SimpleCard title="Recommendations" subtitle="Curated for you">
-            <ul className="space-y-1 text-white/80">
-              {recommendations.slice(0, 5).map((r, i) => (
-                <li key={i}>{r.name ?? "Unknown"}</li>
-              ))}
-            </ul>
-          </SimpleCard>
+          
         </div>
 
         {/* CHARTS */}
