@@ -18,7 +18,6 @@ class ProcessData:
         if not raw_data:
             return pd.DataFrame()  # Return empty DataFrame if no data
 
-        # Normalize nested JSON into flat table
         df = pd.json_normalize(raw_data)
         return df
 
@@ -43,18 +42,34 @@ class UserAnalytics:
         df = self.process.flatten_data(artists)
         return df.to_dict(orient='records')
 
+    # ---------------- RECENTLY PLAYED (FIXED) ----------------
     async def getRecentlyPlayed(self, n=50):
         before = int(datetime.now().timestamp() * 1000)
 
-        data = await self.proxy.fetch_api("me/player/recently-played",
-                                          params={"limit": n, 'before': before})
+        data = await self.proxy.fetch_api(
+            "me/player/recently-played",
+            params={"limit": n, "before": before},
+        )
+
         plays = data.get("items", [])
         df = self.process.flatten_data(plays)
         df = df.where(pd.notnull(df), None)
 
-        return df.to_dict(orient='records')
+        # Deep clean all nested NaN/NaT/Inf values
+        def clean_json(obj):
+            if isinstance(obj, dict):
+                return {k: clean_json(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [clean_json(x) for x in obj]
+            if pd.isna(obj):
+                return None
+            return obj
 
-    # ---------------- DIRECT TO FRONTEND ----------------
+        records = df.to_dict(orient="records")
+        cleaned = clean_json(records)
+        return cleaned
+
+    # ---------------- TOP GENRES ----------------
     async def getTopGenres(self, n=50):
         records = await self.getTopArtists(n=n)
         df = self.process.flatten_data(records)
@@ -68,6 +83,7 @@ class UserAnalytics:
 
         return cleaned
 
+    # ---------------- QUICKSTATS ----------------
     async def getQuickStats(self):
         artist_task = self.getTopArtists(n=2)
         track_task = self.getTopTracks(n=1)
@@ -82,14 +98,15 @@ class UserAnalytics:
         return [{
             'top_artist': top_artist[0]['name'] if top_artist else None,
             'top_track': top_track[0]['name'] if top_track else None,
-            'top_genre': top_genre["genre"].value_counts().idxmax() if not top_genre.empty else None
+            'top_genre': top_genre["genre"].value_counts().idxmax()
+            if not top_genre.empty else None
         }]
 
+    # ---------------- RECOMMENDATIONS (CLEANED) ----------------
     async def getSongRecommendations(self, n=20):
         top_tracks = await self.getTopTracks(n=2)
         top_artists = await self.getTopArtists(n=1)
 
-        # Create DF from top genres and clean it
         top_genres = pd.DataFrame(await self.getTopGenres(n=2))
         top_genres = top_genres.where(pd.notnull(top_genres), None)
 
