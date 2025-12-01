@@ -64,7 +64,9 @@ interface PieDataPoint {
   genre: string;
   count: number;
   percentage: number;
+  [key: string]: string | number;   // <-- REQUIRED FOR RECHARTS
 }
+
 
 /* ----------------------------------------
    THEME COLORS
