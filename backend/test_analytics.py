@@ -150,26 +150,18 @@ class TestUserAnalytics(unittest.IsolatedAsyncioTestCase):
     #   Song Recommendations
     # ----------------------------------------------------
     async def test_get_song_recommendations(self):
-        # Mock fetch_api to return proper IDs and genres
-        self.ua.proxy = MockSpotifyAPIProxy({
-            "me/top/tracks": {
-                "items": [{"id": "track1"}, {"id": "track2"}]
-            },
-            "me/top/artists": {
-                "items": [
-                    {"id": "artist1", "name": "Artist1", "genres": ["pop", "rock"]},
-                ]
-            },
-            "recommendations": {
-                "tracks": [{"id": "rec1", "name": "Recommended Song"}]
-            }
-        })
-
         result = await self.ua.getSongRecommendations(n=1)
 
-        # Checks
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["id"], "rec1")
+        # Ensure recommendations key exists
+        self.assertIn("recommendations", result)
+        self.assertIsInstance(result["recommendations"], list)
+
+        # Should contain exactly 1 recommendation
+        self.assertEqual(len(result["recommendations"]), 1)
+
+        # Validate the returned ID
+        self.assertEqual(result["recommendations"][0]["id"], "rec1")
+
 
 
 
