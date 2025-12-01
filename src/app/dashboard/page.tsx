@@ -27,22 +27,44 @@ import {
   Cell,
 } from "recharts";
 
-// -----------------------
-// TYPES
-// -----------------------
+// ---------------- TYPES ----------------
 interface RecentlyPlayedItem {
   played_at?: string;
   track?: {
     duration_ms?: number;
   };
+  [key: string]: unknown;
 }
 
 interface GenreItem {
   genre?: string | null;
+  [key: string]: unknown;
 }
 
 interface RecommendationItem {
   name?: string;
+  [key: string]: unknown;
+}
+
+// RECHARTS TYPE REQUIREMENT
+interface LineDataPoint {
+  date: string;
+  minutes: number;
+  [key: string]: string | number;
+}
+
+interface BarDataPoint {
+  artist: string;
+  minutes: number;
+  [key: string]: string | number;
+}
+
+interface PieDataPoint {
+  genre: string;
+  minutes: number;
+
+  // ✔ REQUIRED for Recharts strict TS mode
+  [key: string]: string | number;
 }
 
 interface CardProps {
@@ -51,27 +73,10 @@ interface CardProps {
   children: ReactNode;
 }
 
-interface LineDataPoint {
-  date: string;
-  minutes: number;
-}
-
-interface BarDataPoint {
-  artist: string;
-  minutes: number;
-}
-
-interface PieDataPoint {
-  genre: string;
-  minutes: number;
-}
-
-// -----------------------
-// CARD
-// -----------------------
+// ---------------- CARD ----------------
 function SimpleCard(props: CardProps) {
   return (
-    <div className="rounded-3xl p-10 bg-[#ffffff0a] backdrop-blur-md border border-white/10 shadow-xl min-height-[260px]">
+    <div className="rounded-3xl p-10 bg-[#ffffff0a] backdrop-blur-md border border-white/10 shadow-xl">
       <h2 className="text-2xl font-semibold text-white">{props.title}</h2>
       <p className="text-white/60 -mt-2">{props.subtitle}</p>
       <div className="mt-3 text-white/80">{props.children}</div>
@@ -79,34 +84,29 @@ function SimpleCard(props: CardProps) {
   );
 }
 
-// -----------------------
-// DASHBOARD
-// -----------------------
+// ---------------- DASHBOARD ----------------
 export default function DashboardPage() {
   const { data: session, status } = useSession();
 
+  // Raw data
   const [recentlyPlayed, setRecentlyPlayed] = useState<RecentlyPlayedItem[]>([]);
   const [topGenres, setTopGenres] = useState<GenreItem[]>([]);
-  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
+  const [recommendations, setRecommendations] =
+    useState<RecommendationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // CHART DATA
+  // Chart data
   const [lineData, setLineData] = useState<LineDataPoint[]>([]);
   const [barData, setBarData] = useState<BarDataPoint[]>([]);
   const [pieData, setPieData] = useState<PieDataPoint[]>([]);
 
-  // -----------------------
-  // DATE FORMAT
-  // -----------------------
   const formattedDate = new Date().toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
 
-  // -----------------------
-  // LOAD ALL DATA USING UTILS (WORKING)
-  // -----------------------
+  // ---------------- LOAD DATA USING DISHA'S UTILS ----------------
   useEffect(() => {
     if (status !== "authenticated") return;
     const token = session?.accessToken;
@@ -123,14 +123,15 @@ export default function DashboardPage() {
 
         const recently = (rp?.recently_played as RecentlyPlayedItem[]) ?? [];
         const genres = (tg?.top_genres as GenreItem[]) ?? [];
+        const recs = (rc?.recommendations as RecommendationItem[]) ?? [];
 
         setRecentlyPlayed(recently);
         setTopGenres(genres);
-        setRecommendations((rc?.recommendations as RecommendationItem[]) ?? []);
+        setRecommendations(recs);
 
-        // ---------------- CHART MAPPINGS ----------------
+        // ---------------- MAP TO CHARTS ----------------
 
-        // LINE CHART (minutes listened per track)
+        // LINE: from recently played
         const lineMapped: LineDataPoint[] = recently.map((item) => ({
           date: item.played_at?.slice(0, 10) ?? "Unknown",
           minutes: item.track?.duration_ms
@@ -139,7 +140,7 @@ export default function DashboardPage() {
         }));
         setLineData(lineMapped);
 
-        // BAR CHART (genre counts)
+        // PIE: Genre counts
         const genreCountMap: Record<string, number> = {};
         genres.forEach((g) => {
           const genre = g.genre ?? "Unknown";
@@ -154,13 +155,11 @@ export default function DashboardPage() {
         );
         setPieData(pieMapped);
 
-        // BAR CHART from recommendations (mock metric)
-        const barMapped: BarDataPoint[] = (rc?.recommendations ?? []).map(
-          (rec: RecommendationItem) => ({
-            artist: rec.name ?? "Unknown",
-            minutes: Math.floor(Math.random() * 50) + 10,
-          })
-        );
+        // BAR: Mock minutes per recommendation track
+        const barMapped: BarDataPoint[] = recs.map((track) => ({
+          artist: track.name ?? "Unknown",
+          minutes: Math.floor(Math.random() * 40) + 10,
+        }));
         setBarData(barMapped);
       } finally {
         setLoading(false);
@@ -170,11 +169,16 @@ export default function DashboardPage() {
     load();
   }, [status, session]);
 
-  const PIE_COLORS = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#B76CFD", "#FF914D"];
+  const PIE_COLORS = [
+    "#FF6B6B",
+    "#FFD93D",
+    "#6BCB77",
+    "#4D96FF",
+    "#B76CFD",
+    "#FF914D",
+  ];
 
-  // -----------------------
-  // UI
-  // -----------------------
+  // ---------------- UI ----------------
   return (
     <div className="flex min-h-screen bg-[#0d0f18] text-white">
       {/* Sidebar */}
@@ -183,7 +187,7 @@ export default function DashboardPage() {
         <Sidebar />
       </div>
 
-      {/* Main */}
+      {/* Main content */}
       <main className="flex-1 px-10 py-10">
         <h1 className="text-5xl font-extrabold mb-2">
           <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-300 text-transparent bg-clip-text">
@@ -194,43 +198,30 @@ export default function DashboardPage() {
 
         {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
-          {/* Recently Played */}
-          <SimpleCard title="Recently Played" subtitle="Your last tracks">
-            {loading ? (
-              <p className="text-white/50">Loading…</p>
-            ) : (
-              <ul>
-                {recentlyPlayed.slice(0, 5).map((item, i) => (
-                  <li key={i}>
-                    {item.played_at?.slice(0, 10) ?? "Unknown Track"}
-                  </li>
-                ))}
-              </ul>
-            )}
+          <SimpleCard title="Recently Played" subtitle="Last tracks">
+            {loading ? <p>Loading…</p> : <pre>{JSON.stringify(recentlyPlayed.slice(0, 5), null, 2)}</pre>}
           </SimpleCard>
 
-          {/* Top Genres */}
           <SimpleCard title="Top Genres" subtitle="From your top artists">
             <ul>
               {topGenres.slice(0, 5).map((g, i) => (
-                <li key={i}>{g.genre ?? "Unknown Genre"}</li>
+                <li key={i}>{g.genre ?? "Unknown"}</li>
               ))}
             </ul>
           </SimpleCard>
 
-          {/* Recommendations */}
           <SimpleCard title="Recommendations" subtitle="Suggested for you">
             <ul>
               {recommendations.slice(0, 5).map((rec, i) => (
-                <li key={i}>{rec.name ?? "Unknown Track"}</li>
+                <li key={i}>{rec.name ?? "Unknown"}</li>
               ))}
             </ul>
           </SimpleCard>
         </div>
 
-        {/* ================== CHARTS ================== */}
+        {/* ---------------- CHARTS ---------------- */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* LINE CHART */}
+          {/* LINE */}
           <div className="bg-white p-6 rounded-3xl shadow-xl text-black">
             <h2 className="text-2xl font-bold mb-4">Minutes Listened</h2>
             <ResponsiveContainer width="100%" height={300}>
@@ -250,9 +241,9 @@ export default function DashboardPage() {
             </ResponsiveContainer>
           </div>
 
-          {/* BAR CHART */}
+          {/* BAR */}
           <div className="bg-white p-6 rounded-3xl shadow-xl text-black">
-            <h2 className="text-2xl font-bold mb-4">Top Recommendations</h2>
+            <h2 className="text-2xl font-bold mb-4">Recommended Tracks</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={barData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -265,7 +256,7 @@ export default function DashboardPage() {
             </ResponsiveContainer>
           </div>
 
-          {/* PIE CHART */}
+          {/* PIE */}
           <div className="bg-white p-6 rounded-3xl shadow-xl text-black col-span-1 md:col-span-2">
             <h2 className="text-2xl font-bold mb-4">Genre Breakdown</h2>
             <ResponsiveContainer width="100%" height={350}>
@@ -281,7 +272,10 @@ export default function DashboardPage() {
                   outerRadius={120}
                 >
                   {pieData.map((_, index) => (
-                    <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    <Cell
+                      key={index}
+                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                    />
                   ))}
                 </Pie>
               </PieChart>
