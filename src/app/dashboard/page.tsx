@@ -315,35 +315,34 @@ function DonutChart({
 
       <ResponsiveContainer width="100%" height={350}>
         <PieChart>
-          <Tooltip
-            formatter={(_, __, item: any) => [
-  `${item?.payload?.percentage ?? 0}%`,
-  "Genre",
-]}
+         <Tooltip
+  formatter={(_, __, item: { payload: PieDataPoint }) => [
+    `${item.payload.percentage}%`,
+    "Genre",
+  ]}
+  contentStyle={{
+    backgroundColor: "#1b1c29",
+    border: "1px solid rgba(255,255,255,0.1)",
+    color: "white",
+  }}
+/>
+
+<Pie
+  data={pieData}
+  dataKey="percentage"
+  nameKey="genre"
+  cx="50%"
+  cy="50%"
+  outerRadius={120}
+  innerRadius={60}
+  onClick={(entry: PieDataPoint) =>
+    setExpandedGenre(
+      expandedGenre === entry.genre ? null : entry.genre
+    )
+  }
+>
 
 
-            contentStyle={{
-              backgroundColor: "#1b1c29",
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: "white",
-            }}
-          />
-
-          <Legend wrapperStyle={{ color: "white" }} />
-
-          <Pie
-            data={pieData}
-            dataKey="percentage"
-            nameKey="genre"
-            cx="50%"
-            cy="50%"
-            outerRadius={120}
-            innerRadius={60}
-            onClick={(entry: any) =>
-              setExpandedGenre(
-                expandedGenre === entry.genre ? null : entry.genre
-              )
-            }
           >
             {pieData.map((entry, i) => (
               <Cell
