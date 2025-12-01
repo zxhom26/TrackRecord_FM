@@ -13,6 +13,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://trackrecord-fm-ui.onrender.com",
+        "https://trackrecord-fm.onrender.com",      # BACKEND
         "http://localhost:3000",
     ],
     allow_credentials=True,
