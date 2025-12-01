@@ -315,17 +315,18 @@ function DonutChart({
 
       <ResponsiveContainer width="100%" height={350}>
         <PieChart>
-         <Tooltip
-  formatter={(_, __, item: { payload: PieDataPoint }) => [
-    `${item.payload.percentage}%`,
-    "Genre",
-  ]}
+        <Tooltip
+  formatter={(_value, _name, item: any) => {
+    const pct = item?.payload?.percentage ?? 0;
+    return [`${pct}%`, "Genre"];
+  }}
   contentStyle={{
     backgroundColor: "#1b1c29",
     border: "1px solid rgba(255,255,255,0.1)",
     color: "white",
   }}
 />
+
 
 <Pie
   data={pieData}
