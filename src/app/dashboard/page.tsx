@@ -19,32 +19,26 @@ import {
 
 export default function DashboardPage() {
   // ---------------- STATE ----------------
-  const [minutesByDate, setMinutesByDate] = useState([]);
-  const [artistTotals, setArtistTotals] = useState([]);
-  const [genreTotals, setGenreTotals] = useState([]);
-
-  // ---------------- DEBUG LOGGING ----------------
-  useEffect(() => {
-    console.log("🔥 minutesByDate:", minutesByDate);
-    console.log("🔥 artistTotals:", artistTotals);
-    console.log("🔥 genreTotals:", genreTotals);
-  }, [minutesByDate, artistTotals, genreTotals]);
+  const [minutesByDate, setMinutesByDate] = useState<
+    { date: string; minutes: number }[]
+  >([]);
+  const [artistTotals, setArtistTotals] = useState<
+    { artist: string; minutes: number }[]
+  >([]);
+  const [genreTotals, setGenreTotals] = useState<
+    { genre: string; minutes: number }[]
+  >([]);
 
   // ---------------- FETCH ANALYTICS ----------------
   useEffect(() => {
     async function loadDashboard() {
-      console.log("📡 loading analytics...");
+      console.log("📡 Loading analytics…");
 
       try {
-        // Fetch from REAL backend routes
-        const [
-          playedRes,
-          artistsRes,
-          genresRes
-        ] = await Promise.all([
+        const [playedRes, artistsRes, genresRes] = await Promise.all([
           fetch("https://trackrecord-fm.onrender.com/recently-played"),
           fetch("https://trackrecord-fm.onrender.com/top-artists"),
-          fetch("https://trackrecord-fm.onrender.com/genres")
+          fetch("https://trackrecord-fm.onrender.com/genres"),
         ]);
 
         const played = await playedRes.json();
@@ -53,35 +47,43 @@ export default function DashboardPage() {
 
         console.log("📊 Loaded:", { played, artists, genres });
 
-        // -----------------------------
-        // FORMAT DATA FOR THE CHARTS
-        // -----------------------------
-
+        // ---------------- LINE CHART ----------------
         const minutesData =
-  played?.items?.map((item: any) => ({
-    date: item.played_at?.slice(0, 10),
-    minutes: Math.floor(item.track?.duration_ms / 60000),
-  })) || [];
-setMinutesByDate(minutesData);
+          played?.items?.map((item: any) => ({
+            date: item.played_at?.slice(0, 10),
+            minutes: Math.floor((item.track?.duration_ms || 0) / 60000),
+          })) || [];
 
-// ---- BAR CHART ----
-const artistsData =
-  artists?.items?.map((artist: any) => ({
-    artist: artist.name,
-    minutes: artist.total_minutes
-      ? artist.total_minutes
-      : artist.popularity || 0,
-  })) || [];
-setArtistTotals(artistsData);
+        setMinutesByDate(minutesData);
 
-// ---- PIE CHART ----
-const genreData = Object.entries(genres?.genre_counts || {}).map(
-  ([genre, count]: any) => ({
-    genre,
-    minutes: count,
-  })
-);
-setGenreTotals(genreData);
+        // ---------------- BAR CHART ----------------
+        const artistsData =
+          artists?.items?.map((artist: any) => ({
+            artist: artist.name,
+            minutes: artist.total_minutes
+              ? artist.total_minutes
+              : artist.popularity || 0,
+          })) || [];
+
+        setArtistTotals(artistsData);
+
+        // ---------------- PIE CHART ----------------
+        const genreData = Object.entries(genres?.genre_counts || {}).map(
+          ([genre, count]: [string, any]) => ({
+            genre,
+            minutes: Number(count),
+          })
+        );
+
+        setGenreTotals(genreData);
+      } catch (error) {
+        console.error("❌ Dashboard Error:", error);
+      }
+    }
+
+    loadDashboard();
+  }, []);
+
   // ---------------- COLORS FOR PIE ----------------
   const COLORS = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#B76CFD", "#FF914D"];
 
