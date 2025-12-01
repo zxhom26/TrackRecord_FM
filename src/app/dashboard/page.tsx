@@ -23,7 +23,7 @@ export default function DashboardPage() {
   const [artistTotals, setArtistTotals] = useState([]);
   const [genreTotals, setGenreTotals] = useState([]);
 
-  // ⭐⭐⭐ ADD THIS DEBUG LOG HERE ⭐⭐⭐
+  // ---------------- DEBUG LOGGING ----------------
   useEffect(() => {
     console.log("🔥 minutesByDate:", minutesByDate);
     console.log("🔥 artistTotals:", artistTotals);
@@ -35,24 +35,65 @@ export default function DashboardPage() {
     async function loadDashboard() {
       console.log("📡 loading analytics...");
 
-      const res = await fetch("https://trackrecord-fm.onrender.com/analytics");
-      const data = await res.json();
+      try {
+        // Fetch from REAL backend routes
+        const [
+          playedRes,
+          artistsRes,
+          genresRes
+        ] = await Promise.all([
+          fetch("https://trackrecord-fm.onrender.com/recently-played"),
+          fetch("https://trackrecord-fm.onrender.com/top-artists"),
+          fetch("https://trackrecord-fm.onrender.com/genres")
+        ]);
 
-      console.log("📊 Loaded:", data);
+        const played = await playedRes.json();
+        const artists = await artistsRes.json();
+        const genres = await genresRes.json();
 
-      // EXPECTED FORMAT:
-      // data.minutesByDate = [{ date: "2025-01-01", minutes: 145 }, ...]
-      // data.artistTotals = [{ artist: "Drake", minutes: 300 }, ...]
-      // data.genreTotals = [{ genre: "Pop", minutes: 240 }, ...]
+        console.log("📊 Loaded:", { played, artists, genres });
 
-      setMinutesByDate(data.minutesByDate || []);
-      setArtistTotals(data.artistTotals || []);
-      setGenreTotals(data.genreTotals || []);
+        // -----------------------------
+        // FORMAT DATA FOR THE CHARTS
+        // -----------------------------
+
+        // ---- LINE CHART ----
+        // recently-played returns: { items: [ { played_at, track: { duration_ms } } ] }
+        const minutesData =
+          played?.items?.map((item) => ({
+            date: item.played_at?.slice(0, 10),
+            minutes: Math.floor(item.track?.duration_ms / 60000),
+          })) || [];
+        setMinutesByDate(minutesData);
+
+        // ---- BAR CHART ----
+        // top-artists returns: { items: [ { name, total_minutes (or popularity) } ] }
+        const artistsData =
+          artists?.items?.map((artist) => ({
+            artist: artist.name,
+            minutes: artist.total_minutes
+              ? artist.total_minutes
+              : artist.popularity || 0,
+          })) || [];
+        setArtistTotals(artistsData);
+
+        // ---- PIE CHART ----
+        // genres returns: { genre_counts: { "pop": 12, "rap": 5, ... } }
+        const genreData = Object.entries(genres?.genre_counts || {}).map(
+          ([genre, count]) => ({
+            genre,
+            minutes: count,
+          })
+        );
+        setGenreTotals(genreData);
+
+      } catch (error) {
+        console.error("❌ Dashboard error:", error);
+      }
     }
 
     loadDashboard();
   }, []);
-
 
   // ---------------- COLORS FOR PIE ----------------
   const COLORS = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#B76CFD", "#FF914D"];
@@ -63,7 +104,9 @@ export default function DashboardPage() {
 
       {/* ---------------- LINE CHART ---------------- */}
       <section className="p-6 rounded-2xl shadow-md border bg-white">
-        <h2 className="text-2xl font-semibold mb-4">Minutes Listened (Daily / Weekly / Monthly)</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          Minutes Listened (Daily / Weekly / Monthly)
+        </h2>
 
         <ResponsiveContainer width="100%" height={350}>
           <LineChart data={minutesByDate}>
@@ -72,14 +115,22 @@ export default function DashboardPage() {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="minutes" stroke="#4D96FF" strokeWidth={3} dot={false} />
+            <Line
+              type="monotone"
+              dataKey="minutes"
+              stroke="#4D96FF"
+              strokeWidth={3}
+              dot={false}
+            />
           </LineChart>
         </ResponsiveContainer>
       </section>
 
       {/* ---------------- BAR CHART ---------------- */}
       <section className="p-6 rounded-2xl shadow-md border bg-white">
-        <h2 className="text-2xl font-semibold mb-4">Top Artists by Minutes Streamed</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          Top Artists by Minutes Streamed
+        </h2>
 
         <ResponsiveContainer width="100%" height={350}>
           <BarChart data={artistTotals}>
@@ -101,7 +152,6 @@ export default function DashboardPage() {
           <PieChart>
             <Tooltip />
             <Legend />
-
             <Pie
               data={genreTotals}
               dataKey="minutes"
