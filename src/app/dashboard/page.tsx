@@ -32,6 +32,7 @@ interface RecentlyPlayedItem {
   played_at?: string;
   ["track.duration_ms"]?: number;
   ["track.name"]?: string;
+  ["track.artists"]?: { name: string }[];
   [key: string]: unknown;
 }
 
@@ -50,7 +51,7 @@ interface LineDataPoint {
 
 interface BarDataPoint {
   artist: string;
-  minutes: number;
+  count: number;
 }
 
 interface PieDataPoint {
@@ -59,7 +60,12 @@ interface PieDataPoint {
   [key: string]: string | number;
 }
 
+interface HeatmapCell {
+  hour: number;
+  count: number;
+}
 
+// ---------------- CARD COMPONENT ----------------
 function SimpleCard(props: {
   title: string;
   subtitle: string;
@@ -86,6 +92,7 @@ export default function DashboardPage() {
   const [lineData, setLineData] = useState<LineDataPoint[]>([]);
   const [barData, setBarData] = useState<BarDataPoint[]>([]);
   const [pieData, setPieData] = useState<PieDataPoint[]>([]);
+  const [heatmap, setHeatmap] = useState<HeatmapCell[]>([]);
 
   const formattedDate = new Date().toLocaleDateString("en-US", {
     month: "long",
@@ -93,7 +100,7 @@ export default function DashboardPage() {
     year: "numeric",
   });
 
-  // ---------------- FETCH DATA (UNCHANGED) ----------------
+  // ---------------- FETCH DATA ----------------
   useEffect(() => {
     if (status !== "authenticated") return;
     const token = session?.accessToken;
@@ -117,19 +124,17 @@ export default function DashboardPage() {
         setTopGenres(genres);
         setRecommendations(recs);
 
-        // ---------------- LINE CHART: REAL MINUTES/DAY ----------------
+        // ---------------- LINE CHART (REAL MINUTES/DAY) ----------------
         const dailyMap: Record<string, number> = {};
 
         recently.forEach((item) => {
           const played = item["played_at"]?.slice(0, 10);
           const ms = item["track.duration_ms"] ?? 0;
-
           if (!played) return;
-
           dailyMap[played] = (dailyMap[played] || 0) + ms;
         });
 
-        const mappedLine: LineDataPoint[] = Object.entries(dailyMap)
+        const mappedLine = Object.entries(dailyMap)
           .map(([date, totalMs]) => ({
             date,
             minutes: Math.round(totalMs / 60000),
@@ -138,7 +143,7 @@ export default function DashboardPage() {
 
         setLineData(mappedLine);
 
-        // ---------------- PIE CHART: TOP 8 GENRES ----------------
+        // ---------------- PIE CHART (TOP 5 + OTHER) ----------------
         const counts: Record<string, number> = {};
         genres.forEach((g) => {
           const name = g.genre ?? "Unknown";
@@ -146,24 +151,58 @@ export default function DashboardPage() {
         });
 
         const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        const top5 = sorted.slice(0, 5);
+        const other = sorted.slice(5).reduce((sum, [, v]) => sum + v, 0);
 
-        const top8 = sorted.slice(0, 8);
-        const otherCount = sorted.slice(8).reduce((sum, [, v]) => sum + v, 0);
+        const total = sorted.reduce((sum, [, v]) => sum + v, 0);
 
-        const mappedPie: PieDataPoint[] = [
-          ...top8.map(([genre, count]) => ({ genre, minutes: count })),
-          { genre: "Other", minutes: otherCount },
+        const mappedPie = [
+          ...top5.map(([genre, count]) => ({
+            genre,
+            minutes: count,
+            percent: ((count / total) * 100).toFixed(1),
+          })),
+          {
+            genre: "Other",
+            minutes: other,
+            percent: ((other / total) * 100).toFixed(1),
+          },
         ];
 
         setPieData(mappedPie);
 
-        // ---------------- BAR CHART: PLACEHOLDER UNTIL BACKEND SUPPLIES DURATIONS ----------------
-        const mappedBar: BarDataPoint[] = recs.map((t) => ({
-          artist: t.name ?? "Unknown",
-          minutes: Math.floor(Math.random() * 40) + 10,
+        // ---------------- ARTIST BAR CHART (REAL FREQUENCY) ----------------
+        const artistFreq: Record<string, number> = {};
+
+        recently.forEach((item) => {
+          const artists = item["track.artists"] ?? [];
+          artists.forEach((a: { name: string }) => {
+            artistFreq[a.name] = (artistFreq[a.name] || 0) + 1;
+          });
+        });
+
+        const sortedArtists = Object.entries(artistFreq)
+          .map(([artist, count]) => ({ artist, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+
+        setBarData(sortedArtists);
+
+        // ---------------- HEATMAP (HOUR OF DAY) ----------------
+        const hourMap: Record<number, number> = {};
+
+        recently.forEach((item) => {
+          if (!item.played_at) return;
+          const hour = new Date(item.played_at).getHours();
+          hourMap[hour] = (hourMap[hour] || 0) + 1;
+        });
+
+        const mappedHeat = Array.from({ length: 24 }, (_, hour) => ({
+          hour,
+          count: hourMap[hour] ?? 0,
         }));
 
-        setBarData(mappedBar);
+        setHeatmap(mappedHeat);
       } finally {
         setLoading(false);
       }
@@ -172,12 +211,12 @@ export default function DashboardPage() {
     load();
   }, [status, session]);
 
-  // Dashboard theme colors
+  // COLORS
   const PIE_COLORS = [
-    "#A78BFA", "#C084FC", "#E879F9", "#FB7185",
-    "#FCA5A5", "#FCD34D", "#6EE7B7", "#7DD3FC",
-    "#94A3B8", // Other
+    "#A78BFA", "#C084FC", "#E879F9", "#FB7185", "#FCA5A5", "#94A3B8",
   ];
+
+  const HEAT_COLORS = ["#1e293b", "#475569", "#64748b", "#94a3b8", "#cbd5e1"];
 
   // ---------------- UI ----------------
   return (
@@ -198,9 +237,7 @@ export default function DashboardPage() {
         {/* SUMMARY CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
           <SimpleCard title="Recently Played" subtitle="Last tracks">
-            {loading ? (
-              <p>Loading…</p>
-            ) : (
+            {loading ? <p>Loading…</p> : (
               <ul>
                 {recentlyPlayed.slice(0, 5).map((item, i) => (
                   <li key={i}>{item["track.name"] ?? "Unknown Track"}</li>
@@ -235,17 +272,26 @@ export default function DashboardPage() {
             {lineData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={lineData}>
+                  <defs>
+                    <linearGradient id="colorMinutes" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#4D96FF" stopOpacity={0.7}/>
+                      <stop offset="100%" stopColor="#4D96FF" stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis label={{ value: "Minutes", angle: -90, position: "insideLeft" }} />
                   <Tooltip />
                   <Legend />
                   <Line
-                    type="linear"
+                    type="monotone"
                     dataKey="minutes"
                     stroke="#4D96FF"
                     strokeWidth={3}
-                    dot={{ r: 4 }}
+                    dot={{ r: 5 }}
+                    activeDot={{ r: 7 }}
+                    fillOpacity={1}
+                    fill="url(#colorMinutes)"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -254,33 +300,33 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* BAR CHART */}
+          {/* ARTIST BAR CHART */}
           <div className="bg-white p-6 rounded-3xl shadow-xl text-black">
-            <h2 className="text-2xl font-bold mb-4">Recommended Tracks</h2>
+            <h2 className="text-2xl font-bold mb-4">Top Artists (Your Last 50 Tracks)</h2>
             {barData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={barData}>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={barData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="artist" hide />
-                  <YAxis />
+                  <XAxis type="number" />
+                  <YAxis dataKey="artist" type="category" width={120}/>
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="minutes" fill="#6BCB77" />
+                  <Bar dataKey="count" fill="#A78BFA" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p>No recommendation data available</p>
+              <p>No artist data available</p>
             )}
           </div>
 
-          {/* PIE CHART */}
+          {/* GENRE DONUT */}
           <div className="bg-white p-6 rounded-3xl shadow-xl text-black col-span-1 md:col-span-2">
             <h2 className="text-2xl font-bold mb-4">Genre Breakdown</h2>
 
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={350}>
                 <PieChart>
-                  <Tooltip formatter={(v, n) => [`${v}`, `${n}`]} />
+                  <Tooltip formatter={(v, n, d) => [`${d.payload.percent}%`, n]} />
                   <Legend />
                   <Pie
                     data={pieData}
@@ -288,6 +334,7 @@ export default function DashboardPage() {
                     nameKey="genre"
                     cx="50%"
                     cy="50%"
+                    innerRadius={70}
                     outerRadius={120}
                   >
                     {pieData.map((_, i) => (
@@ -299,6 +346,41 @@ export default function DashboardPage() {
             ) : (
               <p>No genre data available</p>
             )}
+          </div>
+
+          {/* HEATMAP */}
+          <div className="bg-white p-6 rounded-3xl shadow-xl text-black col-span-1 md:col-span-2">
+            <h2 className="text-2xl font-bold mb-4">Listening Activity by Hour</h2>
+
+            <div className="grid grid-cols-12 gap-1">
+              {heatmap.map((h, i) => (
+                <div
+                  key={i}
+                  title={`${h.hour}:00 — ${h.count} plays`}
+                  className="h-6 rounded-md transition hover:scale-110"
+                  style={{
+                    backgroundColor:
+                      HEAT_COLORS[
+                        h.count === 0
+                          ? 0
+                          : h.count === 1
+                          ? 1
+                          : h.count === 2
+                          ? 2
+                          : h.count < 5
+                          ? 3
+                          : 4
+                      ],
+                  }}
+                ></div>
+              ))}
+            </div>
+
+            <div className="flex justify-between text-xs text-gray-600 mt-2">
+              {Array.from({ length: 24 }, (_, i) => (
+                <span key={i}>{i}</span>
+              ))}
+            </div>
           </div>
 
         </div>
