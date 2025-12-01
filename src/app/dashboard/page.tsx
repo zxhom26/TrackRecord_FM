@@ -27,7 +27,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   // ---------------------------
-  // SEND TOKEN TO BACKEND (required)
+  // SEND TOKEN TO BACKEND
   // ---------------------------
   useEffect(() => {
     if (session?.accessToken) {
@@ -36,18 +36,18 @@ export default function DashboardPage() {
   }, [session?.accessToken]);
 
   // ---------------------------
-  // LOAD ANALYTICS VIA utils.js
+  // LOAD ALL ANALYTICS
   // ---------------------------
   async function loadAnalytics() {
     if (!session?.accessToken) return;
-
     setLoading(true);
+
     const token = session.accessToken;
 
     try {
       console.log("📡 Fetching dashboard analytics (via utils.js)…");
 
-      // 
+      // Fetch everything
       const artistsRes = await fetchTopArtists(token);
       const genresRes = await fetchTopGenres(token);
       const quickRes = await getQuickStats(token);
@@ -58,10 +58,11 @@ export default function DashboardPage() {
       // Save genres
       setGenres(genresRes.top_genres || []);
 
-      // Save listening minutes
-      setListeningMinutes(
-        quickRes?.minutes_listened_by_day || []
-      );
+      // QUICK FIX — correct path to minutes!!!!
+      const minutes =
+        quickRes?.quick_stats?.[0]?.minutes_listened_by_day || [];
+
+      setListeningMinutes(minutes);
 
     } catch (err) {
       console.error("❌ Dashboard error:", err);
@@ -70,11 +71,9 @@ export default function DashboardPage() {
     setLoading(false);
   }
 
-  // Call when token arrives
+  // Trigger when token arrives
   useEffect(() => {
-    if (session?.accessToken) {
-      loadAnalytics();
-    }
+    if (session?.accessToken) loadAnalytics();
   }, [session?.accessToken]);
 
   // ---------------------------
