@@ -316,10 +316,11 @@ function DonutChart({
       <ResponsiveContainer width="100%" height={350}>
         <PieChart>
           <Tooltip
-            formatter={(_, __, item) => [
-  `${(item as { payload: { percentage: number } }).payload.percentage}%`,
+            formatter={(_, __, item: any) => [
+  `${item?.payload?.percentage ?? 0}%`,
   "Genre",
 ]}
+
 
             contentStyle={{
               backgroundColor: "#1b1c29",
@@ -338,7 +339,7 @@ function DonutChart({
             cy="50%"
             outerRadius={120}
             innerRadius={60}
-            onClick={(entry) =>
+            onClick={(entry: any) =>
               setExpandedGenre(
                 expandedGenre === entry.genre ? null : entry.genre
               )
@@ -439,12 +440,14 @@ export default function DashboardPage() {
 
         /* ---------- TOP ARTISTS ---------- */
         const artistCounts: Record<string, number> = {};
-        recently.forEach((item) => {
-          const artists = item["track.artists"] ?? [];
-          artists.forEach((a) => {
-            artistCounts[a.name] = (artistCounts[a.name] || 0) + 1;
-          });
-        });
+        recently.forEach((item: RecentlyPlayedItem) => {
+  const artists = (item["track.artists"] ?? []) as SpotifyArtist[];
+
+  artists.forEach((a: SpotifyArtist) => {
+    artistCounts[a.name] = (artistCounts[a.name] || 0) + 1;
+  });
+});
+
 
         setArtistBarData(
           Object.entries(artistCounts)
@@ -482,13 +485,17 @@ export default function DashboardPage() {
 
         /* ---------- HEATMAP (MINS PER HOUR) ---------- */
         const hourBins = new Array(24).fill(0);
-        recently.forEach((item) => {
-          const t = item.played_at;
-          const ms = item["track.duration_ms"] ?? 0;
-          if (!t) return;
-          const h = new Date(t).getHours();
-          hourBins[h] += Math.round(ms / 60000);
-        });
+
+recently.forEach((item: RecentlyPlayedItem) => {
+  const t = item.played_at;
+  const ms = item["track.duration_ms"] ?? 0;
+
+  if (!t) return;
+
+  const h = new Date(t).getHours();
+  hourBins[h] += Math.round(ms / 60000);
+});
+
 
         setHeatmapData(hourBins);
       } finally {
