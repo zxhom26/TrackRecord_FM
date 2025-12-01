@@ -103,59 +103,59 @@ class UserAnalytics:
         }]
 
     # ---------------- RECOMMENDATIONS (FULLY FIXED) ----------------
-async def getSongRecommendations(self, n=20):
-    try:
-        # ---- Get seeds ----
-        top_tracks = await self.getTopTracks(n=5)
-        top_artists = await self.getTopArtists(n=3)
-        top_genres_raw = await self.getTopGenres(n=10)
+    async def getSongRecommendations(self, n=20):
+        try:
+            # ---- Get seeds ----
+            top_tracks = await self.getTopTracks(n=5)
+            top_artists = await self.getTopArtists(n=3)
+            top_genres_raw = await self.getTopGenres(n=10)
 
-        # Tracks
-        seed_tracks = [
-            track.get("id")
-            for track in top_tracks
-            if track.get("id")
-        ]
+            # Tracks
+            seed_tracks = [
+                track.get("id")
+                for track in top_tracks
+                if track.get("id")
+            ]
 
-        # Artists
-        seed_artists = [
-            artist.get("id")
-            for artist in top_artists
-            if artist.get("id")
-        ]
+            # Artists
+            seed_artists = [
+                artist.get("id")
+                for artist in top_artists
+                if artist.get("id")
+            ]
 
-        # Genres
-        seed_genres = [
-            g.get("genre")
-            for g in top_genres_raw
-            if g.get("genre") and isinstance(g.get("genre"), str)
-        ]
+            # Genres
+            seed_genres = [
+                g.get("genre")
+                for g in top_genres_raw
+                if g.get("genre") and isinstance(g.get("genre"), str)
+            ]
 
-        # ---- Prevent Spotify API error ----
-        if not (seed_tracks or seed_artists or seed_genres):
-            print("⚠️ No seeds found for recommendations.")
+            # ---- Prevent Spotify API error ----
+            if not (seed_tracks or seed_artists or seed_genres):
+                print("⚠️ No seeds found for recommendations.")
+                return {"recommendations": []}
+
+            # ---- Build params ----
+            params = {
+                "seed_tracks": ",".join(seed_tracks[:2]),
+                "seed_artists": ",".join(seed_artists[:2]),
+                "seed_genres": ",".join(seed_genres[:2]),
+                "limit": n
+            }
+
+            # ---- Call Spotify API ----
+            data = await self.proxy.fetch_api("recommendations", params=params)
+            tracks = data.get("tracks", [])
+
+            # ---- Clean DataFrame ----
+            df = self.process.flatten_data(tracks)
+            df = df.where(pd.notnull(df), None)
+            cleaned = df.to_dict(orient='records')
+
+            # ⭐⭐ MOST IMPORTANT: return JSON with key ⭐⭐
+            return {"recommendations": cleaned}
+
+        except Exception as e:
+            print(f"❌ Error in recommendations: {e}")
             return {"recommendations": []}
-
-        # ---- Build params ----
-        params = {
-            "seed_tracks": ",".join(seed_tracks[:2]),
-            "seed_artists": ",".join(seed_artists[:2]),
-            "seed_genres": ",".join(seed_genres[:2]),
-            "limit": n
-        }
-
-        # ---- Call Spotify API ----
-        data = await self.proxy.fetch_api("recommendations", params=params)
-        tracks = data.get("tracks", [])
-
-        # ---- Clean DataFrame ----
-        df = self.process.flatten_data(tracks)
-        df = df.where(pd.notnull(df), None)
-        cleaned = df.to_dict(orient='records')
-
-        # ⭐⭐ MOST IMPORTANT: return JSON with key ⭐⭐
-        return {"recommendations": cleaned}
-
-    except Exception as e:
-        print(f"❌ Error in recommendations: {e}")
-        return {"recommendations": []}
