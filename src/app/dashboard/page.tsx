@@ -23,6 +23,13 @@ export default function DashboardPage() {
   const [artistTotals, setArtistTotals] = useState([]);
   const [genreTotals, setGenreTotals] = useState([]);
 
+  // ⭐⭐⭐ ADD THIS DEBUG LOG HERE ⭐⭐⭐
+  useEffect(() => {
+    console.log("🔥 minutesByDate:", minutesByDate);
+    console.log("🔥 artistTotals:", artistTotals);
+    console.log("🔥 genreTotals:", genreTotals);
+  }, [minutesByDate, artistTotals, genreTotals]);
+
   // ---------------- FETCH ANALYTICS ----------------
   useEffect(() => {
     async function loadDashboard() {
