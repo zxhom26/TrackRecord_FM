@@ -9,19 +9,19 @@ user_tokens = {}
 app = FastAPI()
 
 # CORS setup to enable requests from frontend
+# CORS setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://trackrecord-fm-ui.onrender.com",
-        "http://trackrecord-fm-ui.onrender.com",
-        "https://trackrecord-fm.onrender.com",
-        "http://trackrecord-fm.onrender.com",
-        "http://localhost:3000",
+        "https://trackrecord-fm-ui.onrender.com",   
+        "https://trackrecord-fm.onrender.com",      
+        "http://localhost:3000"                     
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Basic root endpoint
 @app.get("/")
