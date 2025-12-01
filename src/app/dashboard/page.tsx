@@ -125,22 +125,23 @@ function GenreDetailSection({
 
   const artistCount: Record<string, number> = {};
 
-  recentlyPlayed.forEach((item: RecentlyPlayedItem) => {
-    const genres = item["track.genres"];
-    if (!Array.isArray(genres)) return;
+ recentlyPlayed.forEach((item: RecentlyPlayedItem) => {
+  const genres = item["track.genres"];
+  if (!Array.isArray(genres)) return;
 
-    const match = genres.some((g) =>
-      g.toLowerCase().includes(genre.toLowerCase())
-    );
+  const match = genres.some((g) =>
+    g.toLowerCase().includes(genre.toLowerCase())
+  );
 
-    if (match) {
-      const artists = item["track.artists"] ?? [];
-      artists.forEach((a) => {
-        const name = a.name;
-        artistCount[name] = (artistCount[name] || 0) + 1;
-      });
-    }
-  });
+  if (match) {
+    const artists = item["track.artists"] ?? [];
+    artists.forEach((a) => {
+      const name = a.name;
+      artistCount[name] = (artistCount[name] || 0) + 1;
+    });
+  }
+});
+
 
   const topArtists = Object.entries(artistCount)
     .map(([artist, count]) => ({ artist, count }))
@@ -222,9 +223,16 @@ function HeatmapRenderer({ data }: { data: number[] }) {
 
       {/* Label row */}
       <div className="flex justify-between mt-2 text-white/50 text-xs">
-        {Array.from({ length: 24 }).map((_, i) => (
-          <span key={i}>{i}</span>
-        ))}
+        {Array.from({ length: 24 }).map((_, i) => {
+  let label = "";
+  if (i === 0) label = "12 AM";
+  else if (i < 12) label = `${i} AM`;
+  else if (i === 12) label = "12 PM";
+  else label = `${i - 12} PM`;
+
+  return <span key={i}>{label}</span>;
+})}
+
       </div>
     </div>
   );
@@ -260,7 +268,17 @@ function TopArtistsBar({
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={artistsToShow} layout="vertical">
           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-          <XAxis stroke="#ffffff90" type="number" />
+          <XAxis
+  stroke="#ffffff90"
+  type="number"
+  label={{
+    value: "Track Plays",
+    position: "insideBottom",
+    offset: -5,
+    fill: "#ffffff90",
+  }}
+/>
+
           <YAxis
             type="category"
             dataKey="artist"
@@ -268,6 +286,8 @@ function TopArtistsBar({
             stroke="#ffffff90"
           />
           <Tooltip
+          formatter={(value) => [`${value} plays`, "Play Count"]}
+
             contentStyle={{
               backgroundColor: "#1b1c29",
               border: "1px solid rgba(255,255,255,0.1)",
@@ -311,9 +331,10 @@ function DonutChart({
         <PieChart>
           <Tooltip
             formatter={(value: number, name: string) => [
-              `${value} tracks`,
-              name,
-            ]}
+  `${value}%`,
+  name,
+]}
+
             contentStyle={{
               backgroundColor: "#1b1c29",
               border: "1px solid rgba(255,255,255,0.1)",
@@ -326,7 +347,7 @@ function DonutChart({
 
           <Pie
             data={pieData}
-            dataKey="count"
+            dataKey="percentage"
             nameKey="genre"
             cx="50%"
             cy="50%"
@@ -455,11 +476,11 @@ genres.forEach((g: GenreItem) => {
 const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
 const total = sorted.reduce((a, [, c]) => a + c, 0);
 
-const top5 = sorted.slice(0, 5);
-const others = sorted.slice(5).reduce((acc, [, v]) => acc + v, 0);
+const top8 = sorted.slice(0, 8);
+const others = sorted.slice(8).reduce((acc, [, v]) => acc + v, 0);
 
 setPieData([
-  ...top5.map(([g, c]) => ({
+  ...top8.map(([g, c]) => ({
     genre: g,
     count: c,
     percentage: Number(((c / total) * 100).toFixed(1)),
