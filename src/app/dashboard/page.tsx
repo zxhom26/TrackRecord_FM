@@ -1,57 +1,32 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 
 import {
   fetchRecentlyPlayed,
   fetchTopGenres,
   fetchRecommendations,
-} from "../../utils"; // correct path
+} from "../../utils";
 
-import Sidebar from "../components/Sidebar"; // correct path
-
-// Recharts
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
+import Sidebar from "../components/sidebar";
+import Logo from "../components/Logo";
 
 // -------------------- TYPES --------------------
 
 interface PlayedTrack {
-  played_at?: string;
-  track?: {
-    name?: string;
-    popularity?: number;
-    album?: {
-      images?: { url: string }[];
-    };
-    artists?: { name: string }[];
-  };
   [key: string]: unknown;
 }
 
 interface GenreItem {
-  genre?: string;
+  genre?: string | null;
   [key: string]: unknown;
 }
 
 interface RecommendationItem {
-  id?: string;
-  name?: string;
-  artists?: { name: string }[];
-  album?: { images?: { url: string }[] };
+  id?: string | number;
+  name?: string | null;
+  artists?: { name?: string | null }[];
   [key: string]: unknown;
 }
 
@@ -65,197 +40,29 @@ function getFormattedDate() {
   });
 }
 
-const GENRE_COLORS = [
-  "#7dd3fc",
-  "#a5b4fc",
-  "#f9a8d4",
-  "#f97373",
-  "#facc15",
-  "#4ade80",
-];
-
-// -------------------- COMPONENTS --------------------
-
-function ListeningLineChart({ data }: { data: PlayedTrack[] }) {
-  const chartData = useMemo(() => {
-    if (!Array.isArray(data)) return [];
-
-    const buckets: Record<string, number> = {};
-
-    data.forEach((item) => {
-      const rawTime = item.played_at;
-      if (!rawTime) return;
-
-      const d = new Date(rawTime);
-      if (isNaN(d.getTime())) return;
-
-      const hourLabel = d.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        hour12: true,
-      });
-
-      buckets[hourLabel] = (buckets[hourLabel] || 0) + 1;
-    });
-
-    return Object.entries(buckets).map(([hour, plays]) => ({
-      hour,
-      plays,
-    }));
-  }, [data]);
-
-  if (!chartData.length) {
-    return (
-      <div className="flex h-full items-center justify-center text-sm text-zinc-300">
-        Not enough listening history yet.
-      </div>
-    );
-  }
-
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-        <XAxis dataKey="hour" />
-        <YAxis allowDecimals={false} />
-        <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="plays"
-          stroke="#a5b4fc"
-          strokeWidth={2.2}
-          dot={{ r: 3 }}
-          activeDot={{ r: 5 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  );
-}
-
-function GenrePieChart({ genres }: { genres: GenreItem[] }) {
-  const genreData = useMemo(() => {
-    if (!Array.isArray(genres)) return [];
-
-    const counts: Record<string, number> = {};
-
-    genres.forEach((g) => {
-      const name = g.genre?.toLowerCase();
-      if (!name) return;
-      counts[name] = (counts[name] || 0) + 1;
-    });
-
-    const topEntries = Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
-    const mapped = topEntries.map(([name, value]) => ({
-      name,
-      value,
-    }));
-
-    const otherTotal = Object.entries(counts)
-      .slice(5)
-      .reduce((acc, [, v]) => acc + v, 0);
-
-    if (otherTotal > 0) {
-      mapped.push({ name: "other", value: otherTotal });
+// Try to pull a reasonable label from a generic object
+function getSafeStringField(
+  obj: { [key: string]: unknown },
+  keys: string[],
+  fallback: string
+): string {
+  for (const key of keys) {
+    const value = obj[key];
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value;
     }
-
-    return mapped;
-  }, [genres]);
-
-  if (!genreData.length) {
-    return (
-      <div className="flex h-full items-center justify-center text-sm text-zinc-300">
-        No genre analytics yet.
-      </div>
-    );
   }
-
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={genreData}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
-          outerRadius={90}
-          innerRadius={50}
-        >
-          {genreData.map((_, i) => (
-            <Cell key={i} fill={GENRE_COLORS[i % GENRE_COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
-  );
+  return fallback;
 }
 
-function RecommendationsCard({ recs }: { recs: RecommendationItem[] }) {
-  if (!recs.length) {
-    return (
-      <div className="flex h-full items-center justify-center text-zinc-300 text-sm">
-        No recommendations available yet.
-      </div>
-    );
-  }
-
-  const topFive = recs.slice(0, 5);
-
-  return (
-    <div className="flex h-full flex-col">
-      <h2 className="mb-4 text-xl font-semibold text-white">
-        Recommended For You
-      </h2>
-
-      <div className="flex flex-col gap-3">
-        {topFive.map((track) => {
-          const img =
-            track.album?.images?.[0]?.url ?? "/placeholder_album.png";
-
-          const name = track.name ?? "Unknown Track";
-          const artist = track.artists?.[0]?.name ?? "Unknown Artist";
-
-          return (
-            <div
-              key={track.id ?? `${name}-${artist}`}
-              className="flex items-center gap-3 rounded-full bg-rose-100/70 px-3 py-2 shadow-sm"
-            >
-              <Image
-                src={img}
-                alt={name}
-                width={40}
-                height={40}
-                className="rounded-full object-cover"
-              />
-
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-zinc-900">
-                  {name}
-                </span>
-                <span className="text-xs text-zinc-600">{artist}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// -------------------- MAIN PAGE --------------------
+// -------------------- PAGE --------------------
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
 
   const [recentlyPlayed, setRecentlyPlayed] = useState<PlayedTrack[]>([]);
-  const [topGenres, setTopGenres] = useState<GenreItem[]>([]);
-  const [recommendations, setRecommendations] = useState<RecommendationItem[]>(
-    []
-  );
+  const [genres, setGenres] = useState<GenreItem[]>([]);
+  const [recs, setRecs] = useState<RecommendationItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const formattedDate = getFormattedDate();
@@ -266,7 +73,12 @@ export default function DashboardPage() {
         setLoading(true);
 
         const token = session?.accessToken;
-        if (!token) return;
+        if (!token) {
+          setRecentlyPlayed([]);
+          setGenres([]);
+          setRecs([]);
+          return;
+        }
 
         const [rp, tg, rc] = await Promise.all([
           fetchRecentlyPlayed(token),
@@ -274,20 +86,35 @@ export default function DashboardPage() {
           fetchRecommendations(token),
         ]);
 
-        setRecentlyPlayed(rp.recently_played ?? []);
-        setTopGenres(tg.top_genres ?? []);
-        setRecommendations(rc.recommendations ?? []);
+        const rpArray = Array.isArray(rp?.recently_played)
+          ? (rp.recently_played as PlayedTrack[])
+          : [];
+        const tgArray = Array.isArray(tg?.top_genres)
+          ? (tg.top_genres as GenreItem[])
+          : [];
+        const rcArray = Array.isArray(rc?.recommendations)
+          ? (rc.recommendations as RecommendationItem[])
+          : [];
+
+        setRecentlyPlayed(rpArray);
+        setGenres(tgArray);
+        setRecs(rcArray);
+      } catch {
+        // On any error, just clear data; we don’t want the UI to crash
+        setRecentlyPlayed([]);
+        setGenres([]);
+        setRecs([]);
       } finally {
         setLoading(false);
       }
     }
 
     load();
-  }, [session]);
+  }, [session?.accessToken]);
 
   if (status === "loading") {
     return (
-      <div className="flex h-screen items-center justify-center text-white">
+      <div className="flex h-screen items-center justify-center bg-[#050816] text-white">
         Loading…
       </div>
     );
@@ -295,53 +122,189 @@ export default function DashboardPage() {
 
   if (!session?.accessToken) {
     return (
-      <div className="flex h-screen items-center justify-center text-white">
-        Please log in with Spotify first.
+      <div className="flex h-screen items-center justify-center bg-[#050816] text-white">
+        Please log in with Spotify to view your analytics.
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen bg-[#050816] text-white">
-      <Sidebar />
+      {/* SIDEBAR + LOGO COLUMN */}
+      <div className="relative flex-shrink-0">
+        <div className="absolute top-4 left-4 z-20">
+          <Logo />
+        </div>
+        <div className="h-full">
+          <Sidebar />
+        </div>
+      </div>
 
+      {/* MAIN CONTENT */}
       <main className="flex-1 px-10 py-8">
-        <h1 className="mb-10 bg-gradient-to-r from-purple-400 via-pink-300 to-orange-300 bg-clip-text text-4xl font-extrabold text-transparent md:text-5xl">
-          Your Analytics On {formattedDate}:
+        {/* Title + Date (date text white) */}
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
+          <span className="bg-gradient-to-r from-purple-400 via-pink-300 to-orange-300 bg-clip-text text-transparent">
+            Your Analytics
+          </span>
         </h1>
+        <p className="text-lg text-white mb-8">On {formattedDate}</p>
 
         {loading && (
-          <p className="mb-4 text-sm text-zinc-300">
-            Fetching your analytics…
+          <p className="mb-4 text-sm text-white/70">
+            Checking your Spotify data…
           </p>
         )}
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {/* Panel 1 */}
-          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-purple-500/40 via-purple-400/20 to-indigo-500/30 p-5 shadow-lg">
-            <h2 className="mb-2 text-lg font-semibold">Listening Activity</h2>
-            <p className="mb-4 text-xs text-zinc-300">
-              Songs you&apos;ve played recently.
+        {/* ====================== 3 FEATURE CARDS ====================== */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-4">
+          {/* =============== RECENTLY PLAYED CARD =============== */}
+          <div
+            className="
+              rounded-3xl p-10
+              bg-[#6a3ff815] backdrop-blur-md
+              border border-white/10 shadow-xl
+              hover:scale-[1.03] hover:border-white/20
+              transition-all cursor-default
+              flex flex-col gap-4
+              min-h-[280px]
+            "
+          >
+            <h2 className="text-2xl font-semibold">Recently Played</h2>
+            <p className="text-white/80 text-sm">
+              A quick peek at what you&apos;ve been listening to lately.
             </p>
-            <div className="h-[220px]">
-              <ListeningLineChart data={recentlyPlayed} />
-            </div>
+
+            {recentlyPlayed.length === 0 ? (
+              <p className="mt-4 text-sm text-white/60">
+                No recently played data available yet.
+              </p>
+            ) : (
+              <div className="mt-4 text-sm text-white/85 w-full">
+                <p className="mb-2 text-white/70">
+                  Total items: {recentlyPlayed.length}
+                </p>
+                <ul className="space-y-2">
+                  {recentlyPlayed.slice(0, 5).map((item, idx) => {
+                    const label = getSafeStringField(
+                      item,
+                      [
+                        "track.name",
+                        "song_name",
+                        "name",
+                      ],
+                      "Unknown track"
+                    );
+
+                    return (
+                      <li
+                        key={idx}
+                        className="px-3 py-2 rounded-full bg-white/5 border border-white/10"
+                      >
+                        {label}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
 
-          {/* Panel 2 */}
-          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-pink-500/40 via-rose-400/20 to-purple-500/30 p-5 shadow-lg">
-            <h2 className="mb-2 text-lg font-semibold">Top Genres</h2>
-            <p className="mb-4 text-xs text-zinc-300">
-              Based on your top artists.
+          {/* =============== TOP GENRES CARD =============== */}
+          <div
+            className="
+              rounded-3xl p-10
+              bg-[#ff88d715] backdrop-blur-md
+              border border-white/10 shadow-xl
+              hover:scale-[1.03] hover:border-white/20
+              transition-all cursor-default
+              flex flex-col gap-4
+              min-h-[280px]
+            "
+          >
+            <h2 className="text-2xl font-semibold">Top Genres</h2>
+            <p className="text-white/80 text-sm">
+              Genres detected directly from your top artists.
             </p>
-            <div className="h-[220px]">
-              <GenrePieChart genres={topGenres} />
-            </div>
+
+            {genres.length === 0 ? (
+              <p className="mt-4 text-sm text-white/60">
+                No genre data available.
+              </p>
+            ) : (
+              <div className="mt-4 text-sm text-white/85 w-full">
+                <p className="mb-2 text-white/70">
+                  Total items: {genres.length}
+                </p>
+                <ul className="space-y-2">
+                  {genres.slice(0, 6).map((g, idx) => (
+                    <li
+                      key={idx}
+                      className="px-3 py-2 rounded-full bg-white/5 border border-white/10"
+                    >
+                      {g.genre ?? "(unknown genre)"}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
-          {/* Panel 3 */}
-          <div className="h-[320px] rounded-3xl bg-gradient-to-br from-rose-400/50 via-rose-300/30 to-amber-300/40 p-5 shadow-lg">
-            <RecommendationsCard recs={recommendations} />
+          {/* =============== RECOMMENDATIONS CARD =============== */}
+          <div
+            className="
+              rounded-3xl p-10
+              bg-[#ff987515] backdrop-blur-md
+              border border-white/10 shadow-xl
+              hover:scale-[1.03] hover:border-white/20
+              transition-all cursor-default
+              flex flex-col gap-4
+              min-h-[280px]
+            "
+          >
+            <h2 className="text-2xl font-semibold">Recommendations</h2>
+            <p className="text-white/80 text-sm">
+              Tracks your backend is suggesting right now.
+            </p>
+
+            {recs.length === 0 ? (
+              <p className="mt-4 text-sm text-white/60">
+                No recommendations available yet.
+              </p>
+            ) : (
+              <div className="mt-4 text-sm text-white/85 w-full">
+                <p className="mb-2 text-white/70">
+                  Total items: {recs.length}
+                </p>
+                <ul className="space-y-2">
+                  {recs.slice(0, 5).map((r, idx) => {
+                    const name =
+                      typeof r.name === "string" && r.name.trim().length > 0
+                        ? r.name
+                        : "Unknown track";
+
+                    const artist =
+                      Array.isArray(r.artists) &&
+                      r.artists[0] &&
+                      typeof r.artists[0].name === "string"
+                        ? r.artists[0].name
+                        : "Unknown artist";
+
+                    return (
+                      <li
+                        key={r.id ?? idx}
+                        className="px-3 py-2 rounded-full bg-white/5 border border-white/10 flex flex-col"
+                      >
+                        <span className="font-semibold">{name}</span>
+                        <span className="text-xs text-white/70">
+                          {artist}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </main>
