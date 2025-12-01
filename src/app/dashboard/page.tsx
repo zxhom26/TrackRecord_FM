@@ -445,30 +445,32 @@ export default function DashboardPage() {
         );
 
         /* ---------- PIE CHART ---------- */
-        const genreCounts: Record<string, number> = {};
-        genres.forEach((g) => {
-          const name = g.genre ?? "Unknown";
-          genreCounts[name] = (genreCounts[name] || 0) + 1;
-        });
+      /* ---------- PIE CHART ---------- */
+const genreCounts: Record<string, number> = {};
+genres.forEach((g: GenreItem) => {
+  const name = g.genre ?? "Unknown";
+  genreCounts[name] = (genreCounts[name] || 0) + 1;
+});
 
-        const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
-        const total = sorted.reduce((a, [, c]) => a + c, 0);
+const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+const total = sorted.reduce((a, [, c]) => a + c, 0);
 
-        const top5 = sorted.slice(0, 5);
-        const others = sorted.slice(5).reduce((acc, [, v]) => acc + v, 0);
+const top5 = sorted.slice(0, 5);
+const others = sorted.slice(5).reduce((acc, [, v]) => acc + v, 0);
 
-        setPieData([
-          ...top5.map(([g, c]) => ({
-            genre: g,
-            count: c,
-            percentage: Number(((c / total) * 100).toFixed(1)),
-          })),
-          {
-            genre: "Other",
-            count: others,
-            percentage: Number(((others / total) * 100).toFixed(1)),
-          },
-        ]);
+setPieData([
+  ...top5.map(([g, c]) => ({
+    genre: g,
+    count: c,
+    percentage: Number(((c / total) * 100).toFixed(1)),
+  })),
+  {
+    genre: "Other",
+    count: others,
+    percentage: Number(((others / total) * 100).toFixed(1)),
+  },
+]);
+
 
         /* ---------- HEATMAP ---------- */
         const hourBins = new Array(24).fill(0);
