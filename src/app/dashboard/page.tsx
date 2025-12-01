@@ -29,17 +29,21 @@ import {
 
 /* ----------------------------------------
    TYPES — STRICT (NO `any`)
+   Defines shapes for spotify data returned by backend and ensures type safety 
 -----------------------------------------*/
 interface SpotifyArtist {
   name: string;
 }
 
 interface RecentlyPlayedItem {
+  //ISO time for when track was played
   played_at?: string;
+  //duration of track (ms)
   "track.duration_ms"?: number;
   "track.name"?: string;
   "track.artists"?: SpotifyArtist[];
   "track.genres"?: string[];
+// Safety: allow extra unknown keys
   [key: string]: unknown;
 }
 
@@ -51,11 +55,14 @@ interface RecommendationItem {
   name: string;
 }
 
+// Data point for line chart (minutes by day)
+
 interface LineDataPoint {
   date: string;
   minutes: number;
 }
 
+// Data for bar chart (artist → count)
 interface BarDataPoint {
   artist: string;
   count: number;
@@ -82,6 +89,7 @@ const BD_COLORS = [
   "#FDE68A",
 ];
 
+//high to low intensity
 const HEATMAP_COLORS = [
   "#0f1424",
   "#1e2850",
@@ -93,6 +101,8 @@ const HEATMAP_COLORS = [
 
 /* ----------------------------------------
    SIMPLE CARD WRAPPER
+      - Used throughout the dashboard to unify UI
+   - Accepts a title, subtitle, and content
 -----------------------------------------*/
 function SimpleCard({
   title,
@@ -113,6 +123,8 @@ function SimpleCard({
 }
 /* ----------------------------------------
    GENRE DETAIL SECTION
+   - When a genre is clicked → show top artists
+   - Filters recently played tracks by genre
 -----------------------------------------*/
 function GenreDetailSection({
   genre,
@@ -121,14 +133,17 @@ function GenreDetailSection({
   genre: string;
   recentlyPlayed: RecentlyPlayedItem[];
 }) {
+    // Do not show detail on "Other" or empty
   if (!genre || genre === "Other") return null;
-
+  // Count plays per artist within this genre
   const artistCount: Record<string, number> = {};
+  // Loop over recently played tracks
 
  recentlyPlayed.forEach((item: RecentlyPlayedItem) => {
   const genres = item["track.genres"];
   if (!Array.isArray(genres)) return;
 
+  // Check if track belongs to selected genre
   const match = genres.some((g) =>
     g.toLowerCase().includes(genre.toLowerCase())
   );
@@ -142,7 +157,7 @@ function GenreDetailSection({
   }
 });
 
-
+  // Top 3 artists for selected genre
   const topArtists = Object.entries(artistCount)
     .map(([artist, count]) => ({ artist, count }))
     .sort((a, b) => b.count - a.count)
@@ -175,8 +190,10 @@ function GenreDetailSection({
 
 /* ----------------------------------------
    HEATMAP (24 hours)
+   - displays minutes listed by hour
 -----------------------------------------*/
 function HeatmapRenderer({ data }: { data: number[] }) {
+    // Maximum value used to compute intensity shading
   const maxVal = Math.max(...data);
 
   return (
@@ -240,6 +257,8 @@ function HeatmapRenderer({ data }: { data: number[] }) {
 
 /* ----------------------------------------
    TOP ARTISTS BAR
+     - Shows top artists by number of plays
+   - Toggle button switches between Top 5 and Top 10
 -----------------------------------------*/
 function TopArtistsBar({
   data,
@@ -250,6 +269,7 @@ function TopArtistsBar({
   showAll: boolean;
   setShowAll: (v: boolean) => void;
 }) {
+    // Show either top 5 or top 10 artists
   const artistsToShow = showAll ? data.slice(0, 10) : data.slice(0, 5);
 
   return (
@@ -311,6 +331,8 @@ function TopArtistsBar({
 
 /* ----------------------------------------
    DONUT CHART – GENRES
+      - Shows top genres + percentages
+   - Clicking a slice expands details below
 -----------------------------------------*/
 function DonutChart({
   pieData,
@@ -382,23 +404,30 @@ function DonutChart({
 }
 /* ----------------------------------------
    MAIN DASHBOARD
+    - Fetches all analytics data
+   - Adds UI states
+   - Builds derived data for charts
 -----------------------------------------*/
 export default function DashboardPage() {
   const { data: session, status } = useSession();
 
+  //data from backend
   const [recentlyPlayed, setRecentlyPlayed] = useState<RecentlyPlayedItem[]>([]);
   const [topGenres, setTopGenres] = useState<GenreItem[]>([]);
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  //chart data states
   const [lineData, setLineData] = useState<LineDataPoint[]>([]);
   const [artistBarData, setArtistBarData] = useState<BarDataPoint[]>([]);
   const [pieData, setPieData] = useState<PieDataPoint[]>([]);
   const [heatmapData, setHeatmapData] = useState<number[]>(new Array(24).fill(0));
 
+  //ui controls 
   const [expandedGenre, setExpandedGenre] = useState<string | null>(null);
   const [showAllArtists, setShowAllArtists] = useState<boolean>(false);
 
+  //today's date
   const formattedDate = new Date().toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -407,6 +436,8 @@ export default function DashboardPage() {
 
   /* ----------------------------------------
      FETCH DATA
+          - Ensures no fetch before token exists
+     - Loads all backend endpoints at once
   -----------------------------------------*/
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -416,16 +447,20 @@ export default function DashboardPage() {
     async function load() {
       setLoading(true);
       try {
+        // Parallel fetching → faster UI
         const [rp, tg, rc] = await Promise.all([
           fetchRecentlyPlayed(token),
           fetchTopGenres(token),
           fetchRecommendations(token),
         ]);
 
+       // Normalize backend responses
+
         const recently = rp?.recently_played ?? [];
         const genres = tg?.top_genres ?? [];
         const recs = rc?.recommendations ?? [];
 
+         // Save to state
         setRecentlyPlayed(recently);
         setTopGenres(genres);
         setRecommendations(recs);
@@ -515,6 +550,8 @@ setPieData([
 
   /* ----------------------------------------
      RENDER
+          - If loading → show placeholder
+     - Otherwise render charts + insights
   -----------------------------------------*/
   return (
     <div className="flex min-h-screen bg-[#0d0f18] text-white">
