@@ -338,9 +338,11 @@ function DonutChart({
   cy="50%"
   outerRadius={120}
   innerRadius={60}
-  onClick={(entry: PieDataPoint) =>
-    setExpandedGenre(expandedGenre === entry.genre ? null : entry.genre)
-  }
+  onClick={(entry) => {
+  const e: any = entry;  // local cast = allowed
+  setExpandedGenre(expandedGenre === e.genre ? null : e.genre);
+}}
+
 >
   {pieData.map((entry, i) => (
     <Cell
