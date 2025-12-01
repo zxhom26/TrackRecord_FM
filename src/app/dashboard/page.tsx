@@ -65,7 +65,9 @@ interface PieDataPoint {
   genre: string;
   count: number;
   percentage: number;
+  [key: string]: string | number;
 }
+
 
 /* ----------------------------------------
    THEME COLORS — BLACK DIAMOND
