@@ -1,17 +1,19 @@
+
+/* ------------------ API HELPERS ------------------ */
 // ---  Call backend helper ---
-export async function callBackend() {
-  try {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+export async function callBackend() { // exported async function to check connectivity with backend
+  try { // error handling block
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL; //read the backend URL from env variables
 
-    const res = await fetch(`${backendUrl}/api/data`, { method: "GET" });
+    const res = await fetch(`${backendUrl}/api/data`, { method: "GET" }); // fetches (GETs) data from a backend endpoint
 
-    if (!res.ok) {
-      throw new Error(`Backend responded with status ${res.status}`);
+    if (!res.ok) { // backend will send an ok response if status is good (ex. 200), if the response is not okay then...
+      throw new Error(`Backend responded with status ${res.status}`); // Throw error with message + code
     }
 
-    return await res.json();
+    return await res.json(); // backend sends a .json
   } catch (err) {
-    console.error("Error calling backend:", err);
+    console.error("Error calling backend:", err); // log any errors 
     return { error: err.message };
   }
 }
@@ -19,16 +21,16 @@ export async function callBackend() {
 // --- Send token to backend ---
 export async function sendTokenToBackend(token) {
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL; // build backend URL
 
-    const res = await fetch(`${backendUrl}/api/token`, {
-      method: "POST",
+    const res = await fetch(`${backendUrl}/api/token`, { // sets a constant variable called 'res'. 'res' will be assigned to the response of fetch POST. await will wait until it is received
+      method: "POST", // tells the backend we are sending (POST) a json (the OAuth token)
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accessToken: token }),
+      body: JSON.stringify({ accessToken: token }), // body ex. {accessToken: abcxyz123}
     });
 
     if (!res.ok) {
-      throw new Error(`Backend responded with status ${res.status}`);
+      throw new Error(`Backend responded with status ${res.status}`); // throw error if bad status
     }
 
     return await res.json();
@@ -42,9 +44,9 @@ export async function sendTokenToBackend(token) {
 export async function fetchTopTracks(token) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-tracks`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/top-tracks`, // similar to above, waiting for a response from top-tracks endpoint
       {
-        method: "POST", // backend expects POST
+        method: "POST", // backend expects POST of access token -- CODE SMELL (could just call sendTokenToBackend here)
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ "accessToken": token }),
       }
@@ -158,6 +160,7 @@ export async function fetchRecommendations(token) {
 // ─────────────────────────────────────────
 
 const GENRE_TO_MOOD_MAP = [
+  // static array lookup table - assigning genres to moods -- includes fragments as well
   { key: "rap", mood: "Bold & Confident" },
   { key: "hip hop", mood: "Bold & Confident" },
   { key: "trap", mood: "Bold & Confident" },
@@ -184,29 +187,30 @@ const GENRE_TO_MOOD_MAP = [
 ];
 
 export function getTopMoodsFromGenres(genres) {
-  if (!genres || genres.length === 0) {
-    return ["Unknown Mood"];
+  if (!genres || genres.length === 0) { // if not genres OR no genres come up
+    return ["Unknown Mood"]; // then unknown mood
   }
 
-  const lower = genres.map((g) => g.toLowerCase());
-  const moodScores = {};
+  const lower = genres.map((g) => g.toLowerCase()); // convert all genres to lowercase
+  const moodScores = {}; // creates mood object literals
 
-  for (const g of lower) {
-    for (const entry of GENRE_TO_MOOD_MAP) {
-      if (g.includes(entry.key)) {
-        moodScores[entry.mood] = (moodScores[entry.mood] || 0) + 1;
+  for (const g of lower) { // loops through the lowercase genres
+    for (const entry of GENRE_TO_MOOD_MAP) { // compare the given entry against the array of genre/moods
+      if (g.includes(entry.key)) { // if the key (genre) is includes
+        moodScores[entry.mood] = (moodScores[entry.mood] || 0) + 1; // add to the mood score
       }
     }
   }
 
   if (Object.keys(moodScores).length === 0) {
-    return ["🎧 Balanced Vibes"];
+    return ["🎧 Balanced Vibes"]; // if the genre is not recognized then we will return 'Balanced Vibes'
   }
-
+  
+  // fallback if no genre found
   return Object.entries(moodScores)
     .sort((a, b) => b[1] - a[1])
     .map((pair) => pair[0])
-    .slice(0, 3);
+    .slice(0, 3); // slicing to the top 3
 }
 
 // --- Fetch QuickStats ---

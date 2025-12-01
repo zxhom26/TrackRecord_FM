@@ -1,54 +1,55 @@
-"use client";
+"use client"; // must run on client, not server
 
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { BarChart3, PieChart, Brain } from "lucide-react";
-import Link from "next/link";
-import { getQuickStats } from "../utils";
+import { useSession } from "next-auth/react"; // NextAuth for authenticating user (stores the OAuth access token)
+import { useEffect, useState } from "react"; // React hooks for state management + side effects
+import { BarChart3, PieChart, Brain } from "lucide-react"; // icons
+import Link from "next/link"; // allows redirect between pages 
+import { getQuickStats } from "../utils"; // getQuickStats from utils.js to populate quickstats card
 
-// NEW — import your logo component
-import Logo from "./components/Logo";
+import Logo from "./components/Logo"; // component for Logo UI
 
+// TypeScript interface defines the shape of the quickstats (the format in which the data is expected)
 interface QuickStats {
   topTrack: string;
   topArtist: string;
   topGenre: string;
 }
 
-export default function HomePage() {
-  const { data: session } = useSession();
+export default function HomePage() { // exportable homepage function
+  const { data: session } = useSession(); // extract user session (may contain accessToken if authenticated)
 
-  const [quickStats, setQuickStats] = useState<QuickStats>({
+  const [quickStats, setQuickStats] = useState<QuickStats>({ // initializes placeholders before data pops up 
     topTrack: "Loading…",
     topArtist: "Loading…",
     topGenre: "Loading…",
   });
 
-  const [loadingQuickStats, setLoadingQuickStats] = useState(true);
+  const [loadingQuickStats, setLoadingQuickStats] = useState(true); // boolean used to switch between "Loading" and actual data
 
   // Fetch QuickStats on load
   useEffect(() => {
-    const token = session?.accessToken;
-    if (!token) return;
+    const token = session?.accessToken; // once the token is available
+    if (!token) return; // no token (not authenticated), return
 
-    async function loadStats() {
+    async function loadStats() { // inner async function so that the rest of the UI can populate
       try {
         setLoadingQuickStats(true);
 
-        const stats = await getQuickStats(token);
-        setQuickStats(stats);
+        const stats = await getQuickStats(token); // fetch quickstats
+        setQuickStats(stats); // set the UI with new data
       } catch (err) {
-        console.error("QuickStats error:", err);
+        console.error("QuickStats error:", err); // update console with errors
       } finally {
-        setLoadingQuickStats(false);
+        setLoadingQuickStats(false); // loading indicator is removed even if the quickstats dont show
       }
     }
 
     loadStats();
-  }, [session?.accessToken]);
+  }, [session?.accessToken]); //reload the stats whenever the token changes 
 
+  // --- PAGE LAYOUT ---
   return (
-    <main className="min-h-screen bg-[#1b1b1b] text-white px-10 pb-32">
+    <main className="min-h-screen bg-[#1b1b1b] text-white px-10 pb-32"> 
 
       {/* ====================== TOP BAR ====================== */}
       <div className="flex items-center justify-between py-6">

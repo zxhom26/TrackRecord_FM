@@ -1,13 +1,14 @@
-import NextAuth from "next-auth";
-import SpotifyProvider from "next-auth/providers/spotify";
+import NextAuth from "next-auth"; // import nextauth for authentication
+import SpotifyProvider from "next-auth/providers/spotify"; // import the spotify provider (OAuth) -- automatic handling of redirect -> spotify -> callback
 
-async function refreshAccessToken(token) {
+async function refreshAccessToken(token) { // used to refresh the access token upon expiration
   try {
-    const params = new URLSearchParams();
-    params.append("grant_type", "refresh_token");
+    // puts params in required spotify format
+    const params = new URLSearchParams(); 
+    params.append("grant_type", "refresh_token"); // tells spotify what action to perform
     params.append("refresh_token", token.refreshToken);
 
-    const response = await fetch("https://accounts.spotify.com/api/token", {
+    const response = await fetch("https://accounts.spotify.com/api/token", { // call spotify's token endpoint
       method: "POST",
       headers: {
         Authorization:
@@ -19,20 +20,20 @@ async function refreshAccessToken(token) {
           ).toString("base64"),
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: params.toString(),
+      body: params.toString(), // covert the body to a string
     });
 
-    const refreshed = await response.json();
+    const refreshed = await response.json(); // covert respone into a js 
 
-    if (!response.ok) throw refreshed;
+    if (!response.ok) throw refreshed; // refresh if response not 200
 
     return {
-      ...token,
-      accessToken: refreshed.access_token,
-      expiresAt: Date.now() + refreshed.expires_in * 1000,
-      refreshToken: refreshed.refresh_token ?? token.refreshToken,
+      ...token, // keep previous fields
+      accessToken: refreshed.access_token, // replace old token with refreshed
+      expiresAt: Date.now() + refreshed.expires_in * 1000, // compute expiration timestamp
+      refreshToken: refreshed.refresh_token ?? token.refreshToken, // use refreshed token if provided, if not keep old one
     };
-  } catch (error) {
+  } catch (error) { // log any errors
     console.error("Error refreshing access token:", error);
     return {
       ...token,
@@ -43,26 +44,26 @@ async function refreshAccessToken(token) {
 
 export const authOptions = {
   providers: [
-    SpotifyProvider({
-      clientId: process.env.SPOTIFY_CLIENT_ID,
+    SpotifyProvider({ // OAuth provider
+      clientId: process.env.SPOTIFY_CLIENT_ID, // read secret variables
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
       authorization: {
         url: "https://accounts.spotify.com/authorize",
         params: {
           scope:
-            "user-read-email user-top-read user-read-recently-played user-read-private",
+            "user-read-email user-top-read user-read-recently-played user-read-private", // permissions that the user needs to give (email, top tracks/artists, recently played songs, basic profile information)
         },
       },
     }),
   ],
 
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true,
+  debug: true, // print debig logs in terminal 
 
   callbacks: {
-    async jwt({ token, account }) {
-      // Initial login
-      if (account) {
+    async jwt({ token, account }) { // handles token that is stored in cookie
+      // Initial login (first authentication)
+      if (account) { // store token info in custom JWT object
         return {
           accessToken: account.access_token,
           refreshToken: account.refresh_token,
@@ -78,7 +79,7 @@ export const authOptions = {
       // Otherwise refresh it
       return await refreshAccessToken(token);
     },
-
+    // mapping JWT to a session for multiple users
     async session({ session, token }) {
       session.accessToken = token.accessToken;
       session.refreshToken = token.refreshToken;
@@ -90,4 +91,4 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST }; 
