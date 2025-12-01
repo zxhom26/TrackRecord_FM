@@ -1,5 +1,21 @@
 "use client";
 
+/* 
+===============================================================================
+ DASHBOARD PAGE — TrackRecord.FM
+ FULLY COMMENTED FOR PRESENTATION
+===============================================================================
+ This file renders the full Analytics Dashboard:
+ - Recently Played
+ - Top Genres
+ - Daily Listening Trend (Line Chart)
+ - Top Artists (Bar Chart)
+ - Genre Breakdown (Donut Chart)
+ - Hourly Listening Heatmap
+ Everything is driven by Spotify data fetched from our backend.
+===============================================================================
+*/
+
 import { useEffect, useState, ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import Sidebar from "../components/Sidebar";
@@ -27,17 +43,17 @@ import {
   Cell,
 } from "recharts";
 
-/* ----------------------------------------
-   TYPES — STRICT (NO `any`)
------------------------------------------*/
+/* =============================================================================
+   TYPE DEFINITIONS (Strongly-Typed Structures)
+   These ensure we never deal with undefined shapes when reading Spotify data.
+=============================================================================*/
 
-// Spotify artist object
+// Minimal Spotify artist object
 interface SpotifyArtist {
   name: string;
 }
 
-// Shape of a recently played track returned by backend
-
+// Structure for recently played items returned by backend
 interface RecentlyPlayedItem {
   played_at?: string;
   "track.duration_ms"?: number;
@@ -47,40 +63,40 @@ interface RecentlyPlayedItem {
   [key: string]: unknown;
 }
 
-// Genre object from backend
+// Genre item returned by backend
 interface GenreItem {
   genre: string | null;
 }
 
-// Genre object from backend
+// Recommendation structure (future expansion)
 interface RecommendationItem {
   name: string;
 }
 
-// Data structure for the line chart (daily minutes)
+// Line chart datapoint = (date → minutes listened)
 interface LineDataPoint {
   date: string;
   minutes: number;
 }
 
-// Data structure for the top artists bar chart
+// Top artist chart datapoint
 interface BarDataPoint {
   artist: string;
   count: number;
 }
 
-// Pie chart structure
+// Pie chart datapoint for genres
 interface PieDataPoint {
   genre: string;
   count: number;
   percentage: number;
-  [key: string]: string | number;
 }
 
+/* =============================================================================
+   THEME COLORS
+   Used consistently across charts for branding and visual identity.
+=============================================================================*/
 
-/* ----------------------------------------
-   THEME COLORS — BLACK DIAMOND
------------------------------------------*/
 const BD_COLORS = [
   "#A78BFA",
   "#C084FC",
@@ -100,9 +116,10 @@ const HEATMAP_COLORS = [
   "#6b7fff",
 ];
 
-/* ----------------------------------------
+/* =============================================================================
    SIMPLE CARD WRAPPER
------------------------------------------*/
+   Reusable UI container component used throughout dashboard.
+=============================================================================*/
 function SimpleCard({
   title,
   subtitle,
@@ -120,9 +137,12 @@ function SimpleCard({
     </div>
   );
 }
-/* ----------------------------------------
+
+/* =============================================================================
    GENRE DETAIL SECTION
------------------------------------------*/
+   When a user clicks a genre in the donut chart, this shows:
+   → Top artists contributing to that genre
+=============================================================================*/
 function GenreDetailSection({
   genre,
   recentlyPlayed,
@@ -130,31 +150,30 @@ function GenreDetailSection({
   genre: string;
   recentlyPlayed: RecentlyPlayedItem[];
 }) {
-    // Don't show anything if clicking "Other" or empty
+  // If genre is "Other" or nothing selected, hide panel
   if (!genre || genre === "Other") return null;
 
-   // Count artists for the selected genre
+  // Count artists inside selected genre
   const artistCount: Record<string, number> = {};
 
- recentlyPlayed.forEach((item: RecentlyPlayedItem) => {
-  const genres = item["track.genres"];
-  if (!Array.isArray(genres)) return;
+  recentlyPlayed.forEach((item) => {
+    const genres = item["track.genres"];
+    if (!Array.isArray(genres)) return;
 
-  // Does the track match the clicked donut slice?
-  const match = genres.some((g) =>
-    g.toLowerCase().includes(genre.toLowerCase())
-  );
+    // Check if track belongs to selected genre
+    const match = genres.some((g) =>
+      g.toLowerCase().includes(genre.toLowerCase())
+    );
 
-  if (match) {
-    const artists = item["track.artists"] ?? [];
-    artists.forEach((a) => {
-      const name = a.name;
-      artistCount[name] = (artistCount[name] || 0) + 1;
-    });
-  }
-});
+    if (match) {
+      const artists = item["track.artists"] ?? [];
+      artists.forEach((a) => {
+        artistCount[a.name] = (artistCount[a.name] || 0) + 1;
+      });
+    }
+  });
 
-  // Convert dictionary → sorted list
+  // Sort and take top 3
   const topArtists = Object.entries(artistCount)
     .map(([artist, count]) => ({ artist, count }))
     .sort((a, b) => b.count - a.count)
@@ -185,87 +204,75 @@ function GenreDetailSection({
   );
 }
 
-/* ----------------------------------------
-   HEATMAP (24 hours)
------------------------------------------*/
+/* =============================================================================
+   HEATMAP COMPONENT (24-hour listening activity)
+   Displays user's minutes listened across each hour of the day.
+=============================================================================*/
 function HeatmapRenderer({ data }: { data: number[] }) {
   const maxVal = Math.max(...data);
 
-  const COLORS = [
-    "#1f2335", // none
-    "#3f4bce", // low
-    "#6573ff",
-    "#7a83ff",
-    "#8f99ff",
-    "#a8b1ff", // highest
-  ];
-
   return (
-    <div className="w-full flex flex-col items-center">
-
-      {/* SINGLE ROW OF 24 BLOCKS */}
-      <div className="
-        grid 
-        grid-cols-24 
-        gap-2 
-        w-full 
-        max-w-[1200px] 
-        mx-auto 
-        place-items-center
-      ">
-        {data.map((val, hour) => {
+    <div>
+      {/* Top row: 12 AM → 11 AM */}
+      <div className="grid grid-cols-12 gap-1">
+        {data.slice(0, 12).map((val, hour) => {
           const intensity = maxVal === 0 ? 0 : val / maxVal;
-          const idx = Math.min(5, Math.floor(intensity * 5));
+          const idx = Math.min(5, Math.floor(intensity * 5)); // pick color index
 
           return (
-            <div key={hour} className="flex flex-col items-center">
-              <div
-                className="
-                  w-8 h-8 
-                  sm:w-9 sm:h-9 
-                  md:w-10 md:h-10 
-                  rounded-lg 
-                  transition-all duration-150
-                "
-                style={{
-                  backgroundColor: COLORS[idx],
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-                title={`${hour}:00 — ${val} minutes`}
-              ></div>
-            </div>
+            <div
+              key={hour}
+              title={`${hour}:00 — ${val} minutes`}
+              className="h-8 rounded-md transition-all duration-150"
+              style={{
+                backgroundColor: HEATMAP_COLORS[idx],
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}
+            />
           );
         })}
       </div>
 
-      {/* LABELS UNDERNEATH */}
-      <div
-        className="
-          grid 
-          grid-cols-24 
-          gap-2 
-          w-full 
-          max-w-[1200px] 
-          mx-auto 
-          mt-3
-        "
-      >
-        {Array.from({ length: 24 }).map((_, i) => {
-          const label =
-            i === 0 ? "12 AM" :
-            i < 12 ? `${i} AM` :
-            i === 12 ? "12 PM" :
-            `${i - 12} PM`;
+      {/* Bottom row: 12 PM → 11 PM */}
+      <div className="grid grid-cols-12 gap-1 mt-1">
+        {data.slice(12).map((val, idx) => {
+          const hour = idx + 12;
+          const intensity = maxVal === 0 ? 0 : val / maxVal;
+          const colorIdx = Math.min(5, Math.floor(intensity * 5));
 
           return (
-            <span
-              key={i}
-              className="text-[10px] text-gray-400 text-ce
+            <div
+              key={hour}
+              title={`${hour}:00 — ${val} minutes`}
+              className="h-8 rounded-md transition-all duration-150"
+              style={{
+                backgroundColor: HEATMAP_COLORS[colorIdx],
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}
+            />
+          );
+        })}
+      </div>
 
+      {/* Hour labels (AM/PM) */}
+      <div className="flex justify-between mt-2 text-white/50 text-xs">
+        {Array.from({ length: 24 }).map((_, i) => {
+          let label = "";
+          if (i === 0) label = "12 AM";
+          else if (i < 12) label = `${i} AM`;
+          else if (i === 12) label = "12 PM";
+          else label = `${i - 12} PM`;
 
-/* ----------------------------------------
-   TOP ARTISTS BAR
------------------------------------------*/
+          return <span key={i}>{label}</span>;
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* =============================================================================
+   TOP ARTISTS — BAR CHART
+=============================================================================*/
 function TopArtistsBar({
   data,
   showAll,
@@ -282,6 +289,7 @@ function TopArtistsBar({
       <div className="flex justify-between mb-4">
         <h2 className="text-2xl font-bold">Top Artists</h2>
 
+        {/* Toggle top 10 / top 5 */}
         <button
           onClick={() => setShowAll(!showAll)}
           className="px-3 py-1 rounded-full bg-[#1b1d2c] border border-white/10 text-white/70 text-sm"
@@ -293,26 +301,29 @@ function TopArtistsBar({
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={artistsToShow} layout="vertical">
           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-          <XAxis
-  stroke="#ffffff90"
-  type="number"
-  label={{
-    value: "Track Plays",
-    position: "insideBottom",
-    offset: -5,
-    fill: "#ffffff90",
-  }}
-/>
 
+          {/* x-axis shows number of plays */}
+          <XAxis
+            stroke="#ffffff90"
+            type="number"
+            label={{
+              value: "Track Plays",
+              position: "insideBottom",
+              offset: -5,
+              fill: "#ffffff90",
+            }}
+          />
+
+          {/* y-axis lists artists */}
           <YAxis
             type="category"
             dataKey="artist"
             width={120}
             stroke="#ffffff90"
           />
-          <Tooltip
-          formatter={(value) => [`${value} plays`, "Play Count"]}
 
+          <Tooltip
+            formatter={(value) => [`${value} plays`, "Play Count"]}
             contentStyle={{
               backgroundColor: "#1b1c29",
               border: "1px solid rgba(255,255,255,0.1)",
@@ -320,8 +331,11 @@ function TopArtistsBar({
               borderRadius: "8px",
             }}
           />
+
+          {/* Bar with gradient */}
           <Bar dataKey="count" fill="url(#artistGradient)" radius={[8, 8, 8, 8]} />
 
+          {/* Gradient definition */}
           <defs>
             <linearGradient id="artistGradient" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0%" stopColor="#A78BFA" />
@@ -334,9 +348,9 @@ function TopArtistsBar({
   );
 }
 
-/* ----------------------------------------
-   DONUT CHART – GENRES
------------------------------------------*/
+/* =============================================================================
+   DONUT CHART — GENRE BREAKDOWN
+=============================================================================*/
 function DonutChart({
   pieData,
   expandedGenre,
@@ -355,26 +369,19 @@ function DonutChart({
       <ResponsiveContainer width="100%" height={350}>
         <PieChart>
           <Tooltip
-            formatter={(value: number, name: string) => [
-  `${value}%`,
-  name,
-]}
-
+            formatter={(value: number, name: string) => [`${value}%`, name]}
             contentStyle={{
               backgroundColor: "#1b1c29",
               border: "1px solid rgba(255,255,255,0.1)",
               borderRadius: "8px",
             }}
-             itemStyle={{ color: "white" }}
+            itemStyle={{ color: "white" }}
             labelStyle={{ color: "white" }}
           />
 
-          <Legend
-  wrapperStyle={{ color: "white" }}
-  style={{ color: "white" }}
-/>
+          <Legend wrapperStyle={{ color: "white" }} />
 
-
+          {/* Clickable donut chart */}
           <Pie
             data={pieData}
             dataKey="percentage"
@@ -400,27 +407,33 @@ function DonutChart({
           </Pie>
         </PieChart>
       </ResponsiveContainer>
-
-   
     </div>
   );
 }
-/* ----------------------------------------
-   MAIN DASHBOARD
------------------------------------------*/
+
+/* =============================================================================
+   MAIN DASHBOARD COMPONENT
+   Fetches Spotify data, processes charts, and renders full UI.
+=============================================================================*/
 export default function DashboardPage() {
   const { data: session, status } = useSession();
 
+  // All datasets
   const [recentlyPlayed, setRecentlyPlayed] = useState<RecentlyPlayedItem[]>([]);
   const [topGenres, setTopGenres] = useState<GenreItem[]>([]);
-  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
+  const [recommendations, setRecommendations] =
+    useState<RecommendationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Chart data
   const [lineData, setLineData] = useState<LineDataPoint[]>([]);
   const [artistBarData, setArtistBarData] = useState<BarDataPoint[]>([]);
   const [pieData, setPieData] = useState<PieDataPoint[]>([]);
-  const [heatmapData, setHeatmapData] = useState<number[]>(new Array(24).fill(0));
+  const [heatmapData, setHeatmapData] = useState<number[]>(
+    new Array(24).fill(0)
+  );
 
+  // UI controls
   const [expandedGenre, setExpandedGenre] = useState<string | null>(null);
   const [showAllArtists, setShowAllArtists] = useState<boolean>(false);
 
@@ -430,9 +443,9 @@ export default function DashboardPage() {
     year: "numeric",
   });
 
-  /* ----------------------------------------
-     FETCH DATA
-  -----------------------------------------*/
+  /* =============================================================================
+     FETCH DATA ON LOGIN
+=============================================================================*/
   useEffect(() => {
     if (status !== "authenticated") return;
     const token = session?.accessToken;
@@ -440,7 +453,9 @@ export default function DashboardPage() {
 
     async function load() {
       setLoading(true);
+
       try {
+        // Fetch all in parallel
         const [rp, tg, rc] = await Promise.all([
           fetchRecentlyPlayed(token),
           fetchTopGenres(token),
@@ -455,34 +470,39 @@ export default function DashboardPage() {
         setTopGenres(genres);
         setRecommendations(recs);
 
-        /* ---------- LINE CHART ---------- */
+        /* ---------------------------------------------------------------------
+           LINE CHART PROCESSING
+           Aggregates listening time by date.
+        ---------------------------------------------------------------------*/
         const totals: Record<string, number> = {};
-        recently.forEach((item: RecentlyPlayedItem) => {
+
+        recently.forEach((item) => {
           const date = item.played_at?.slice(0, 10);
           const ms = item["track.duration_ms"] ?? 0;
           if (!date) return;
           totals[date] = (totals[date] || 0) + ms;
         });
 
-
         setLineData(
           Object.entries(totals)
-            .map(([d, ms]) => ({
-              date: d,
+            .map(([date, ms]) => ({
+              date,
               minutes: Math.round(ms / 60000),
             }))
             .sort((a, b) => a.date.localeCompare(b.date))
         );
 
-        /* ---------- BAR CHART ---------- */
+        /* ---------------------------------------------------------------------
+           BAR CHART PROCESSING — Artist play counts
+        ---------------------------------------------------------------------*/
         const artistCounts: Record<string, number> = {};
-        recently.forEach((item: RecentlyPlayedItem) => {
+
+        recently.forEach((item) => {
           const artists = item["track.artists"] ?? [];
           artists.forEach((a) => {
             artistCounts[a.name] = (artistCounts[a.name] || 0) + 1;
           });
         });
-
 
         setArtistBarData(
           Object.entries(artistCounts)
@@ -490,52 +510,51 @@ export default function DashboardPage() {
             .sort((a, b) => b.count - a.count)
         );
 
-        /* ---------- PIE CHART ---------- */
-      /* ---------- PIE CHART ---------- */
-const genreCounts: Record<string, number> = {};
-genres.forEach((g: GenreItem) => {
-  const name = g.genre ?? "Unknown";
-  genreCounts[name] = (genreCounts[name] || 0) + 1;
-});
+        /* ---------------------------------------------------------------------
+           PIE CHART PROCESSING — Genre %
+        ---------------------------------------------------------------------*/
+        const genreCounts: Record<string, number> = {};
+        genres.forEach((g) => {
+          const name = g.genre ?? "Unknown";
+          genreCounts[name] = (genreCounts[name] || 0) + 1;
+        });
 
-const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
-const total = sorted.reduce((a, [, c]) => a + c, 0);
+        const sorted = Object.entries(genreCounts).sort(
+          (a, b) => b[1] - a[1]
+        );
+        const total = sorted.reduce((acc, [, v]) => acc + v, 0);
 
-const top8 = sorted.slice(0, 8);
-const others = sorted.slice(8).reduce((acc, [, v]) => acc + v, 0);
+        const top8 = sorted.slice(0, 8);
+        const others = sorted.slice(8).reduce((acc, [, v]) => acc + v, 0);
 
-setPieData([
-  ...top8.map(([g, c]) => ({
-    genre: g,
-    count: c,
-    percentage: Number(((c / total) * 100).toFixed(1)),
-  })),
-  {
-    genre: "Other",
-    count: others,
-    percentage: Number(((others / total) * 100).toFixed(1)),
-  },
-]);
+        setPieData([
+          ...top8.map(([genre, count]) => ({
+            genre,
+            count,
+            percentage: Number(((count / total) * 100).toFixed(1)),
+          })),
+          {
+            genre: "Other",
+            count: others,
+            percentage: Number(((others / total) * 100).toFixed(1)),
+          },
+        ]);
 
-      /* ---------- HEATMAP ---------- */
-const hourBins = new Array(24).fill(0);
+        /* ---------------------------------------------------------------------
+           HEATMAP PROCESSING — Minutes listened per hour of day
+        ---------------------------------------------------------------------*/
+        const hourBins = new Array(24).fill(0);
 
-recently.forEach((item: RecentlyPlayedItem) => {
-  const t = item.played_at;
-  const ms = item["track.duration_ms"] ?? 0;
-  if (!t) return;
+        recently.forEach((item) => {
+          const time = item.played_at;
+          const ms = item["track.duration_ms"] ?? 0;
+          if (!time) return;
 
-  // Convert Spotify UTC → CST/CDT correctly
-  const localTime = new Date(
-    new Date(t).toLocaleString("en-US", { timeZone: "America/Chicago" })
-  );
+          const hour = new Date(time).getHours();
+          hourBins[hour] += Math.round(ms / 60000);
+        });
 
-  const h = localTime.getHours();
-  hourBins[h] += Math.round(ms / 60000);
-});
-
-setHeatmapData(hourBins);
-
+        setHeatmapData(hourBins);
       } finally {
         setLoading(false);
       }
@@ -544,18 +563,18 @@ setHeatmapData(hourBins);
     load();
   }, [status, session]);
 
-  /* ----------------------------------------
-     RENDER
-  -----------------------------------------*/
+  /* =============================================================================
+     PAGE RENDER
+=============================================================================*/
   return (
     <div className="flex min-h-screen bg-[#0d0f18] text-white">
-      {/* SIDEBAR */}
+      {/* LEFT SIDEBAR */}
       <div className="w-20 md:w-24 bg-[#0b0d14] border-r border-white/10 flex flex-col items-center py-6 gap-10">
         <Logo className="w-10 opacity-80" />
         <Sidebar />
       </div>
 
-      {/* MAIN */}
+      {/* MAIN CONTENT AREA */}
       <main className="flex-1 px-10 py-10">
         <h1 className="text-5xl font-extrabold mb-2 tracking-tight">
           <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-300 text-transparent bg-clip-text">
@@ -566,6 +585,7 @@ setHeatmapData(hourBins);
 
         {/* SUMMARY CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
+          {/* Recently Played Card */}
           <SimpleCard title="Recently Played" subtitle="Your latest listening">
             {loading ? (
               <p>Loading...</p>
@@ -578,6 +598,7 @@ setHeatmapData(hourBins);
             )}
           </SimpleCard>
 
+          {/* Top Genres */}
           <SimpleCard title="Top Genres" subtitle="Detected from your listening">
             <ul className="space-y-1 text-white/80">
               {topGenres.slice(0, 5).map((g, i) => (
@@ -585,15 +606,14 @@ setHeatmapData(hourBins);
               ))}
             </ul>
           </SimpleCard>
-
-          
         </div>
 
-        {/* CHARTS */}
+        {/* MAIN CHART GRID */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* LINE CHART */}
+          {/* Line Chart */}
           <div className="bg-[#11121c] p-6 rounded-3xl shadow-xl border border-white/10">
             <h2 className="text-2xl font-bold mb-4">Daily Listening Trend</h2>
+
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={lineData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
@@ -617,6 +637,7 @@ setHeatmapData(hourBins);
                 />
                 <Legend wrapperStyle={{ color: "white" }} />
 
+                {/* Line path */}
                 <Line
                   type="monotone"
                   dataKey="minutes"
@@ -629,14 +650,14 @@ setHeatmapData(hourBins);
             </ResponsiveContainer>
           </div>
 
-          {/* TOP ARTISTS */}
+          {/* Top Artists Bar Chart */}
           <TopArtistsBar
             data={artistBarData}
             showAll={showAllArtists}
             setShowAll={setShowAllArtists}
           />
 
-          {/* GENRES */}
+          {/* Genres Donut Chart */}
           <DonutChart
             pieData={pieData}
             expandedGenre={expandedGenre}
@@ -644,7 +665,7 @@ setHeatmapData(hourBins);
             recentlyPlayed={recentlyPlayed}
           />
 
-          {/* HEATMAP */}
+          {/* Hourly Heatmap */}
           <div className="bg-[#11121c] p-6 rounded-3xl shadow-xl border border-white/10 col-span-1 md:col-span-2">
             <h2 className="text-2xl font-bold mb-4">Listening Activity by Hour</h2>
             <HeatmapRenderer data={heatmapData} />
