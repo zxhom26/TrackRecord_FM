@@ -57,44 +57,31 @@ export default function DashboardPage() {
         // FORMAT DATA FOR THE CHARTS
         // -----------------------------
 
-        // ---- LINE CHART ----
-        // recently-played returns: { items: [ { played_at, track: { duration_ms } } ] }
         const minutesData =
-          played?.items?.map((item) => ({
-            date: item.played_at?.slice(0, 10),
-            minutes: Math.floor(item.track?.duration_ms / 60000),
-          })) || [];
-        setMinutesByDate(minutesData);
+  played?.items?.map((item: any) => ({
+    date: item.played_at?.slice(0, 10),
+    minutes: Math.floor(item.track?.duration_ms / 60000),
+  })) || [];
+setMinutesByDate(minutesData);
 
-        // ---- BAR CHART ----
-        // top-artists returns: { items: [ { name, total_minutes (or popularity) } ] }
-        const artistsData =
-          artists?.items?.map((artist) => ({
-            artist: artist.name,
-            minutes: artist.total_minutes
-              ? artist.total_minutes
-              : artist.popularity || 0,
-          })) || [];
-        setArtistTotals(artistsData);
+// ---- BAR CHART ----
+const artistsData =
+  artists?.items?.map((artist: any) => ({
+    artist: artist.name,
+    minutes: artist.total_minutes
+      ? artist.total_minutes
+      : artist.popularity || 0,
+  })) || [];
+setArtistTotals(artistsData);
 
-        // ---- PIE CHART ----
-        // genres returns: { genre_counts: { "pop": 12, "rap": 5, ... } }
-        const genreData = Object.entries(genres?.genre_counts || {}).map(
-          ([genre, count]) => ({
-            genre,
-            minutes: count,
-          })
-        );
-        setGenreTotals(genreData);
-
-      } catch (error) {
-        console.error("❌ Dashboard error:", error);
-      }
-    }
-
-    loadDashboard();
-  }, []);
-
+// ---- PIE CHART ----
+const genreData = Object.entries(genres?.genre_counts || {}).map(
+  ([genre, count]: any) => ({
+    genre,
+    minutes: count,
+  })
+);
+setGenreTotals(genreData);
   // ---------------- COLORS FOR PIE ----------------
   const COLORS = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#B76CFD", "#FF914D"];
 
