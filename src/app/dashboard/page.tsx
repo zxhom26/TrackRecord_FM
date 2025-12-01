@@ -179,64 +179,77 @@ function GenreDetailSection({
 function HeatmapRenderer({ data }: { data: number[] }) {
   const maxVal = Math.max(...data);
 
+  const COLORS = [
+    "#1f2335", // none
+    "#3f4bce", // low
+    "#6573ff",
+    "#7a83ff",
+    "#8f99ff",
+    "#a8b1ff", // highest
+  ];
+
   return (
-    <div>
-      {/* 2-row layout */}
-      <div className="grid grid-cols-12 gap-1">
-        {data.slice(0, 12).map((val, hour) => {
+    <div className="w-full flex flex-col items-center">
+
+      {/* SINGLE ROW OF 24 BLOCKS */}
+      <div className="
+        grid 
+        grid-cols-24 
+        gap-2 
+        w-full 
+        max-w-[1200px] 
+        mx-auto 
+        place-items-center
+      ">
+        {data.map((val, hour) => {
           const intensity = maxVal === 0 ? 0 : val / maxVal;
           const idx = Math.min(5, Math.floor(intensity * 5));
 
           return (
-            <div
-              key={hour}
-              title={`${hour}:00 — ${val} minutes`}
-              className="h-8 rounded-md transition-all duration-150"
-              style={{
-                backgroundColor: HEATMAP_COLORS[idx],
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}
-            />
+            <div key={hour} className="flex flex-col items-center">
+              <div
+                className="
+                  w-8 h-8 
+                  sm:w-9 sm:h-9 
+                  md:w-10 md:h-10 
+                  rounded-lg 
+                  transition-all duration-150
+                "
+                style={{
+                  backgroundColor: COLORS[idx],
+                  border: "1px solid rgba(255,255,255,0.1)",
+                }}
+                title={`${hour}:00 — ${val} minutes`}
+              ></div>
+            </div>
           );
         })}
       </div>
 
-      <div className="grid grid-cols-12 gap-1 mt-1">
-        {data.slice(12).map((val, idx) => {
-          const hour = idx + 12;
-          const intensity = maxVal === 0 ? 0 : val / maxVal;
-          const i = Math.min(5, Math.floor(intensity * 5));
+      {/* LABELS UNDERNEATH */}
+      <div
+        className="
+          grid 
+          grid-cols-24 
+          gap-2 
+          w-full 
+          max-w-[1200px] 
+          mx-auto 
+          mt-3
+        "
+      >
+        {Array.from({ length: 24 }).map((_, i) => {
+          const label =
+            i === 0 ? "12 AM" :
+            i < 12 ? `${i} AM` :
+            i === 12 ? "12 PM" :
+            `${i - 12} PM`;
 
           return (
-            <div
-              key={hour}
-              title={`${hour}:00 — ${val} minutes`}
-              className="h-8 rounded-md transition-all duration-150"
-              style={{
-                backgroundColor: HEATMAP_COLORS[i],
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}
-            />
-          );
-        })}
-      </div>
+            <span
+              key={i}
+              className="text-[10px] text-gray-400 text-ce
 
-      {/* Label row */}
-      <div className="flex justify-between mt-2 text-white/50 text-xs">
-        {Array.from({ length: 24 }).map((_, i) => {
-  let label = "";
-  if (i === 0) label = "12 AM";
-  else if (i < 12) label = `${i} AM`;
-  else if (i === 12) label = "12 PM";
-  else label = `${i - 12} PM`;
-
-  return <span key={i}>{label}</span>;
-})}
-
-      </div>
-    </div>
-  );
-}
 
 /* ----------------------------------------
    TOP ARTISTS BAR
