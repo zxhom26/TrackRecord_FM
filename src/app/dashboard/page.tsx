@@ -15,8 +15,8 @@ import {
 // TYPES
 // -----------------------
 interface RecentlyPlayedItem {
-  track?: { name?: string };
-  name?: string;
+  // We don't know all keys, but we know we can index by string
+  [key: string]: unknown;
 }
 
 interface GenreItem {
@@ -138,13 +138,18 @@ export default function DashboardPage() {
               <p className="text-white/50">No recently played data available.</p>
             ) : (
               <ul className="space-y-1">
-                {recentlyPlayed.slice(0, 5).map((item, index) => (
-                  <li key={index}>
-                    {item.track?.name ??
-                      item.name ??
-                      "Unknown Track"}
-                  </li>
-                ))}
+                {recentlyPlayed.slice(0, 5).map((item, index) => {
+                  let trackName = "Unknown Track";
+
+                  const flattenedName = item["track.name"];
+                  if (typeof flattenedName === "string") {
+                    trackName = flattenedName;
+                  } else if (typeof item["name"] === "string") {
+                    trackName = item["name"] as string;
+                  }
+
+                  return <li key={index}>{trackName}</li>;
+                })}
               </ul>
             )}
           </SimpleCard>
@@ -175,7 +180,9 @@ export default function DashboardPage() {
             {loading ? (
               <p className="text-white/50">Loading…</p>
             ) : recommendations.length === 0 ? (
-              <p className="text-white/50">No recommendations available.</p>
+              <p className="text-white/50">
+                No recommendations available right now.
+              </p>
             ) : (
               <ul className="space-y-1">
                 {recommendations.slice(0, 5).map((track, index) => (
