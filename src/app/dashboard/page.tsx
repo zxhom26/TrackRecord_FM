@@ -1,14 +1,15 @@
 "use client";
 
 // --------------------------------------------------------
-// DASHBOARD + CHARTS (FULLY CLEANED & COMMENTED)
+// DASHBOARD + CHARTS (FIXED FOR NEXT.JS + RENDER BUILD)
+// Includes required index signatures for Recharts
 // --------------------------------------------------------
 import { useEffect, useState, ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import Sidebar from "../components/Sidebar";
 import Logo from "../components/Logo";
 
-// Backend fetch utils (Disha wrote these)
+// Backend fetch utils
 import {
   fetchRecentlyPlayed,
   fetchTopGenres,
@@ -33,7 +34,7 @@ import {
 } from "recharts";
 
 // --------------------------------------------------------
-// TYPES (Matches flattened Spotify data)
+// TYPES FOR FLATTENED SPOTIFY DATA
 // --------------------------------------------------------
 interface RecentlyPlayedItem {
   played_at?: string;
@@ -50,20 +51,25 @@ interface RecommendationItem {
   name?: string;
 }
 
-// Chart-specific types
+// --------------------------------------------------------
+// CHART TYPES (FIXED WITH INDEX SIGNATURES)
+// --------------------------------------------------------
 interface LineDataPoint {
   date: string;
   minutes: number;
+  [key: string]: string | number; // REQUIRED for Recharts
 }
 
 interface BarDataPoint {
   artist: string;
   minutes: number;
+  [key: string]: string | number; // REQUIRED for Recharts
 }
 
 interface PieDataPoint {
   genre: string;
-  minutes: number; // Recharts **requires** a number
+  minutes: number;
+  [key: string]: string | number; // REQUIRED for Recharts
 }
 
 // --------------------------------------------------------
@@ -120,7 +126,6 @@ export default function DashboardPage() {
       setLoading(true);
 
       try {
-        // Backend may 404 → utils return undefined → guard below fixes that
         const [rp, tg, rc] = await Promise.all([
           fetchRecentlyPlayed(token),
           fetchTopGenres(token),
@@ -137,15 +142,12 @@ export default function DashboardPage() {
 
         // --------------------------------------------------------
         // LINE CHART — Minutes listened per track
-        // Using flattened keys: "track.duration_ms" + "played_at"
         // --------------------------------------------------------
         const mappedLine: LineDataPoint[] = recently
           .map((item) => {
             const ms = (item["track.duration_ms"] as number) ?? 0;
             const played = (item["played_at"] as string) ?? "";
-
             if (!played || !ms) return null;
-
             return {
               date: played.slice(0, 10),
               minutes: Math.floor(ms / 60000),
@@ -174,7 +176,7 @@ export default function DashboardPage() {
         setPieData(mappedPie);
 
         // --------------------------------------------------------
-        // BAR CHART — Recommended tracks (placeholder minutes)
+        // BAR CHART — Recommended tracks
         // --------------------------------------------------------
         const mappedBar: BarDataPoint[] = recs.map((track) => ({
           artist: track.name ?? "Unknown",
