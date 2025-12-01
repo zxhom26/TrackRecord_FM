@@ -125,7 +125,7 @@ function GenreDetailSection({
 
   const artistCount: Record<string, number> = {};
 
-  recentlyPlayed.forEach((item) => {
+  recentlyPlayed.forEach((item: RecentlyPlayedItem) => {
     const genres = item["track.genres"];
     if (!Array.isArray(genres)) return;
 
@@ -411,12 +411,13 @@ export default function DashboardPage() {
 
         /* ---------- LINE CHART ---------- */
         const totals: Record<string, number> = {};
-        recently.forEach((item) => {
+        recently.forEach((item: RecentlyPlayedItem) => {
           const date = item.played_at?.slice(0, 10);
           const ms = item["track.duration_ms"] ?? 0;
           if (!date) return;
           totals[date] = (totals[date] || 0) + ms;
         });
+
 
         setLineData(
           Object.entries(totals)
@@ -429,12 +430,13 @@ export default function DashboardPage() {
 
         /* ---------- BAR CHART ---------- */
         const artistCounts: Record<string, number> = {};
-        recently.forEach((item) => {
+        recently.forEach((item: RecentlyPlayedItem) => {
           const artists = item["track.artists"] ?? [];
           artists.forEach((a) => {
             artistCounts[a.name] = (artistCounts[a.name] || 0) + 1;
           });
         });
+
 
         setArtistBarData(
           Object.entries(artistCounts)
@@ -470,13 +472,14 @@ export default function DashboardPage() {
 
         /* ---------- HEATMAP ---------- */
         const hourBins = new Array(24).fill(0);
-        recently.forEach((item) => {
+        recently.forEach((item: RecentlyPlayedItem) => {
           const t = item.played_at;
           const ms = item["track.duration_ms"] ?? 0;
           if (!t) return;
           const h = new Date(t).getHours();
           hourBins[h] += Math.round(ms / 60000);
         });
+
 
         setHeatmapData(hourBins);
       } finally {
