@@ -55,8 +55,10 @@ interface BarDataPoint {
 
 interface PieDataPoint {
   genre: string;
-  minutes: number; // Recharts numeric value
+  minutes: number;
+  [key: string]: string | number;
 }
+
 
 function SimpleCard(props: {
   title: string;
