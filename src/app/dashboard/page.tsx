@@ -317,7 +317,7 @@ function DonutChart({
         <PieChart>
        <Tooltip
   formatter={(value, name, item) => {
-    const p: any = item; // type inside the function = allowed!
+    const p = item as unknown as { payload?: PieDataPoint };
     const pct = p?.payload?.percentage ?? 0;
     return [`${pct}%`, "Genre"];
   }}
@@ -330,6 +330,7 @@ function DonutChart({
 
 
 
+
 <Pie
   data={pieData}
   dataKey="percentage"
@@ -338,10 +339,11 @@ function DonutChart({
   cy="50%"
   outerRadius={120}
   innerRadius={60}
-  onClick={(entry) => {
-  const e: any = entry;  // local cast = allowed
+  oonClick={(entry) => {
+  const e = entry as unknown as PieDataPoint;
   setExpandedGenre(expandedGenre === e.genre ? null : e.genre);
 }}
+
 
 >
   {pieData.map((entry, i) => (
