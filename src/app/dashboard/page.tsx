@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import Sidebar from "../components/Sidebar";
 import Logo from "../components/Logo";
@@ -11,26 +11,71 @@ import {
   fetchRecommendations,
 } from "../../utils";
 
+// -----------------------
+// TYPES
+// -----------------------
+interface RecentlyPlayedItem {
+  track?: { name?: string };
+  name?: string;
+}
+
+interface GenreItem {
+  genre?: string | null;
+}
+
+interface RecommendationItem {
+  name?: string;
+}
+
+interface CardProps {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+}
+
+// -----------------------
+// CARD COMPONENT (SAFE)
+// -----------------------
+function SimpleCard(props: CardProps) {
+  return (
+    <div
+      className="
+        rounded-3xl p-10
+        bg-[#ffffff0a] backdrop-blur-md
+        border border-white/10 shadow-xl
+        min-h-[260px]
+      "
+    >
+      <h2 className="text-2xl font-semibold text-white">{props.title}</h2>
+      <p className="text-white/60 -mt-2">{props.subtitle}</p>
+      <div className="mt-3 text-white/80">{props.children}</div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
 
-  const [recentlyPlayed, setRecentlyPlayed] = useState([]);
-  const [topGenres, setTopGenres] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // -----------------------
+  // STATE (STRICT TYPED)
+  // -----------------------
+  const [recentlyPlayed, setRecentlyPlayed] = useState<RecentlyPlayedItem[]>([]);
+  const [topGenres, setTopGenres] = useState<GenreItem[]>([]);
+  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // --------------------------
-  // DATE FORMAT (matches Mood)
-  // --------------------------
+  // -----------------------
+  // DATE FORMAT
+  // -----------------------
   const formattedDate = new Date().toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
 
-  // --------------------------
-  // SAFE DATA LOADING
-  // --------------------------
+  // -----------------------
+  // DATA LOADING (TS-SAFE)
+  // -----------------------
   useEffect(() => {
     if (status !== "authenticated") return;
 
@@ -38,18 +83,17 @@ export default function DashboardPage() {
     if (!token) return;
 
     async function load() {
+      setLoading(true);
       try {
-        setLoading(true);
-
         const [rp, tg, rc] = await Promise.all([
           fetchRecentlyPlayed(token),
           fetchTopGenres(token),
           fetchRecommendations(token),
         ]);
 
-        setRecentlyPlayed(rp?.recently_played ?? []);
-        setTopGenres(tg?.top_genres ?? []);
-        setRecommendations(rc?.recommendations ?? []);
+        setRecentlyPlayed((rp?.recently_played as RecentlyPlayedItem[]) ?? []);
+        setTopGenres((tg?.top_genres as GenreItem[]) ?? []);
+        setRecommendations((rc?.recommendations as RecommendationItem[]) ?? []);
       } finally {
         setLoading(false);
       }
@@ -58,38 +102,21 @@ export default function DashboardPage() {
     load();
   }, [status, session]);
 
-  // --------------------------
-  // CARD COMPONENT
-  // --------------------------
-  const Card = ({ title, subtitle, children }) => (
-    <div
-      className="
-        rounded-3xl p-10
-        bg-[#ffffff0a] backdrop-blur-md
-        border border-white/10 shadow-xl
-        transition-all flex flex-col gap-4
-        min-h-[260px]
-      "
-    >
-      <h2 className="text-2xl font-semibold text-white">{title}</h2>
-      <p className="text-white/60 -mt-2">{subtitle}</p>
-      <div className="mt-3 text-white/80">{children}</div>
-    </div>
-  );
-
+  // -----------------------
+  // UI
+  // -----------------------
   return (
     <div className="flex min-h-screen bg-[#0d0f18] text-white">
 
-      {/* ---------------- SIDEBAR ---------------- */}
+      {/* Sidebar */}
       <div className="w-20 md:w-24 bg-[#0b0d14] border-r border-white/10 flex flex-col items-center py-6 gap-10">
         <Logo className="w-10 h-auto opacity-90" />
         <Sidebar />
       </div>
 
-      {/* ---------------- MAIN CONTENT ---------------- */}
+      {/* Main Content */}
       <main className="flex-1 px-10 py-10">
 
-        {/* HEADER */}
         <h1 className="text-5xl font-extrabold mb-2">
           <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-300 text-transparent bg-clip-text">
             Your Analytics
@@ -97,62 +124,66 @@ export default function DashboardPage() {
           <span className="text-white">On {formattedDate}:</span>
         </h1>
 
-        {/* GUI GRID */}
+        {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
 
           {/* Recently Played */}
-          <Card
+          <SimpleCard
             title="Recently Played"
-            subtitle="A quick peek at what you've been listening to lately."
+            subtitle="A quick peek at what you’ve been listening to."
           >
             {loading ? (
-              <p className="text-white/50 animate-pulse">Loading…</p>
+              <p className="text-white/50">Loading…</p>
             ) : recentlyPlayed.length === 0 ? (
-              <p className="text-white/50">No recently played data available yet.</p>
+              <p className="text-white/50">No recently played data available.</p>
             ) : (
               <ul className="space-y-1">
-                {recentlyPlayed.slice(0, 5).map((item, i) => (
-                  <li key={i}>{item?.track?.name ?? item?.name ?? "Unknown Track"}</li>
+                {recentlyPlayed.slice(0, 5).map((item, index) => (
+                  <li key={index}>
+                    {item.track?.name ??
+                      item.name ??
+                      "Unknown Track"}
+                  </li>
                 ))}
               </ul>
             )}
-          </Card>
+          </SimpleCard>
 
           {/* Top Genres */}
-          <Card
+          <SimpleCard
             title="Top Genres"
-            subtitle="Genres detected directly from your top artists."
+            subtitle="Genres detected from your top artists."
           >
             {loading ? (
-              <p className="text-white/50 animate-pulse">Loading…</p>
+              <p className="text-white/50">Loading…</p>
             ) : topGenres.length === 0 ? (
               <p className="text-white/50">No genre data available.</p>
             ) : (
               <ul className="space-y-1">
-                {topGenres.slice(0, 5).map((g, i) => (
-                  <li key={i}>{g.genre ?? "Unknown Genre"}</li>
+                {topGenres.slice(0, 5).map((g, index) => (
+                  <li key={index}>{g.genre ?? "Unknown Genre"}</li>
                 ))}
               </ul>
             )}
-          </Card>
+          </SimpleCard>
 
           {/* Recommendations */}
-          <Card
+          <SimpleCard
             title="Recommendations"
-            subtitle="Tracks your backend is suggesting right now."
+            subtitle="Tracks suggested just for you."
           >
             {loading ? (
-              <p className="text-white/50 animate-pulse">Loading…</p>
+              <p className="text-white/50">Loading…</p>
             ) : recommendations.length === 0 ? (
-              <p className="text-white/50">No recommendations available yet.</p>
+              <p className="text-white/50">No recommendations available.</p>
             ) : (
               <ul className="space-y-1">
-                {recommendations.slice(0, 5).map((track, i) => (
-                  <li key={i}>{track?.name ?? "Unknown Track"}</li>
+                {recommendations.slice(0, 5).map((track, index) => (
+                  <li key={index}>{track.name ?? "Unknown Track"}</li>
                 ))}
               </ul>
             )}
-          </Card>
+          </SimpleCard>
 
         </div>
       </main>
