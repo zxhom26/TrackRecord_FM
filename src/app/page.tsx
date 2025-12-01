@@ -128,7 +128,7 @@ export default function HomePage() {
 
         {/* ANALYTICS */}
         <Link
-          href="/analytics"
+          href="/dashboard"
           className="
             rounded-3xl p-10
             bg-[#ff88d715] backdrop-blur-md
