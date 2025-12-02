@@ -1,0 +1,32 @@
+name: Frontend Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - TRF-68-Data-Fetching-Testing
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: |
+          cd src
+          npm install
+
+      - name: Run tests
+        run: |
+          cd src
+          npm test
