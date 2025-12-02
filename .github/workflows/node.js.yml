@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "TRF-60-Add-inter-app-redirects-for-left-side-panel", "main" ]
+    branches: [ "TRF-60-Add-inter-app-redirects-for-left-side-panel", "main", "TRF-69" ]
   pull_request:
-    branches: [ "TRF-60-Add-inter-app-redirects-for-left-side-panel", "main" ]
+    branches: [ "TRF-60-Add-inter-app-redirects-for-left-side-panel", "main", "TRF-69" ]
 
 jobs:
   build:

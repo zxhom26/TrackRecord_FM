@@ -256,4 +256,11 @@ export async function getQuickStats(token) {
   }
 }
 
-
+// ---  route helper ---
+export function navigateToHome(router) {
+  try {
+    return router.push("/");
+  } catch (err) {
+    return { error: err.message };
+  }
+}
